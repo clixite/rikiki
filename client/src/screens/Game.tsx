@@ -1,4 +1,5 @@
 import { Navigate } from 'react-router-dom';
+import { useWakeLock } from '../hooks/useWakeLock';
 import { fr } from '../i18n/fr';
 import { useGame } from '../store/game';
 import { useSession } from '../store/session';
@@ -9,6 +10,7 @@ import Table from './Table';
 export default function Game() {
   const view = useGame((s) => s.view);
   const { roomCode, user } = useSession();
+  useWakeLock(view !== null && view.phase !== 'lobby' && view.phase !== 'game-over');
 
   if (!user) return <Navigate to="/profile" replace />;
   if (!view) {
