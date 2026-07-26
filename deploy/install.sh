@@ -121,34 +121,36 @@ chown -R 1000:1000 "$APP_DIR/data"
 cd "$APP_DIR/deploy"
 
 if [ "$PROXY_MODE" = "traefik" ]; then
-  # --- Reprendre la convention Traefik déjà utilisée par les autres services du serveur
-  ALL_LABELS="$(docker ps -q | xargs -r docker inspect --format '{{range $k, $v := .Config.Labels}}{{$k}}={{$v}}
-{{end}}' 2>/dev/null || true)"
+  # --- Lire la configuration STATIQUE de Traefik (seule source fiable : les labels
+  # des autres conteneurs ne disent rien si Traefik n'utilise pas le fournisseur Docker)
+  TRAEFIK_CMD_JSON="$(docker inspect "$TRAEFIK_CONTAINER" --format '{{json .Config.Cmd}}' 2>/dev/null || echo '[]')"
+  TRAEFIK_ARGS="$(printf '%s' "$TRAEFIK_CMD_JSON" | tr ',' '\n' | tr -d '"[]')"
 
-  if [ -z "${TRAEFIK_NETWORK:-}" ]; then
-    TRAEFIK_NETWORK="$(printf '%s\n' "$ALL_LABELS" | sed -n 's/^traefik\.docker\.network=//p' | head -1)"
-  fi
-  if [ -z "${TRAEFIK_NETWORK:-}" ]; then
-    TRAEFIK_NETWORK="$(docker inspect "$TRAEFIK_CONTAINER" \
-      --format '{{range $k, $v := .NetworkSettings.Networks}}{{$k}}
-{{end}}' | grep -v '^bridge$' | grep -v '^$' | head -1)"
-  fi
-  : "${TRAEFIK_NETWORK:=bridge}"
+  TRAEFIK_DOCKER_PROVIDER="false"
+  printf '%s\n' "$TRAEFIK_ARGS" | grep -q -- '--providers.docker' && TRAEFIK_DOCKER_PROVIDER="true"
 
-  if [ -z "${TRAEFIK_ENTRYPOINT:-}" ]; then
-    TRAEFIK_ENTRYPOINT="$(printf '%s\n' "$ALL_LABELS" \
-      | sed -n 's/^traefik\.http\.routers\.[^.]*\.entrypoints=//p' | tr ',' '\n' \
-      | grep -vx 'web' | grep -v '^$' | head -1)"
-  fi
+  TRAEFIK_FILE_DIR_IN_CONTAINER="$(printf '%s\n' "$TRAEFIK_ARGS" | sed -n 's/^--providers\.file\.directory=//p' | head -1)"
+
+  # Entrypoint HTTPS : celui écoutant sur :443
+  TRAEFIK_ENTRYPOINT="$(printf '%s\n' "$TRAEFIK_ARGS" \
+    | sed -n 's/^--entrypoints\.\([a-zA-Z0-9_-]*\)\.address=:443$/\1/p' | head -1)"
   : "${TRAEFIK_ENTRYPOINT:=websecure}"
 
-  if [ -z "${TRAEFIK_CERTRESOLVER:-}" ]; then
-    TRAEFIK_CERTRESOLVER="$(printf '%s\n' "$ALL_LABELS" | sed -n 's/^.*\.certresolver=//p' | head -1)"
-  fi
+  # Résolveur de certificat : premier déclaré dans la config statique
+  TRAEFIK_CERTRESOLVER="$(printf '%s\n' "$TRAEFIK_ARGS" \
+    | sed -n 's/^--certificatesresolvers\.\([a-zA-Z0-9_-]*\)\..*/\1/p' | head -1)"
 
-  echo "    réseau Traefik   : ${TRAEFIK_NETWORK}"
-  echo "    entrypoint       : ${TRAEFIK_ENTRYPOINT}"
-  echo "    certresolver     : ${TRAEFIK_CERTRESOLVER:-<aucun : certificat par défaut de Traefik>}"
+  # Réseau Docker : celui de Traefik lui-même (hors bridge par défaut)
+  TRAEFIK_NETWORK="$(docker inspect "$TRAEFIK_CONTAINER" \
+    --format '{{range $k, $v := .NetworkSettings.Networks}}{{$k}}
+{{end}}' | grep -v '^bridge$' | grep -v '^$' | head -1)"
+  : "${TRAEFIK_NETWORK:=bridge}"
+
+  echo "    fournisseur Docker : ${TRAEFIK_DOCKER_PROVIDER}"
+  echo "    fournisseur fichier: ${TRAEFIK_FILE_DIR_IN_CONTAINER:-<non>}"
+  echo "    réseau Traefik     : ${TRAEFIK_NETWORK}"
+  echo "    entrypoint         : ${TRAEFIK_ENTRYPOINT}"
+  echo "    certresolver       : ${TRAEFIK_CERTRESOLVER:-<aucun : certificat par défaut de Traefik>}"
 
   if ! docker network inspect "$TRAEFIK_NETWORK" >/dev/null 2>&1; then
     echo "❌ Le réseau Docker « ${TRAEFIK_NETWORK} » est introuvable."
@@ -156,7 +158,15 @@ if [ "$PROXY_MODE" = "traefik" ]; then
     exit 1
   fi
 
-  # Compose dédié à Traefik : aucun port publié sur l'hôte, routage par labels
+  if [ "$TRAEFIK_DOCKER_PROVIDER" = "true" ]; then
+    RIKIKI_LABELS=$'    labels:\n      - traefik.enable=true\n      - traefik.docker.network='"${TRAEFIK_NETWORK}"$'\n      - traefik.http.routers.rikiki.rule=Host(`'"${DOMAIN}"$'`)\n      - traefik.http.routers.rikiki.entrypoints='"${TRAEFIK_ENTRYPOINT}"$'\n      - traefik.http.routers.rikiki.tls=true'
+    [ -n "${TRAEFIK_CERTRESOLVER:-}" ] && RIKIKI_LABELS="${RIKIKI_LABELS}"$'\n      - traefik.http.routers.rikiki.tls.certresolver='"${TRAEFIK_CERTRESOLVER}"
+    RIKIKI_LABELS="${RIKIKI_LABELS}"$'\n      - traefik.http.services.rikiki.loadbalancer.server.port=3000'
+  else
+    RIKIKI_LABELS=""
+  fi
+
+  # Compose dédié à Traefik : aucun port publié sur l'hôte
   {
     cat <<EOF
 services:
@@ -175,17 +185,9 @@ services:
       - ../data:/app/data
     networks:
       - proxy
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=${TRAEFIK_NETWORK}
-      - traefik.http.routers.rikiki.rule=Host(\`${DOMAIN}\`)
-      - traefik.http.routers.rikiki.entrypoints=${TRAEFIK_ENTRYPOINT}
-      - traefik.http.routers.rikiki.tls=true
 EOF
-    [ -n "${TRAEFIK_CERTRESOLVER:-}" ] && \
-      echo "      - traefik.http.routers.rikiki.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+    [ -n "$RIKIKI_LABELS" ] && printf '%s\n' "$RIKIKI_LABELS"
     cat <<EOF
-      - traefik.http.services.rikiki.loadbalancer.server.port=3000
 
 networks:
   proxy:
@@ -197,6 +199,52 @@ EOF
   docker compose -p rikiki -f docker-compose.traefik.yml up -d --build
   COMPOSE_ARGS="-p rikiki -f docker-compose.traefik.yml"
   HEALTH_CMD='docker exec rikiki node -e "fetch(\"http://127.0.0.1:3000/api/health\").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))" >/dev/null 2>&1'
+
+  # Traefik n'a peut-être pas rejoint le réseau applicatif (il n'en avait pas besoin
+  # jusqu'ici avec le fournisseur fichier) : sans ça, il ne peut pas résoudre "rikiki".
+  if ! docker inspect "$TRAEFIK_CONTAINER" --format '{{json .NetworkSettings.Networks}}' | grep -q "\"${TRAEFIK_NETWORK}\""; then
+    docker network connect "$TRAEFIK_NETWORK" "$TRAEFIK_CONTAINER"
+    echo "    Traefik connecté au réseau ${TRAEFIK_NETWORK}"
+  fi
+
+  # Fournisseur « file » : écrire la route dans le dossier que Traefik surveille
+  if [ -n "$TRAEFIK_FILE_DIR_IN_CONTAINER" ]; then
+    TRAEFIK_FILE_DIR_HOST="$(docker inspect "$TRAEFIK_CONTAINER" --format \
+      '{{range .Mounts}}{{if eq .Destination "'"$TRAEFIK_FILE_DIR_IN_CONTAINER"'"}}{{.Source}}{{end}}{{end}}')"
+    if [ -z "$TRAEFIK_FILE_DIR_HOST" ]; then
+      echo "❌ Impossible de retrouver sur l'hôte le dossier monté sur ${TRAEFIK_FILE_DIR_IN_CONTAINER} dans Traefik."
+      diagnostics
+      exit 1
+    fi
+    mkdir -p "$TRAEFIK_FILE_DIR_HOST"
+    {
+      echo "http:"
+      echo "  routers:"
+      echo "    rikiki:"
+      echo "      rule: \"Host(\`${DOMAIN}\`)\""
+      echo "      entryPoints:"
+      echo "        - ${TRAEFIK_ENTRYPOINT}"
+      echo "      tls:"
+      if [ -n "${TRAEFIK_CERTRESOLVER:-}" ]; then
+        echo "        certResolver: ${TRAEFIK_CERTRESOLVER}"
+      fi
+      echo "      service: rikiki"
+      echo "  services:"
+      echo "    rikiki:"
+      echo "      loadBalancer:"
+      echo "        servers:"
+      echo "          - url: \"http://rikiki:3000\""
+    } > "${TRAEFIK_FILE_DIR_HOST}/rikiki.yml"
+    echo "    configuration de routage écrite : ${TRAEFIK_FILE_DIR_HOST}/rikiki.yml"
+  fi
+
+  if [ "$TRAEFIK_DOCKER_PROVIDER" != "true" ] && [ -z "$TRAEFIK_FILE_DIR_IN_CONTAINER" ]; then
+    echo "⚠️  Impossible de déterminer comment Traefik découvre ses routes (ni fournisseur"
+    echo "    Docker, ni fournisseur fichier détecté dans sa configuration)."
+    echo "    L'application tourne mais n'est pas encore exposée publiquement."
+    echo "    Collez le diagnostic ci-dessous à Claude :"
+    diagnostics
+  fi
 else
   docker compose up -d --build
   COMPOSE_ARGS=""
