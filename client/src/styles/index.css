@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-felt-50: #f0fdf4;
+  --color-felt-600: #1e7a46;
+  --color-felt-700: #166534;
+  --color-felt-800: #14532d;
+  --color-felt-900: #0d3b20;
+  --color-gold-300: #fcd34d;
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+  --font-display: 'Georgia', 'Times New Roman', serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: radial-gradient(ellipse at 50% 30%, var(--color-felt-700) 0%, var(--color-felt-900) 100%);
+  color: white;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+input,
+textarea {
+  user-select: text;
+}
+
+@keyframes card-in {
+  from {
+    transform: translateY(40px) scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-card-in {
+  animation: card-in 0.25s ease-out;
+}
+
+@keyframes pulse-halo {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px var(--color-gold-400);
+  }
+  50% {
+    box-shadow: 0 0 14px 4px var(--color-gold-400);
+  }
+}
+
+.turn-halo {
+  animation: pulse-halo 1.4s ease-in-out infinite;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.25s ease-out;
+}
