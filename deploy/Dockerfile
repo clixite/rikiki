@@ -23,6 +23,8 @@ COPY client/package.json client/
 RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=build /app/server/dist/ server/dist/
 COPY --from=build /app/client/dist/ client/dist/
+# Le conteneur tourne sans privilèges : le dossier de la base doit lui appartenir
+RUN mkdir -p /app/data && chown -R node:node /app/data
 EXPOSE 3000
 USER node
 CMD ["node", "server/dist/index.js"]

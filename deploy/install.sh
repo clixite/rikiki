@@ -114,6 +114,10 @@ fi
 
 # ---------------------------------------------------------------- 5/6 conteneur
 echo "--- 5/6 Build et lancement du conteneur (quelques minutes au premier lancement)"
+# L'application tourne sous l'utilisateur « node » (uid 1000) dans le conteneur :
+# le dossier de la base SQLite monté depuis l'hôte doit lui appartenir.
+mkdir -p "$APP_DIR/data"
+chown -R 1000:1000 "$APP_DIR/data"
 cd "$APP_DIR/deploy"
 
 if [ "$PROXY_MODE" = "traefik" ]; then
@@ -191,26 +195,33 @@ EOF
   } > docker-compose.traefik.yml
 
   docker compose -p rikiki -f docker-compose.traefik.yml up -d --build
-  HEALTH_CMD='docker exec rikiki node -e "fetch(\"http://127.0.0.1:3000/api/health\").then(r=>r.ok?process.exit(0):process.exit(1)).catch(()=>process.exit(1))"'
+  COMPOSE_ARGS="-p rikiki -f docker-compose.traefik.yml"
+  HEALTH_CMD='docker exec rikiki node -e "fetch(\"http://127.0.0.1:3000/api/health\").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))" >/dev/null 2>&1'
 else
   docker compose up -d --build
-  HEALTH_CMD="curl -fsS http://127.0.0.1:${APP_PORT}/api/health >/dev/null"
+  COMPOSE_ARGS=""
+  HEALTH_CMD="curl -fsS http://127.0.0.1:${APP_PORT}/api/health >/dev/null 2>&1"
 fi
 
-for _ in $(seq 1 45); do
-  eval "$HEALTH_CMD" 2>/dev/null && break
-  sleep 2
-done
-if ! eval "$HEALTH_CMD" 2>/dev/null; then
-  echo "❌ Le serveur ne répond pas. Journaux :"
-  if [ "$PROXY_MODE" = "traefik" ]; then
-    docker compose -p rikiki -f docker-compose.traefik.yml logs --tail 40 || true
-  else
-    docker compose logs --tail 40 || true
-  fi
+fail_with_logs() {
+  echo "❌ $1"
+  echo "--- journaux de l'application ---"
+  # shellcheck disable=SC2086
+  docker compose $COMPOSE_ARGS logs --tail 30 2>/dev/null | tail -30 || true
   diagnostics
   exit 1
-fi
+}
+
+HEALTHY=0
+for _ in $(seq 1 45); do
+  if eval "$HEALTH_CMD"; then HEALTHY=1; break; fi
+  # Inutile d'attendre si le conteneur s'est arrêté : on affiche l'erreur tout de suite
+  if [ "$(docker inspect -f '{{.State.Running}}' rikiki 2>/dev/null)" = "false" ]; then
+    fail_with_logs "Le conteneur s'est arrêté au démarrage."
+  fi
+  sleep 2
+done
+[ "$HEALTHY" = "1" ] || fail_with_logs "Le serveur ne répond pas."
 echo "    ✅ application démarrée et fonctionnelle"
 
 # ---------------------------------------------------------------- 6/6 exposition publique
