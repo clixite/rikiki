@@ -14,6 +14,20 @@ APP_DIR=/opt/rikiki
 echo "=== Rikiki : installation sur ${DOMAIN} ==="
 export DEBIAN_FRONTEND=noninteractive
 
+echo "--- 0/6 Vérifications (VPS partagé avec d'autres services)"
+if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '(^|:)3000$'; then
+  echo "❌ Le port 3000 est déjà utilisé par un autre service."
+  echo "   Dites-le à Claude : il adaptera la configuration sur un autre port."
+  exit 1
+fi
+if ss -ltnp 2>/dev/null | grep -E '(^|:)80 ' | grep -qv nginx; then
+  if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '(^|:)80$' && ! command -v nginx >/dev/null 2>&1; then
+    echo "❌ Un serveur web autre que nginx écoute déjà sur le port 80 (Apache ?)."
+    echo "   Dites-le à Claude : la configuration doit être adaptée à votre serveur existant."
+    exit 1
+  fi
+fi
+
 echo "--- 1/6 Docker"
 command -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | sh
 
@@ -54,9 +68,9 @@ curl -fsS http://127.0.0.1:3000/api/health >/dev/null || { echo "❌ Le serveur 
 echo "    serveur OK sur le port 3000"
 
 echo "--- 6/6 nginx + HTTPS"
+# On ajoute uniquement notre site (server_name dédié) — les sites existants sont préservés
 sed "s/rikiki\.mondomaine\.fr/${DOMAIN}/" "$APP_DIR/deploy/nginx.conf.example" > /etc/nginx/sites-available/rikiki
 ln -sf /etc/nginx/sites-available/rikiki /etc/nginx/sites-enabled/rikiki
-rm -f /etc/nginx/sites-enabled/default
 nginx -t && systemctl reload nginx
 command -v ufw >/dev/null 2>&1 && ufw allow 80/tcp >/dev/null 2>&1 && ufw allow 443/tcp >/dev/null 2>&1 || true
 
