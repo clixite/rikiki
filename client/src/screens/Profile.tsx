@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createGuestAccount, updateProfile } from '../api';
+import { createGuestAccount, requestMagicLink, updateProfile } from '../api';
 import { fr } from '../i18n/fr';
 import { connectSocket, updateProfileOnSocket } from '../socket';
 import { useSession } from '../store/session';
@@ -97,11 +97,65 @@ export default function Profile() {
       >
         {user ? fr.save : fr.letsGo}
       </button>
+      {user && <EmailSection isGuest={user.isGuest} email={user.email} />}
       {user && (
         <button type="button" onClick={() => navigate(-1)} className="mt-3 py-2 text-sm text-white/60">
           ← {fr.backHome}
         </button>
       )}
+    </div>
+  );
+}
+
+function EmailSection({ isGuest, email }: { isGuest: boolean; email: string | null }) {
+  const [emailInput, setEmailInput] = useState('');
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  if (!isGuest && email) {
+    return <p className="mt-5 text-center text-xs text-white/50">✅ Profil sauvegardé — {email}</p>;
+  }
+
+  const send = async () => {
+    if (!/^\S+@\S+\.\S+$/.test(emailInput.trim())) {
+      setMessage('Adresse e-mail invalide.');
+      return;
+    }
+    setBusy(true);
+    setMessage('');
+    try {
+      await requestMagicLink(emailInput.trim());
+      setMessage(fr.magicLinkSent);
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : 'Erreur inconnue');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="mt-6 rounded-xl bg-black/20 p-3">
+      <p className="mb-2 text-sm font-medium text-white/80">📬 {fr.saveByEmail}</p>
+      <div className="flex gap-2">
+        <input
+          type="email"
+          value={emailInput}
+          onChange={(e) => setEmailInput(e.target.value)}
+          placeholder={fr.emailPlaceholder}
+          autoComplete="email"
+          inputMode="email"
+          className="min-w-0 flex-1 rounded-lg border border-white/20 bg-black/25 px-3 py-2 text-sm outline-none focus:border-gold-400"
+        />
+        <button
+          type="button"
+          onClick={send}
+          disabled={busy}
+          className="shrink-0 rounded-lg bg-white/15 px-3 py-2 text-sm font-semibold active:scale-95 disabled:opacity-50"
+        >
+          {fr.sendMagicLink}
+        </button>
+      </div>
+      {message && <p className="mt-2 text-xs text-white/70">{message}</p>}
     </div>
   );
 }

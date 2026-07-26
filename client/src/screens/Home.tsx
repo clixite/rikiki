@@ -1,4 +1,7 @@
+import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import type { UserStats } from '@rikiki/shared';
+import { fetchMe } from '../api';
 import { fr } from '../i18n/fr';
 import { createRoom, joinRoom } from '../socket';
 import { useGame } from '../store/game';
@@ -8,6 +11,17 @@ export default function Home() {
   const { user, roomCode } = useSession();
   const socketConnected = useGame((s) => s.socketConnected);
   const navigate = useNavigate();
+  const [stats, setStats] = useState<UserStats | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchMe()
+      .then(({ user: fresh, stats: s }) => {
+        useSession.getState().setUser(fresh);
+        setStats(s);
+      })
+      .catch(() => undefined);
+  }, [user?.id]);
 
   if (!user) return <Navigate to="/profile" replace />;
 
@@ -40,6 +54,11 @@ export default function Home() {
         <div className="mb-2 text-6xl">🃏</div>
         <h1 className="font-display text-5xl font-bold tracking-wide text-gold-300">{fr.appName}</h1>
         <p className="mt-3 text-sm text-white/70">{fr.tagline}</p>
+        {stats && stats.gamesPlayed > 0 && (
+          <p className="mt-3 text-xs text-white/50">
+            🎮 {stats.gamesPlayed} {fr.gamesPlayed.toLowerCase()} · 🏆 {stats.gamesWon} {fr.gamesWon.toLowerCase()}
+          </p>
+        )}
       </div>
 
       <div className="w-full space-y-3 pb-4">

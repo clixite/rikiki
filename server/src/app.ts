@@ -8,12 +8,15 @@ import type { Config } from './config';
 import { openDb } from './db/db';
 import { UsersRepo } from './db/users.repo';
 import { authRoutes } from './auth/routes';
+import { magicLinkRoutes } from './auth/magicLink';
+import { createMailer, type Mailer } from './mail/mailer';
 import { RoomManager } from './rooms/RoomManager';
 import { registerSocketHandlers } from './sockets/handlers';
 
-export function createApp(config: Config) {
+export function createApp(config: Config, overrides: { mailer?: Mailer } = {}) {
   const db = openDb(config.DB_PATH);
   const users = new UsersRepo(db);
+  const mailer = overrides.mailer ?? createMailer(config);
 
   const app = express();
   app.disable('x-powered-by');
@@ -23,6 +26,7 @@ export function createApp(config: Config) {
     res.json({ ok: true });
   });
   app.use('/api', authRoutes(users, config));
+  app.use('/api', magicLinkRoutes(db, users, config, mailer));
 
   const httpServer = http.createServer(app);
   const io = new Server(httpServer, {
