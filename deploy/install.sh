@@ -7,25 +7,35 @@ set -euo pipefail
 
 DOMAIN="${DOMAIN:-rikiki.clixite-prod.cloud}"
 CERTBOT_EMAIL="${CERTBOT_EMAIL:?Définissez CERTBOT_EMAIL=votre@email (pour le certificat HTTPS)}"
-REPO_URL="${REPO_URL:-https://github.com/clixite/rikiki.git}"
-BRANCH="${BRANCH:-claude/rikiki-multiplayer-card-game-t2urye}"
+REPO_URL="${REPO_URL:-https://github.com/clixite/rikiki-public.git}"
+BRANCH="${BRANCH:-main}"
+APP_PORT="${APP_PORT:-3000}"
+export APP_PORT
 APP_DIR=/opt/rikiki
+
+diagnostics() {
+  echo ""
+  echo "=== Diagnostic à copier-coller à Claude ==="
+  ss -ltnp 2>/dev/null | grep -E '(^State|:80 |:443 |:'"${APP_PORT}"' )' || true
+  docker ps --format '{{.Names}}  {{.Ports}}' 2>/dev/null || true
+  echo "==========================================="
+}
 
 echo "=== Rikiki : installation sur ${DOMAIN} ==="
 export DEBIAN_FRONTEND=noninteractive
 
 echo "--- 0/6 Vérifications (VPS partagé avec d'autres services)"
-if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '(^|:)3000$'; then
-  echo "❌ Le port 3000 est déjà utilisé par un autre service."
-  echo "   Dites-le à Claude : il adaptera la configuration sur un autre port."
+if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '(^|:)'"${APP_PORT}"'$'; then
+  echo "❌ Le port ${APP_PORT} est déjà utilisé par un autre service."
+  echo "   Relancez la même commande en ajoutant APP_PORT=3210 devant (ou collez le diagnostic à Claude)."
+  diagnostics
   exit 1
 fi
-if ss -ltnp 2>/dev/null | grep -E '(^|:)80 ' | grep -qv nginx; then
-  if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '(^|:)80$' && ! command -v nginx >/dev/null 2>&1; then
-    echo "❌ Un serveur web autre que nginx écoute déjà sur le port 80 (Apache ?)."
-    echo "   Dites-le à Claude : la configuration doit être adaptée à votre serveur existant."
-    exit 1
-  fi
+if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '(^|:)80$' && ! command -v nginx >/dev/null 2>&1; then
+  echo "❌ Un serveur web autre que nginx écoute déjà sur le port 80 (Apache ? Traefik ? Caddy ?)."
+  echo "   Collez le diagnostic ci-dessous à Claude : il adaptera la configuration."
+  diagnostics
+  exit 1
 fi
 
 echo "--- 1/6 Docker"
@@ -61,15 +71,16 @@ echo "--- 5/6 Build et lancement du conteneur"
 cd "$APP_DIR/deploy"
 docker compose up -d --build
 for i in $(seq 1 30); do
-  if curl -fsS http://127.0.0.1:3000/api/health >/dev/null 2>&1; then break; fi
+  if curl -fsS "http://127.0.0.1:${APP_PORT}/api/health" >/dev/null 2>&1; then break; fi
   sleep 2
 done
-curl -fsS http://127.0.0.1:3000/api/health >/dev/null || { echo "❌ Le serveur ne répond pas — voir : docker compose logs"; exit 1; }
-echo "    serveur OK sur le port 3000"
+curl -fsS "http://127.0.0.1:${APP_PORT}/api/health" >/dev/null || { echo "❌ Le serveur ne répond pas — voir : docker compose logs"; diagnostics; exit 1; }
+echo "    serveur OK sur le port ${APP_PORT}"
 
 echo "--- 6/6 nginx + HTTPS"
 # On ajoute uniquement notre site (server_name dédié) — les sites existants sont préservés
-sed "s/rikiki\.mondomaine\.fr/${DOMAIN}/" "$APP_DIR/deploy/nginx.conf.example" > /etc/nginx/sites-available/rikiki
+sed -e "s/rikiki\.mondomaine\.fr/${DOMAIN}/" -e "s/127\.0\.0\.1:3000/127.0.0.1:${APP_PORT}/" \
+  "$APP_DIR/deploy/nginx.conf.example" > /etc/nginx/sites-available/rikiki
 ln -sf /etc/nginx/sites-available/rikiki /etc/nginx/sites-enabled/rikiki
 nginx -t && systemctl reload nginx
 command -v ufw >/dev/null 2>&1 && ufw allow 80/tcp >/dev/null 2>&1 && ufw allow 443/tcp >/dev/null 2>&1 || true
