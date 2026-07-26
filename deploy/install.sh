@@ -35,17 +35,20 @@ export DEBIAN_FRONTEND=noninteractive
 
 # ---------------------------------------------------------------- 1/6 pré-checks
 echo "--- 1/6 Vérifications (le VPS héberge peut-être déjà d'autres services)"
-if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '(^|:)'"${APP_PORT}"'$'; then
-  echo "❌ Le port ${APP_PORT} est déjà pris par un autre service."
-  echo "   Relancez la même commande précédée de : APP_PORT=3210"
-  diagnostics
-  exit 1
-fi
 
 # Qui écoute sur le port 80 ? (détermine toute la suite)
-PROXY_MODE="none"          # none | nginx | container
+PROXY_MODE="none"          # none | nginx | traefik | container
 PROXY_INFO=""
-if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '(^|:)80$'; then
+TRAEFIK_CONTAINER=""
+
+# Traefik gère le routage par réseau Docker : on cherche son conteneur en premier.
+if command -v docker >/dev/null 2>&1; then
+  TRAEFIK_CONTAINER="$(docker ps --format '{{.Names}}|{{.Image}}' 2>/dev/null | awk -F'|' 'tolower($2) ~ /traefik/ {print $1; exit}' || true)"
+fi
+
+if [ -n "$TRAEFIK_CONTAINER" ]; then
+  PROXY_MODE="traefik"
+elif ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '(^|:)80$'; then
   if command -v docker >/dev/null 2>&1; then
     PROXY_INFO="$(docker ps --format '{{.Names}} | {{.Image}} | {{.Ports}}' 2>/dev/null | grep -E ':80->|:80/tcp' || true)"
   fi
@@ -60,7 +63,17 @@ if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '(^|:)80$'; then
     exit 1
   fi
 fi
+
+# En mode Traefik, l'application n'expose aucun port sur l'hôte : rien à vérifier.
+if [ "$PROXY_MODE" != "traefik" ] && ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE '(^|:)'"${APP_PORT}"'$'; then
+  echo "❌ Le port ${APP_PORT} est déjà pris par un autre service."
+  echo "   Relancez la même commande précédée de : APP_PORT=3210"
+  diagnostics
+  exit 1
+fi
+
 case "$PROXY_MODE" in
+  traefik)   echo "    Traefik détecté (conteneur « ${TRAEFIK_CONTAINER} ») → raccordement par labels, aucun port exposé" ;;
   nginx)     echo "    nginx détecté sur le port 80 → configuration d'un site dédié" ;;
   container) echo "    reverse proxy conteneurisé détecté → l'application sera exposée en local, sans toucher au proxy" ;;
   none)      echo "    port 80 libre → nginx sera installé" ;;
@@ -71,7 +84,7 @@ echo "--- 2/6 Docker et paquets"
 command -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | sh
 apt-get update -y -qq
 apt-get install -y -qq git openssl
-if [ "$PROXY_MODE" != "container" ]; then
+if [ "$PROXY_MODE" = "none" ] || [ "$PROXY_MODE" = "nginx" ]; then
   apt-get install -y -qq nginx certbot python3-certbot-nginx
 fi
 
@@ -102,21 +115,125 @@ fi
 # ---------------------------------------------------------------- 5/6 conteneur
 echo "--- 5/6 Build et lancement du conteneur (quelques minutes au premier lancement)"
 cd "$APP_DIR/deploy"
-docker compose up -d --build
+
+if [ "$PROXY_MODE" = "traefik" ]; then
+  # --- Reprendre la convention Traefik déjà utilisée par les autres services du serveur
+  ALL_LABELS="$(docker ps -q | xargs -r docker inspect --format '{{range $k, $v := .Config.Labels}}{{$k}}={{$v}}
+{{end}}' 2>/dev/null || true)"
+
+  if [ -z "${TRAEFIK_NETWORK:-}" ]; then
+    TRAEFIK_NETWORK="$(printf '%s\n' "$ALL_LABELS" | sed -n 's/^traefik\.docker\.network=//p' | head -1)"
+  fi
+  if [ -z "${TRAEFIK_NETWORK:-}" ]; then
+    TRAEFIK_NETWORK="$(docker inspect "$TRAEFIK_CONTAINER" \
+      --format '{{range $k, $v := .NetworkSettings.Networks}}{{$k}}
+{{end}}' | grep -v '^bridge$' | grep -v '^$' | head -1)"
+  fi
+  : "${TRAEFIK_NETWORK:=bridge}"
+
+  if [ -z "${TRAEFIK_ENTRYPOINT:-}" ]; then
+    TRAEFIK_ENTRYPOINT="$(printf '%s\n' "$ALL_LABELS" \
+      | sed -n 's/^traefik\.http\.routers\.[^.]*\.entrypoints=//p' | tr ',' '\n' \
+      | grep -vx 'web' | grep -v '^$' | head -1)"
+  fi
+  : "${TRAEFIK_ENTRYPOINT:=websecure}"
+
+  if [ -z "${TRAEFIK_CERTRESOLVER:-}" ]; then
+    TRAEFIK_CERTRESOLVER="$(printf '%s\n' "$ALL_LABELS" | sed -n 's/^.*\.certresolver=//p' | head -1)"
+  fi
+
+  echo "    réseau Traefik   : ${TRAEFIK_NETWORK}"
+  echo "    entrypoint       : ${TRAEFIK_ENTRYPOINT}"
+  echo "    certresolver     : ${TRAEFIK_CERTRESOLVER:-<aucun : certificat par défaut de Traefik>}"
+
+  if ! docker network inspect "$TRAEFIK_NETWORK" >/dev/null 2>&1; then
+    echo "❌ Le réseau Docker « ${TRAEFIK_NETWORK} » est introuvable."
+    diagnostics
+    exit 1
+  fi
+
+  # Compose dédié à Traefik : aucun port publié sur l'hôte, routage par labels
+  {
+    cat <<EOF
+services:
+  rikiki:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: rikiki
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      - NODE_ENV=production
+      - DB_PATH=/app/data/rikiki.db
+    volumes:
+      - ../data:/app/data
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${TRAEFIK_NETWORK}
+      - traefik.http.routers.rikiki.rule=Host(\`${DOMAIN}\`)
+      - traefik.http.routers.rikiki.entrypoints=${TRAEFIK_ENTRYPOINT}
+      - traefik.http.routers.rikiki.tls=true
+EOF
+    [ -n "${TRAEFIK_CERTRESOLVER:-}" ] && \
+      echo "      - traefik.http.routers.rikiki.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+    cat <<EOF
+      - traefik.http.services.rikiki.loadbalancer.server.port=3000
+
+networks:
+  proxy:
+    external: true
+    name: ${TRAEFIK_NETWORK}
+EOF
+  } > docker-compose.traefik.yml
+
+  docker compose -p rikiki -f docker-compose.traefik.yml up -d --build
+  HEALTH_CMD='docker exec rikiki node -e "fetch(\"http://127.0.0.1:3000/api/health\").then(r=>r.ok?process.exit(0):process.exit(1)).catch(()=>process.exit(1))"'
+else
+  docker compose up -d --build
+  HEALTH_CMD="curl -fsS http://127.0.0.1:${APP_PORT}/api/health >/dev/null"
+fi
+
 for _ in $(seq 1 45); do
-  curl -fsS "http://127.0.0.1:${APP_PORT}/api/health" >/dev/null 2>&1 && break
+  eval "$HEALTH_CMD" 2>/dev/null && break
   sleep 2
 done
-if ! curl -fsS "http://127.0.0.1:${APP_PORT}/api/health" >/dev/null 2>&1; then
+if ! eval "$HEALTH_CMD" 2>/dev/null; then
   echo "❌ Le serveur ne répond pas. Journaux :"
-  docker compose logs --tail 40 || true
+  if [ "$PROXY_MODE" = "traefik" ]; then
+    docker compose -p rikiki -f docker-compose.traefik.yml logs --tail 40 || true
+  else
+    docker compose logs --tail 40 || true
+  fi
   diagnostics
   exit 1
 fi
-echo "    ✅ application OK sur http://127.0.0.1:${APP_PORT}"
+echo "    ✅ application démarrée et fonctionnelle"
 
 # ---------------------------------------------------------------- 6/6 exposition publique
 echo "--- 6/6 Exposition publique"
+
+if [ "$PROXY_MODE" = "traefik" ]; then
+  echo "    Traefik route ${DOMAIN} vers le conteneur (certificat émis automatiquement)."
+  echo ""
+  echo "    Vérification publique dans quelques secondes…"
+  sleep 12
+  if curl -fsS --max-time 20 "https://${DOMAIN}/api/health" >/dev/null 2>&1; then
+    echo ""
+    echo "✅ Rikiki est en ligne : https://${DOMAIN}"
+  else
+    echo ""
+    echo "⏳ Le routage est en place mais le site ne répond pas encore en HTTPS."
+    echo "   C'est normal si le certificat Let's Encrypt est en cours d'émission (1 à 2 minutes)."
+    echo "   Réessayez : curl -I https://${DOMAIN}/api/health"
+    echo "   Si le problème persiste, collez ceci à Claude :"
+    docker logs "$TRAEFIK_CONTAINER" --tail 20 2>&1 | grep -i -E "rikiki|error|acme" | tail -10 || true
+  fi
+  exit 0
+fi
 
 if [ "$PROXY_MODE" = "container" ]; then
   cat <<EOF

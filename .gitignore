@@ -9,3 +9,4 @@ data/
 .DS_Store
 coverage/
 dev-dist/
+docker-compose.traefik.yml
