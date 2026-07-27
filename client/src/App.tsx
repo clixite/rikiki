@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import Toast from './components/Toast';
+import UpdatePrompt from './components/UpdatePrompt';
 import { fr } from './i18n/fr';
 import { connectSocket, joinRoom } from './socket';
 import { useGame } from './store/game';
@@ -49,6 +50,7 @@ export default function App() {
   return (
     <>
       <Toast />
+      <UpdatePrompt />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<Profile />} />

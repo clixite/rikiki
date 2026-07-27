@@ -6,6 +6,9 @@ import { fetchMe } from '../api';
 import SoundToggle from '../components/SoundToggle';
 import { unlockAudio } from '../audio';
 import { fr } from '../i18n/fr';
+
+/** Injectée à la compilation : permet d'identifier la version installée. */
+const APP_VERSION = __APP_VERSION__;
 import { createRoom, joinRoom } from '../socket';
 import { useGame } from '../store/game';
 import { useSession } from '../store/session';
@@ -174,7 +177,9 @@ export default function Home() {
         {!socketConnected && (
           <p className="pt-1 text-center text-xs text-paper-50/40">{fr.reconnecting}</p>
         )}
-        <p className="pt-0.5 text-center text-[10px] text-paper-50/25">{fr.copyright}</p>
+        <p className="pt-0.5 text-center text-[10px] text-paper-50/25">
+          {fr.copyright} · {fr.version(APP_VERSION)}
+        </p>
       </div>
     </div>
   );

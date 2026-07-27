@@ -1,9 +1,27 @@
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// Version affichée dans l'application : indispensable pour savoir d'un coup
+// d'œil quelle version tourne réellement sur un appareil donné.
+const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
+  version: string;
+};
+// Horodatage lisible (JJ/MM HH:MM) : on peut comparer de visu la version
+// affichée sur un téléphone avec la date du dernier déploiement.
+// `BUILD_ID` permet de forcer un identifiant distinct (CI, tests de mise à jour).
+const d = new Date();
+const pad = (n: number) => String(n).padStart(2, '0');
+const buildStamp =
+  process.env.BUILD_ID ??
+  `${version} · ${pad(d.getDate())}/${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(buildStamp),
+  },
   plugins: [
     react(),
     tailwindcss(),

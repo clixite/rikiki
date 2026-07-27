@@ -231,6 +231,10 @@ export const fr = {
   notificationsServerOff: 'Les notifications ne sont pas configurées sur le serveur.',
   notificationsError: 'Impossible de modifier les notifications.',
 
+  updateAvailable: 'Nouvelle version',
+  updateReload: 'Mettre à jour',
+  version: (v: string) => `version ${v}`,
+
   loading: 'Chargement…',
   errorTitle: 'Oups',
   copyright: '© 2026 Nicolas Simon',
