@@ -5,7 +5,8 @@ import type { GameFormat, GameView } from '@rikiki/shared';
 import { GAME_FORMATS, MIN_PLAYERS, formatSummary, isBotId } from '@rikiki/shared';
 import InviteButtons from '../components/InviteButtons';
 import SoundToggle from '../components/SoundToggle';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 import { addBot, kickPlayer, leaveRoom, removeBot, setFormat, startGame } from '../socket';
 import { useGame } from '../store/game';
 import PlayerAvatar from '../components/PlayerAvatar';
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export default function Lobby({ view }: Props) {
+  const t = useT();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   // Format affiché en attendant l'aller-retour serveur (retour tactile immédiat).
@@ -58,7 +60,7 @@ export default function Lobby({ view }: Props) {
 
       {/* Code de la partie : l'information la plus importante de cet écran */}
       <div className="rk-fade-up text-center">
-        <p className="text-xs uppercase tracking-widest text-paper-50/50">{fr.gameCode}</p>
+        <p className="text-xs uppercase tracking-widest text-paper-50/50">{t.gameCode}</p>
         <p
           data-testid="room-code"
           className="font-display my-1 text-[3.25rem] font-bold leading-none tracking-[0.22em] text-brass-300"
@@ -75,7 +77,7 @@ export default function Lobby({ view }: Props) {
       {/* Liste des joueurs */}
       <div className="rk-scroll min-h-0 flex-1 overflow-y-auto">
         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-paper-50/50">
-          {fr.players} · {view.players.length}/{view.maxPlayers}
+          {t.players} · {view.players.length}/{view.maxPlayers}
         </p>
         <ul className="space-y-1.5">
           {view.players.map((p, i) => {
@@ -93,19 +95,19 @@ export default function Lobby({ view }: Props) {
                 <PlayerAvatar avatar={p.avatar} size={30} />
                 <span className="min-w-0 flex-1 truncate text-[15px] font-medium">
                   {p.pseudo}
-                  {p.id === view.you && <span className="ml-1.5 text-xs text-paper-50/45">({fr.you})</span>}
+                  {p.id === view.you && <span className="ml-1.5 text-xs text-paper-50/45">({t.you})</span>}
                   {bot && <span className="ml-1.5 text-xs text-paper-50/45">· robot</span>}
                 </span>
                 {p.id === view.hostId && (
                   <span className="rounded-full bg-brass-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brass-300">
-                    {fr.host}
+                    {t.host}
                   </span>
                 )}
                 {isHost && p.id !== view.you && (
                   <button
                     type="button"
                     onClick={() => (bot ? removeBot(p.id) : kickPlayer(p.id))}
-                    aria-label={bot ? fr.removeBot : fr.kick}
+                    aria-label={bot ? t.removeBot : t.kick}
                     className="flex h-9 w-9 items-center justify-center rounded-full text-paper-50/40 transition active:scale-90 hover:text-danger"
                   >
                     ✕
@@ -129,8 +131,8 @@ export default function Lobby({ view }: Props) {
               🤖
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-medium text-paper-50/90">{fr.addBot}</span>
-              <span className="block text-[11px] text-paper-50/45">{fr.addBotHint}</span>
+              <span className="block text-[15px] font-medium text-paper-50/90">{t.addBot}</span>
+              <span className="block text-[11px] text-paper-50/45">{t.addBotHint}</span>
             </span>
             <span className="text-lg text-paper-50/40">+</span>
           </button>
@@ -140,8 +142,8 @@ export default function Lobby({ view }: Props) {
       {/* Format de partie : l'hôte choisit la durée, les autres la voient */}
       <div className="pt-4" data-testid="format-picker" data-format={selectedFormat}>
         <div className="mb-2 flex items-baseline justify-between gap-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-paper-50/50">{fr.gameFormat}</p>
-          <p className="text-[11px] text-paper-50/40">{isHost ? fr.gameFormatHint : fr.formatLocked}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-paper-50/50">{t.gameFormat}</p>
+          <p className="text-[11px] text-paper-50/40">{isHost ? t.gameFormatHint : t.formatLocked}</p>
         </div>
 
         {isHost ? (
@@ -155,7 +157,7 @@ export default function Lobby({ view }: Props) {
                   type="button"
                   data-testid={`format-${f}`}
                   aria-pressed={selected}
-                  title={fr.formatDescriptions[f]}
+                  title={t.formatDescriptions[f]}
                   onClick={() => onPickFormat(f)}
                   className={`relative flex min-h-[68px] flex-col items-center justify-center gap-0.5 rounded-xl px-1.5 py-2 transition active:scale-95 ${
                     selected ? 'text-felt-950' : 'bg-felt-900/45 text-paper-50 ring-1 ring-white/6'
@@ -170,20 +172,20 @@ export default function Lobby({ view }: Props) {
                       style={{ boxShadow: '0 2px 8px -2px rgb(0 0 0 / 0.5)' }}
                     />
                   )}
-                  <span className="relative text-[13px] font-bold leading-tight">{fr.formatNames[f]}</span>
+                  <span className="relative text-[13px] font-bold leading-tight">{t.formatNames[f]}</span>
                   <span
                     className={`relative text-[10px] leading-tight tabular-nums ${
                       selected ? 'text-felt-900/75' : 'text-paper-50/50'
                     }`}
                   >
-                    {fr.formatRounds(summary.rounds)}
+                    {t.formatRounds(summary.rounds)}
                   </span>
                   <span
                     className={`relative text-[10px] font-semibold leading-tight tabular-nums ${
                       selected ? 'text-felt-900/75' : 'text-brass-300/80'
                     }`}
                   >
-                    {fr.formatDuration(summary.minutes)}
+                    {t.formatDuration(summary.minutes)}
                   </span>
                 </button>
               );
@@ -195,13 +197,13 @@ export default function Lobby({ view }: Props) {
             className="flex items-center gap-3 rounded-xl bg-felt-900/45 px-3 py-2.5 ring-1 ring-white/6"
           >
             <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-medium text-paper-50">{fr.formatNames[selectedFormat]}</span>
-              <span className="block text-[11px] text-paper-50/45">{fr.formatDescriptions[selectedFormat]}</span>
+              <span className="block text-[15px] font-medium text-paper-50">{t.formatNames[selectedFormat]}</span>
+              <span className="block text-[11px] text-paper-50/45">{t.formatDescriptions[selectedFormat]}</span>
             </span>
             <span className="shrink-0 text-right text-[11px] tabular-nums text-paper-50/55">
-              <span className="block">{fr.formatRounds(formatSummary(view.players.length, selectedFormat).rounds)}</span>
+              <span className="block">{t.formatRounds(formatSummary(view.players.length, selectedFormat).rounds)}</span>
               <span className="block font-semibold text-brass-300/80">
-                {fr.formatDuration(formatSummary(view.players.length, selectedFormat).minutes)}
+                {t.formatDuration(formatSummary(view.players.length, selectedFormat).minutes)}
               </span>
             </span>
           </div>
@@ -220,15 +222,15 @@ export default function Lobby({ view }: Props) {
               className="w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-4 text-lg font-bold text-felt-950 transition active:scale-[0.98] disabled:opacity-35"
               style={{ boxShadow: '0 4px 16px -4px rgb(0 0 0 / 0.5)' }}
             >
-              {fr.startGame}
+              {t.startGame}
             </button>
             {!canStart && (
-              <p className="text-center text-xs text-paper-50/55">{fr.needPlayers(missing)}</p>
+              <p className="text-center text-xs text-paper-50/55">{t.needPlayers(missing)}</p>
             )}
           </>
         ) : (
           <p className="rk-shimmer rounded-xl py-3 text-center text-sm text-paper-50/65">
-            {fr.waitingForHost}
+            {t.waitingForHost}
           </p>
         )}
         <button
@@ -236,7 +238,7 @@ export default function Lobby({ view }: Props) {
           onClick={onLeave}
           className="w-full py-2.5 text-sm text-paper-50/50 transition active:scale-95"
         >
-          {fr.leave}
+          {t.leave}
         </button>
       </div>
     </div>

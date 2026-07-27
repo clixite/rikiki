@@ -3,7 +3,8 @@ import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import Confetti from './components/Confetti';
 import Toast from './components/Toast';
 import UpdatePrompt from './components/UpdatePrompt';
-import { fr } from './i18n/fr';
+import { useT } from './i18n';
+
 import { connectSocket, joinRoom } from './socket';
 import { useGame } from './store/game';
 import { useSession } from './store/session';
@@ -18,6 +19,7 @@ import Rules from './screens/Rules';
 import VerifyEmail from './screens/VerifyEmail';
 
 export default function App() {
+  const t = useT();
   const { token, user, roomCode } = useSession();
   const view = useGame((s) => s.view);
   const celebrate = useGame((s) => s.celebrate);
@@ -46,7 +48,7 @@ export default function App() {
     if (!closedReason) return;
     useGame
       .getState()
-      .showToast(closedReason === 'kicked' ? fr.roomClosedKicked : closedReason === 'expired' ? fr.roomClosedExpired : fr.roomClosed);
+      .showToast(closedReason === 'kicked' ? t.roomClosedKicked : closedReason === 'expired' ? t.roomClosedExpired : t.roomClosed);
     useGame.getState().setClosed(null);
     navigate('/');
   }, [closedReason, navigate]);

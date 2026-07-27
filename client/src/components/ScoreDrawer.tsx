@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 import PlayerAvatar from './PlayerAvatar';
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function ScoreDrawer({ view, open, onClose }: Props) {
+  const t = useT();
   const sorted = [...view.players].sort((a, b) => b.totalScore - a.totalScore);
   const round = view.round;
 
@@ -34,7 +36,7 @@ export default function ScoreDrawer({ view, open, onClose }: Props) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/15" />
-            <h2 className="mb-4 text-center text-lg font-bold">{fr.scoreboard}</h2>
+            <h2 className="mb-4 text-center text-lg font-bold">{t.scoreboard}</h2>
 
             <ul className="space-y-1.5">
               {sorted.map((p, i) => (
@@ -50,7 +52,7 @@ export default function ScoreDrawer({ view, open, onClose }: Props) {
                   <PlayerAvatar avatar={p.avatar} size={22} />
                   <span className="min-w-0 flex-1 truncate text-sm font-medium">
                     {p.pseudo}
-                    {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({fr.you})</span>}
+                    {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({t.you})</span>}
                   </span>
                   {round && round.bids[p.id] !== null && (
                     <span className="shrink-0 text-[11px] tabular-nums text-paper-50/50">

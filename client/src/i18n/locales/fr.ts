@@ -245,7 +245,12 @@ export const fr = {
   updateReload: 'Mettre à jour',
   version: (v: string) => `version ${v}`,
 
+  language: 'Langue',
+  languageHint: 'Choisis la langue de l’application',
+
   loading: 'Chargement…',
   errorTitle: 'Oups',
   copyright: '© 2026 Nicolas Simon',
 };
+
+export default fr;

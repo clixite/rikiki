@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 import { joinRoom } from '../socket';
 import { useGame } from '../store/game';
 import { useSession } from '../store/session';
 
 export default function Join() {
+  const t = useT();
   const { code: urlCode } = useParams();
   const { user } = useSession();
   const socketConnected = useGame((s) => s.socketConnected);
@@ -56,8 +58,8 @@ export default function Join() {
 
   return (
     <div className="mx-auto flex h-dvh max-w-md flex-col items-center justify-center px-6">
-      <h1 className="mb-2 text-2xl font-bold">{fr.joinGame}</h1>
-      <p className="mb-6 text-sm text-white/70">{fr.enterCode}</p>
+      <h1 className="mb-2 text-2xl font-bold">{t.joinGame}</h1>
+      <p className="mb-6 text-sm text-white/70">{t.enterCode}</p>
 
       <div className="relative">
         <input
@@ -70,7 +72,7 @@ export default function Join() {
           spellCheck={false}
           inputMode="text"
           className="absolute inset-0 z-10 w-full bg-transparent text-transparent caret-transparent outline-none"
-          aria-label={fr.enterCode}
+          aria-label={t.enterCode}
         />
         <div className="flex gap-2">
           {[0, 1, 2, 3].map((i) => (
@@ -86,11 +88,11 @@ export default function Join() {
         </div>
       </div>
 
-      {busy && <p className="mt-4 text-sm text-white/60">{fr.loading}</p>}
+      {busy && <p className="mt-4 text-sm text-white/60">{t.loading}</p>}
       {error && <p className="mt-4 text-center text-sm text-red-300">{error}</p>}
 
       <button type="button" onClick={() => navigate('/')} className="mt-8 py-2 text-sm text-white/60">
-        ← {fr.backHome}
+        ← {t.backHome}
       </button>
     </div>
   );

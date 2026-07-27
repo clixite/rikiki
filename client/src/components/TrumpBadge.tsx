@@ -1,7 +1,8 @@
 import { motion } from 'motion/react';
 import type { Card } from '@rikiki/shared';
 import CardFace from './CardFace';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 
 interface Props {
   trumpCard: Card | null;
@@ -17,6 +18,7 @@ interface Props {
  * s'efface au second plan sans jamais disparaître.
  */
 export default function TrumpBadge({ trumpCard, compact }: Props) {
+  const t = useT();
   return (
     <motion.div
       layout
@@ -26,7 +28,7 @@ export default function TrumpBadge({ trumpCard, compact }: Props) {
       data-testid="trump-badge"
     >
       <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brass-300/80">
-        {fr.trump}
+        {t.trump}
       </span>
       {trumpCard ? (
         <div className="relative">
@@ -39,7 +41,7 @@ export default function TrumpBadge({ trumpCard, compact }: Props) {
           />
         </div>
       ) : (
-        <span className="rounded-lg bg-black/25 px-2 py-1 text-xs text-paper-50/70">{fr.noTrump}</span>
+        <span className="rounded-lg bg-black/25 px-2 py-1 text-xs text-paper-50/70">{t.noTrump}</span>
       )}
     </motion.div>
   );

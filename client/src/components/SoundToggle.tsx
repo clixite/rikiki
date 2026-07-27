@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { isMuted, setMuted, unlockAudio } from '../audio';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 
 const listeners = new Set<() => void>();
 
@@ -19,6 +20,7 @@ export function toggleMute(): void {
  * atteignable au pouce : couper le son doit prendre une seconde, sans menu.
  */
 export default function SoundToggle({ className = '' }: { className?: string }) {
+  const t = useT();
   const muted = useSyncExternalStore(subscribe, isMuted, isMuted);
 
   return (
@@ -26,8 +28,8 @@ export default function SoundToggle({ className = '' }: { className?: string }) 
       type="button"
       data-testid="sound-toggle"
       aria-pressed={muted}
-      aria-label={muted ? fr.soundOn : fr.soundOff}
-      title={muted ? fr.soundOn : fr.soundOff}
+      aria-label={muted ? t.soundOn : t.soundOff}
+      title={muted ? t.soundOn : t.soundOff}
       onClick={() => {
         unlockAudio();
         toggleMute();

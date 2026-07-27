@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import type { CompletedTrick, GameView, TransientEvent } from '@rikiki/shared';
 import { playSound } from '../audio';
 import { vibrate } from '../haptics';
-import { fr } from '../i18n/fr';
+import { t as tr } from '../i18n';
+
 
 const TRICK_FREEZE_MS = 1600;
 
@@ -115,7 +116,7 @@ export const useGame = create<GameStore>((set, get) => ({
     const pseudoOf = (id: string) => view?.players.find((p) => p.id === id)?.pseudo ?? '';
     switch (event.type) {
       case 'player-joined':
-        get().showToast(fr.playerJoined(event.pseudo));
+        get().showToast(tr().playerJoined(event.pseudo));
         playSound('join');
         break;
       case 'bid-placed':
@@ -127,13 +128,13 @@ export const useGame = create<GameStore>((set, get) => ({
       // Le verdict de fin de manche est déjà sonorisé dans setView
       // (contrat tenu ou manqué) : pas de second son ici.
       case 'player-left':
-        get().showToast(fr.playerLeft(event.pseudo));
+        get().showToast(tr().playerLeft(event.pseudo));
         break;
       case 'player-disconnected':
-        get().showToast(fr.playerDisconnected(pseudoOf(event.playerId)));
+        get().showToast(tr().playerDisconnected(pseudoOf(event.playerId)));
         break;
       case 'player-reconnected':
-        get().showToast(fr.playerReconnected(pseudoOf(event.playerId)));
+        get().showToast(tr().playerReconnected(pseudoOf(event.playerId)));
         break;
       default:
         break;

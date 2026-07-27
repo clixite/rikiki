@@ -2,7 +2,8 @@ import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import type { GameView } from '@rikiki/shared';
 import SoundToggle from '../components/SoundToggle';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 import { leaveRoom, rematch } from '../socket';
 import { useGame } from '../store/game';
 import PlayerAvatar from '../components/PlayerAvatar';
@@ -14,6 +15,7 @@ interface Props {
 const MEDALS = ['🥇', '🥈', '🥉'];
 
 export default function GameOver({ view }: Props) {
+  const t = useT();
   const navigate = useNavigate();
   const isHost = view.hostId === view.you;
   const sorted = [...view.players].sort((a, b) => b.totalScore - a.totalScore);
@@ -43,7 +45,7 @@ export default function GameOver({ view }: Props) {
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           className="mb-6 text-center"
         >
-          <p className="text-xs uppercase tracking-widest text-paper-50/50">{fr.gameOver}</p>
+          <p className="text-xs uppercase tracking-widest text-paper-50/50">{t.gameOver}</p>
           <motion.div
             initial={{ y: -10 }}
             animate={{ y: 0 }}
@@ -76,7 +78,7 @@ export default function GameOver({ view }: Props) {
               <PlayerAvatar avatar={p.avatar} size={22} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium">
                 {p.pseudo}
-                {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({fr.you})</span>}
+                {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({t.you})</span>}
               </span>
               <span className="text-base font-bold tabular-nums text-brass-300">{p.totalScore}</span>
             </motion.li>
@@ -93,7 +95,7 @@ export default function GameOver({ view }: Props) {
             className="w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-4 text-lg font-bold text-felt-950 transition active:scale-[0.98]"
             style={{ boxShadow: '0 4px 16px -4px rgb(0 0 0 / 0.5)' }}
           >
-            {fr.playAgain}
+            {t.playAgain}
           </button>
         )}
         <button
@@ -101,7 +103,7 @@ export default function GameOver({ view }: Props) {
           onClick={onHome}
           className="w-full rounded-2xl bg-white/8 py-3 text-base font-medium transition active:scale-[0.98]"
         >
-          {fr.backHome}
+          {t.backHome}
         </button>
       </div>
     </div>

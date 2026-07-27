@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 
 interface Props {
   view: GameView;
@@ -15,6 +16,7 @@ interface Props {
  * affichée en permanence, et pas seulement au moment d'annoncer.
  */
 export default function BidsSummary({ view }: Props) {
+  const t = useT();
   const round = view.round;
   if (!round) return null;
 
@@ -26,12 +28,12 @@ export default function BidsSummary({ view }: Props) {
 
   // Tant que tout le monde n'a pas parlé, le total n'a pas de sens définitif.
   const label = !allBid
-    ? fr.bidsPending(announced, cards)
+    ? t.bidsPending(announced, cards)
     : diff === 0
-      ? fr.bidsBalanced(cards)
+      ? t.bidsBalanced(cards)
       : diff > 0
-        ? fr.bidsOver(diff)
-        : fr.bidsUnder(-diff);
+        ? t.bidsOver(diff)
+        : t.bidsUnder(-diff);
 
   const tone = !allBid
     ? 'text-paper-50/55'
@@ -50,7 +52,7 @@ export default function BidsSummary({ view }: Props) {
       data-cards={cards}
     >
       <span className="rounded-full bg-felt-900/55 px-2.5 py-1 text-[11px] font-semibold tabular-nums text-paper-50/80 ring-1 ring-white/8">
-        {fr.bidsAnnounced} {announced}/{cards}
+        {t.bidsAnnounced} {announced}/{cards}
       </span>
       <span className={`text-[11px] font-medium ${tone}`}>{label}</span>
     </motion.div>

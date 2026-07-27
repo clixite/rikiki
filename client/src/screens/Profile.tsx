@@ -2,23 +2,24 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { createGuestAccount, requestMagicLink, updateProfile } from '../api';
+import Avatar, { AVATAR_IDS, DEFAULT_AVATAR_ID } from '../components/Avatar';
+import LocalePicker from '../components/LocalePicker';
 import SoundToggle from '../components/SoundToggle';
 import { unlockAudio } from '../audio';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 import { disablePush, enablePush, readPushState, type PushAvailability } from '../push';
 import { connectSocket, updateProfileOnSocket } from '../socket';
 import { useSession } from '../store/session';
 
-export const AVATARS = [
-  '🦊', '🐼', '🐸', '🦁', '🐙', '🦄', '🐝', '🐺',
-  '🦉', '🐢', '🐬', '🦩', '🐯', '🐨', '🐷', '🦜',
-];
-
 export default function Profile() {
+  const t = useT();
   const { user, setSession, setUser } = useSession();
   const navigate = useNavigate();
   const [pseudo, setPseudo] = useState(user?.pseudo ?? '');
-  const [avatar, setAvatar] = useState(user?.avatar ?? AVATARS[0]);
+  // Un compte existant peut encore porter un ancien avatar emoji : on le garde
+  // tel quel tant que le joueur n'en choisit pas un nouveau (cf. <Avatar />).
+  const [avatar, setAvatar] = useState(user?.avatar ?? DEFAULT_AVATAR_ID);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -64,7 +65,7 @@ export default function Profile() {
             type="button"
             onClick={() => navigate(-1)}
             className="flex h-11 w-11 items-center justify-center rounded-full bg-felt-900/45 text-lg ring-1 ring-white/8 transition active:scale-90"
-            aria-label={fr.backHome}
+            aria-label={t.backHome}
           >
             ←
           </button>
@@ -76,9 +77,9 @@ export default function Profile() {
 
       <div className="rk-scroll min-h-0 flex-1 overflow-y-auto pt-2">
         <h1 className="font-display text-center text-3xl font-bold text-brass-300">
-          {user ? fr.editProfile : fr.appName}
+          {user ? t.editProfile : t.appName}
         </h1>
-        {!user && <p className="mb-6 mt-1 text-center text-sm text-paper-50/55">{fr.tagline}</p>}
+        {!user && <p className="mb-6 mt-1 text-center text-sm text-paper-50/55">{t.tagline}</p>}
 
         {/* Aperçu en direct */}
         <motion.div
@@ -86,14 +87,14 @@ export default function Profile() {
           initial={{ scale: 0.85 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 400, damping: 18 }}
-          className="mx-auto my-5 flex h-20 w-20 items-center justify-center rounded-2xl bg-felt-900/50 text-5xl ring-1 ring-white/10"
+          className="mx-auto my-5 h-20 w-20"
           aria-hidden="true"
         >
-          {avatar}
+          <Avatar id={avatar} size={80} />
         </motion.div>
 
         <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-paper-50/55" htmlFor="pseudo">
-          {fr.yourPseudo}
+          {t.yourPseudo}
         </label>
         <input
           id="pseudo"
@@ -107,27 +108,31 @@ export default function Profile() {
           placeholder="Marie, Karim, Léa…"
         />
 
-        <p className="mb-2 mt-5 text-xs font-medium uppercase tracking-wide text-paper-50/55">{fr.pickAvatar}</p>
-        <div className="grid grid-cols-8 gap-1.5">
-          {AVATARS.map((a) => (
+        <p className="mb-2 mt-5 text-xs font-medium uppercase tracking-wide text-paper-50/55">{t.pickAvatar}</p>
+        {/* Quatre colonnes : la vignette dessinée mérite d'être vue, et la cible
+            tactile reste largement au-dessus des 44 px même sur petit écran. */}
+        <div className="grid grid-cols-4 gap-2.5">
+          {AVATAR_IDS.map((id, i) => (
             <button
-              key={a}
+              key={id}
               type="button"
-              onClick={() => setAvatar(a)}
-              aria-label={a}
-              aria-pressed={avatar === a}
-              className={`aspect-square rounded-xl text-2xl transition ${
-                avatar === a
+              onClick={() => setAvatar(id)}
+              aria-label={`Avatar ${i + 1}`}
+              aria-pressed={avatar === id}
+              className={`flex aspect-square min-h-11 min-w-11 items-center justify-center rounded-2xl p-2 transition ${
+                avatar === id
                   ? 'bg-brass-400/25 ring-2 ring-brass-400'
                   : 'bg-felt-900/40 ring-1 ring-white/6 active:scale-90'
               }`}
             >
-              {a}
+              <Avatar id={id} size={64} className="h-full w-full" />
             </button>
           ))}
         </div>
 
         {error && <p className="mt-3 text-center text-sm text-danger">{error}</p>}
+
+        <LocalePicker className="mt-6" />
 
         {user && <NotificationsSection />}
         {user && <AccountSection isGuest={user.isGuest} email={user.email} />}
@@ -141,7 +146,7 @@ export default function Profile() {
         className="mt-4 w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-4 text-lg font-bold text-felt-950 transition active:scale-[0.98] disabled:opacity-40"
         style={{ boxShadow: '0 4px 20px -6px rgb(0 0 0 / 0.6)' }}
       >
-        {user ? fr.save : fr.letsGo}
+        {user ? t.save : t.letsGo}
       </button>
     </div>
   );
@@ -153,6 +158,7 @@ export default function Profile() {
  * affiché est toujours l'état réel de l'abonnement du navigateur.
  */
 function NotificationsSection() {
+  const t = useT();
   const [availability, setAvailability] = useState<PushAvailability | null>(null);
   const [enabled, setEnabled] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -180,7 +186,7 @@ function NotificationsSection() {
         await enablePush();
       }
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : fr.notificationsError);
+      setMessage(e instanceof Error ? e.message : t.notificationsError);
     } finally {
       // On relit l'état réel plutôt que de supposer que l'action a abouti.
       const state = await readPushState();
@@ -192,25 +198,25 @@ function NotificationsSection() {
 
   const blocked =
     availability === 'unsupported'
-      ? fr.notificationsUnsupported
+      ? t.notificationsUnsupported
       : availability === 'needs-install'
-        ? fr.notificationsNeedsInstall
+        ? t.notificationsNeedsInstall
         : availability === 'denied'
-          ? fr.notificationsDenied
+          ? t.notificationsDenied
           : null;
 
   return (
     <div className="mt-6 rounded-xl bg-felt-900/40 p-3.5 ring-1 ring-white/6">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-paper-50/90">{fr.notificationsTitle}</p>
-          <p className="mt-0.5 text-xs leading-snug text-paper-50/45">{fr.notificationsHint}</p>
+          <p className="text-sm font-medium text-paper-50/90">{t.notificationsTitle}</p>
+          <p className="mt-0.5 text-xs leading-snug text-paper-50/45">{t.notificationsHint}</p>
         </div>
         <button
           type="button"
           role="switch"
           aria-checked={enabled}
-          aria-label={enabled ? fr.notificationsOn : fr.notificationsEnable}
+          aria-label={enabled ? t.notificationsOn : t.notificationsEnable}
           data-testid="push-toggle"
           onClick={toggle}
           disabled={busy || availability === null || blocked !== null}
@@ -229,10 +235,10 @@ function NotificationsSection() {
         {message ||
           blocked ||
           (availability === null
-            ? fr.notificationsChecking
+            ? t.notificationsChecking
             : enabled
-              ? fr.notificationsOn
-              : fr.notificationsOff)}
+              ? t.notificationsOn
+              : t.notificationsOff)}
       </p>
     </div>
   );
@@ -243,6 +249,7 @@ function NotificationsSection() {
  * Volontairement court : un champ, un bouton, aucun mot de passe.
  */
 function AccountSection({ isGuest, email }: { isGuest: boolean; email: string | null }) {
+  const t = useT();
   const [emailInput, setEmailInput] = useState('');
   const [message, setMessage] = useState('');
   const [sent, setSent] = useState(false);
@@ -253,7 +260,7 @@ function AccountSection({ isGuest, email }: { isGuest: boolean; email: string | 
       <div className="mt-6 flex items-center gap-2 rounded-xl bg-success/10 px-3.5 py-3 ring-1 ring-success/20">
         <span aria-hidden="true">✓</span>
         <div className="min-w-0">
-          <p className="text-sm font-medium text-success">{fr.accountSaved}</p>
+          <p className="text-sm font-medium text-success">{t.accountSaved}</p>
           <p className="truncate text-xs text-paper-50/50">{email}</p>
         </div>
       </div>
@@ -270,7 +277,7 @@ function AccountSection({ isGuest, email }: { isGuest: boolean; email: string | 
     try {
       await requestMagicLink(emailInput.trim());
       setSent(true);
-      setMessage(fr.magicLinkSent);
+      setMessage(t.magicLinkSent);
     } catch (e) {
       setMessage(e instanceof Error ? e.message : 'Erreur inconnue');
     } finally {
@@ -280,15 +287,15 @@ function AccountSection({ isGuest, email }: { isGuest: boolean; email: string | 
 
   return (
     <div className="mt-6 rounded-xl bg-felt-900/40 p-3.5 ring-1 ring-white/6">
-      <p className="text-sm font-medium text-paper-50/90">{fr.saveAccount}</p>
-      <p className="mb-2.5 mt-0.5 text-xs leading-snug text-paper-50/45">{fr.saveAccountHint}</p>
+      <p className="text-sm font-medium text-paper-50/90">{t.saveAccount}</p>
+      <p className="mb-2.5 mt-0.5 text-xs leading-snug text-paper-50/45">{t.saveAccountHint}</p>
       {!sent && (
         <div className="flex gap-2">
           <input
             type="email"
             value={emailInput}
             onChange={(e) => setEmailInput(e.target.value)}
-            placeholder={fr.emailPlaceholder}
+            placeholder={t.emailPlaceholder}
             autoComplete="email"
             inputMode="email"
             className="min-w-0 flex-1 rounded-lg bg-felt-950/50 px-3 py-2.5 text-sm outline-none ring-1 ring-white/10 transition placeholder:text-paper-50/25 focus:ring-2 focus:ring-brass-400"
@@ -299,7 +306,7 @@ function AccountSection({ isGuest, email }: { isGuest: boolean; email: string | 
             disabled={busy}
             className="shrink-0 rounded-lg bg-white/10 px-3.5 py-2.5 text-sm font-semibold transition active:scale-95 disabled:opacity-40"
           >
-            {fr.sendMagicLink}
+            {t.sendMagicLink}
           </button>
         </div>
       )}

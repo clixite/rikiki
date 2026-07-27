@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { verifyMagicLink } from '../api';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 import { connectSocket } from '../socket';
 import { useSession } from '../store/session';
 
 export default function VerifyEmail() {
+  const t = useT();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState<'pending' | 'ok' | 'error'>('pending');
@@ -29,17 +31,17 @@ export default function VerifyEmail() {
 
   return (
     <div className="mx-auto flex h-dvh max-w-md flex-col items-center justify-center px-6 text-center">
-      {status === 'pending' && <p className="text-white/70">{fr.verifying}</p>}
+      {status === 'pending' && <p className="text-white/70">{t.verifying}</p>}
       {status === 'ok' && (
         <>
           <div className="mb-3 text-5xl">✅</div>
-          <p className="font-medium">{fr.verified}</p>
+          <p className="font-medium">{t.verified}</p>
         </>
       )}
       {status === 'error' && (
         <>
           <div className="mb-3 text-5xl">😕</div>
-          <p className="text-white/80">{fr.verifyFailed}</p>
+          <p className="text-white/80">{t.verifyFailed}</p>
         </>
       )}
       <button
@@ -47,7 +49,7 @@ export default function VerifyEmail() {
         onClick={() => navigate('/', { replace: true })}
         className="mt-8 rounded-2xl bg-gold-400 px-8 py-3 font-bold text-felt-900 shadow-lg active:scale-95"
       >
-        {fr.backHome}
+        {t.backHome}
       </button>
     </div>
   );

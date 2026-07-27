@@ -1,7 +1,8 @@
 import { motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
 import PlayerAvatar from './PlayerAvatar';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 import { nextRound } from '../socket';
 import { useGame } from '../store/game';
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function RoundRecap({ view }: Props) {
+  const t = useT();
   const round = view.round!;
   const outcome = useGame((s) => s.roundOutcome);
   const isHost = view.hostId === view.you;
@@ -29,9 +31,9 @@ export default function RoundRecap({ view }: Props) {
       >
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
 
-        <h2 className="text-center text-xl font-bold">{fr.roundRecap}</h2>
+        <h2 className="text-center text-xl font-bold">{t.roundRecap}</h2>
         <p className="mt-0.5 text-center text-xs text-paper-50/50">
-          {fr.round} {round.roundIndex + 1}/{view.roundsSequence.length} · {fr.cards(round.cardsCount)}
+          {t.round} {round.roundIndex + 1}/{view.roundsSequence.length} · {t.cards(round.cardsCount)}
         </p>
 
         {/* Verdict personnel : la première chose qu'on cherche des yeux */}
@@ -58,7 +60,7 @@ export default function RoundRecap({ view }: Props) {
               {outcome === 'success' ? '✓' : '✕'}
             </motion.span>
             <span className="text-sm font-bold">
-              {outcome === 'success' ? fr.contractKept : fr.contractMissed}
+              {outcome === 'success' ? t.contractKept : t.contractMissed}
             </span>
             <span className="text-sm font-bold tabular-nums">
               {myPoints > 0 ? `+${myPoints}` : myPoints}
@@ -83,7 +85,7 @@ export default function RoundRecap({ view }: Props) {
                 <PlayerAvatar avatar={p.avatar} size={22} />
                 <span className="min-w-0 flex-1 truncate text-sm font-medium">
                   {p.pseudo}
-                  {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({fr.you})</span>}
+                  {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({t.you})</span>}
                 </span>
                 <span className="shrink-0 text-xs tabular-nums text-paper-50/60">
                   {tricks}/{bid}
@@ -112,11 +114,11 @@ export default function RoundRecap({ view }: Props) {
               className="w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-3.5 text-base font-bold text-felt-950 transition active:scale-[0.98]"
               style={{ boxShadow: '0 4px 16px -4px rgb(0 0 0 / 0.5)' }}
             >
-              {isLastRound ? fr.seeResults : fr.nextRound}
+              {isLastRound ? t.seeResults : t.nextRound}
             </button>
           ) : (
             <p className="rk-shimmer rounded-xl py-3 text-center text-sm text-paper-50/60">
-              {fr.waitingNextRound}
+              {t.waitingNextRound}
             </p>
           )}
         </div>

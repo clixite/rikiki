@@ -1,13 +1,15 @@
-import { fr } from '../i18n/fr';
+
 import { useGame } from '../store/game';
+import { useT } from '../i18n';
 
 interface Props {
   code: string;
 }
 
 export default function InviteButtons({ code }: Props) {
+  const t = useT();
   const url = `${window.location.origin}/j/${code}`;
-  const message = fr.inviteMessage(code, url);
+  const message = t.inviteMessage(code, url);
   const encoded = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/?text=${encoded}`;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -17,7 +19,7 @@ export default function InviteButtons({ code }: Props) {
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(url);
-      useGame.getState().showToast(fr.copied);
+      useGame.getState().showToast(t.copied);
     } catch {
       useGame.getState().showToast(url);
     }
@@ -25,7 +27,7 @@ export default function InviteButtons({ code }: Props) {
 
   const share = async () => {
     try {
-      await navigator.share({ title: fr.appName, text: message, url });
+      await navigator.share({ title: t.appName, text: message, url });
     } catch {
       // partage annulé
     }
@@ -36,17 +38,17 @@ export default function InviteButtons({ code }: Props) {
 
   return (
     <div>
-      <p className="mb-2 text-center text-sm text-white/70">{fr.invite}</p>
+      <p className="mb-2 text-center text-sm text-white/70">{t.invite}</p>
       <div className="grid grid-cols-2 gap-2">
         <a href={whatsappUrl} target="_blank" rel="noreferrer" className={`${btn} bg-[#25D366] text-white`}>
-          💬 {fr.inviteWhatsApp}
+          💬 {t.inviteWhatsApp}
         </a>
         <a href={smsUrl} className={`${btn} bg-blue-500 text-white`}>
-          ✉️ {fr.inviteSms}
+          ✉️ {t.inviteSms}
         </a>
         {canShare && (
           <button type="button" onClick={share} className={`${btn} bg-white/15 text-white`}>
-            📤 {fr.inviteShare}
+            📤 {t.inviteShare}
           </button>
         )}
         <button
@@ -54,7 +56,7 @@ export default function InviteButtons({ code }: Props) {
           onClick={copy}
           className={`${btn} bg-white/15 text-white ${canShare ? '' : 'col-span-1'}`}
         >
-          🔗 {fr.copyLink}
+          🔗 {t.copyLink}
         </button>
       </div>
     </div>

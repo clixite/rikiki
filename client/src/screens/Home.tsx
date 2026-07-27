@@ -5,7 +5,8 @@ import type { UserStats } from '@rikiki/shared';
 import { fetchMe } from '../api';
 import SoundToggle from '../components/SoundToggle';
 import { unlockAudio } from '../audio';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 
 /** Injectée à la compilation : permet d'identifier la version installée. */
 const APP_VERSION = __APP_VERSION__;
@@ -14,6 +15,7 @@ import { useGame } from '../store/game';
 import { useSession } from '../store/session';
 
 export default function Home() {
+  const t = useT();
   const { user, roomCode } = useSession();
   const socketConnected = useGame((s) => s.socketConnected);
   const navigate = useNavigate();
@@ -66,7 +68,7 @@ export default function Home() {
           </span>
           <span className="max-w-32 truncate text-sm font-medium">{user.pseudo}</span>
           {!user.isGuest && (
-            <span className="text-xs text-success" title={fr.accountSaved} aria-label={fr.accountSaved}>
+            <span className="text-xs text-success" title={t.accountSaved} aria-label={t.accountSaved}>
               ✓
             </span>
           )}
@@ -76,8 +78,8 @@ export default function Home() {
           type="button"
           data-testid="open-groups"
           onClick={() => navigate('/groups')}
-          aria-label={fr.groups}
-          title={fr.groups}
+          aria-label={t.groups}
+          title={t.groups}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/45 text-lg ring-1 ring-white/8 transition active:scale-90"
         >
           <span aria-hidden="true">👥</span>
@@ -86,8 +88,8 @@ export default function Home() {
           type="button"
           data-testid="open-rules"
           onClick={() => navigate('/rules')}
-          aria-label={fr.rules}
-          title={fr.rules}
+          aria-label={t.rules}
+          title={t.rules}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/45 text-lg ring-1 ring-white/8 transition active:scale-90"
         >
           <span aria-hidden="true">📖</span>
@@ -119,8 +121,8 @@ export default function Home() {
             </div>
           </div>
 
-          <h1 className="font-display text-5xl font-bold tracking-tight text-brass-300">{fr.appName}</h1>
-          <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-snug text-paper-50/55">{fr.tagline}</p>
+          <h1 className="font-display text-5xl font-bold tracking-tight text-brass-300">{t.appName}</h1>
+          <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-snug text-paper-50/55">{t.tagline}</p>
 
           {stats && stats.gamesPlayed > 0 && (
             <motion.button
@@ -132,7 +134,7 @@ export default function Home() {
               transition={{ delay: 0.2 }}
               className="mx-auto mt-4 flex h-11 items-center gap-1.5 rounded-full bg-felt-900/40 px-4 text-xs tabular-nums text-paper-50/60 ring-1 ring-white/8 transition active:scale-95"
             >
-              {stats.gamesPlayed} {fr.gamesPlayed} · {stats.gamesWon} {fr.gamesWon}
+              {stats.gamesPlayed} {t.gamesPlayed} · {stats.gamesWon} {t.gamesWon}
               <span className="text-paper-50/35">›</span>
             </motion.button>
           )}
@@ -148,7 +150,7 @@ export default function Home() {
             disabled={disabled}
             className="w-full rounded-2xl bg-white/8 py-3 text-sm font-semibold ring-1 ring-white/10 transition active:scale-[0.98] disabled:opacity-40"
           >
-            {fr.resumeGame} · {roomCode}
+            {t.resumeGame} · {roomCode}
           </button>
         )}
         <button
@@ -159,7 +161,7 @@ export default function Home() {
           className="w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-4 text-lg font-bold text-felt-950 transition active:scale-[0.98] disabled:opacity-40"
           style={{ boxShadow: '0 4px 20px -6px rgb(0 0 0 / 0.6)' }}
         >
-          {fr.createGame}
+          {t.createGame}
         </button>
         <button
           type="button"
@@ -171,14 +173,14 @@ export default function Home() {
           disabled={disabled}
           className="w-full rounded-2xl bg-white/8 py-3.5 text-base font-semibold ring-1 ring-white/10 transition active:scale-[0.98] disabled:opacity-40"
         >
-          {fr.joinGame}
+          {t.joinGame}
         </button>
 
         {!socketConnected && (
-          <p className="pt-1 text-center text-xs text-paper-50/40">{fr.reconnecting}</p>
+          <p className="pt-1 text-center text-xs text-paper-50/40">{t.reconnecting}</p>
         )}
         <p className="pt-0.5 text-center text-[10px] text-paper-50/25">
-          {fr.copyright} · {fr.version(APP_VERSION)}
+          {t.copyright} · {t.version(APP_VERSION)}
         </p>
       </div>
     </div>

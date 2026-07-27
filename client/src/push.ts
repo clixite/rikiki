@@ -1,5 +1,6 @@
 import { fetchPushPublicKey, removePushSubscription, savePushSubscription } from './api';
-import { fr } from './i18n/fr';
+import { t as tr } from './i18n';
+
 
 /**
  * Notifications « c'est ton tour » (Web Push).
@@ -56,7 +57,7 @@ export function pushAvailability(): PushAvailability {
 /** Attend le service worker sans jamais bloquer l'interface (dev, SW absent…). */
 async function getRegistration(): Promise<ServiceWorkerRegistration> {
   const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error(fr.notificationsNoServiceWorker)), 5000),
+    setTimeout(() => reject(new Error(tr().notificationsNoServiceWorker)), 5000),
   );
   return Promise.race([navigator.serviceWorker.ready, timeout]);
 }
@@ -101,15 +102,15 @@ export async function readPushState(): Promise<PushState> {
  * serveur. Lève une erreur (message en français) en cas de refus ou d'échec.
  */
 export async function enablePush(): Promise<void> {
-  if (pushAvailability() === 'needs-install') throw new Error(fr.notificationsNeedsInstall);
-  if (!hasPushApis()) throw new Error(fr.notificationsUnsupported);
+  if (pushAvailability() === 'needs-install') throw new Error(tr().notificationsNeedsInstall);
+  if (!hasPushApis()) throw new Error(tr().notificationsUnsupported);
 
   const permission = await Notification.requestPermission();
-  if (permission !== 'granted') throw new Error(fr.notificationsDenied);
+  if (permission !== 'granted') throw new Error(tr().notificationsDenied);
 
   const registration = await getRegistration();
   const { publicKey } = await fetchPushPublicKey();
-  if (!publicKey) throw new Error(fr.notificationsServerOff);
+  if (!publicKey) throw new Error(tr().notificationsServerOff);
   const applicationServerKey = urlBase64ToUint8Array(publicKey);
 
   let sub = await registration.pushManager.getSubscription();

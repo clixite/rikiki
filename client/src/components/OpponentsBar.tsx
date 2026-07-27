@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 import PlayerAvatar from './PlayerAvatar';
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
  * les plis déjà remportés, et l'état de connexion.
  */
 export default function OpponentsBar({ view }: Props) {
+  const t = useT();
   const me = view.players.find((p) => p.id === view.you);
   const round = view.round;
   const n = view.players.length;
@@ -52,14 +54,14 @@ export default function OpponentsBar({ view }: Props) {
 
             {bid === null || bid === undefined ? (
               <span className="text-[10px] leading-tight text-paper-50/40">
-                {view.phase === 'bidding' ? fr.thinking : '—'}
+                {view.phase === 'bidding' ? t.thinking : '—'}
               </span>
             ) : (
               <span
                 className={`text-[11px] font-semibold tabular-nums leading-tight ${
                   over ? 'text-danger' : done ? 'text-success' : 'text-brass-300'
                 }`}
-                title={fr.tricksOfContract(tricks, bid)}
+                title={t.tricksOfContract(tricks, bid)}
               >
                 {tricks}/{bid}
               </span>
@@ -68,13 +70,13 @@ export default function OpponentsBar({ view }: Props) {
             {isDealer && (
               <span
                 className="absolute -right-0.5 -top-0.5 rounded-full bg-brass-400 px-1 text-[8px] font-bold text-felt-950"
-                title={fr.dealer}
+                title={t.dealer}
               >
                 D
               </span>
             )}
             {!p.connected && (
-              <span className="text-[8px] leading-tight text-danger">{fr.offline}</span>
+              <span className="text-[8px] leading-tight text-danger">{t.offline}</span>
             )}
           </motion.div>
         );

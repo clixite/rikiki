@@ -4,7 +4,8 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import type { GameHistoryEntry } from '@rikiki/shared';
 import { fetchHistory, fetchMe, readCachedHistory } from '../api';
 import SoundToggle from '../components/SoundToggle';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 import { useSession } from '../store/session';
 
 function formatDate(ts: number): string {
@@ -17,6 +18,7 @@ function formatDate(ts: number): string {
 }
 
 export default function History() {
+  const t = useT();
   const { user } = useSession();
   const navigate = useNavigate();
   // On affiche d'abord le cache local : la liste apparaît instantanément,
@@ -46,7 +48,7 @@ export default function History() {
         <button
           type="button"
           onClick={() => navigate('/')}
-          aria-label={fr.backHome}
+          aria-label={t.backHome}
           className="flex h-11 w-11 items-center justify-center rounded-full bg-felt-900/45 text-lg ring-1 ring-white/8 transition active:scale-90"
         >
           ←
@@ -54,14 +56,14 @@ export default function History() {
         <SoundToggle />
       </div>
 
-      <h1 className="font-display mt-2 text-center text-2xl font-bold text-brass-300">{fr.historyTitle}</h1>
+      <h1 className="font-display mt-2 text-center text-2xl font-bold text-brass-300">{t.historyTitle}</h1>
 
       {stats && stats.gamesPlayed > 0 && (
         <div className="mt-3 grid grid-cols-3 gap-2">
           {[
-            { value: stats.gamesPlayed, label: fr.gamesPlayed },
-            { value: stats.gamesWon, label: fr.gamesWon },
-            { value: stats.bestRound, label: fr.bestRound },
+            { value: stats.gamesPlayed, label: t.gamesPlayed },
+            { value: stats.gamesWon, label: t.gamesWon },
+            { value: stats.bestRound, label: t.bestRound },
           ].map((s) => (
             <div key={s.label} className="rounded-xl bg-felt-900/45 py-2.5 text-center ring-1 ring-white/6">
               <p className="text-xl font-bold tabular-nums text-brass-300">{s.value}</p>
@@ -73,9 +75,9 @@ export default function History() {
 
       <div className="rk-scroll mt-4 min-h-0 flex-1 overflow-y-auto">
         {loading && !games ? (
-          <p className="py-8 text-center text-sm text-paper-50/45">{fr.loading}</p>
+          <p className="py-8 text-center text-sm text-paper-50/45">{t.loading}</p>
         ) : !games || games.length === 0 ? (
-          <p className="py-8 text-center text-sm text-paper-50/45">{fr.noHistory}</p>
+          <p className="py-8 text-center text-sm text-paper-50/45">{t.noHistory}</p>
         ) : (
           <ul className="space-y-2">
             {games.map((g, i) => (
@@ -92,7 +94,7 @@ export default function History() {
                       g.won ? 'bg-success/20 text-success' : 'bg-white/8 text-paper-50/55'
                     }`}
                   >
-                    {g.won ? fr.wonBadge : `${g.myRank}ᵉ`}
+                    {g.won ? t.wonBadge : `${g.myRank}ᵉ`}
                   </span>
                   <span className="text-xs text-paper-50/45">{formatDate(g.playedAt)}</span>
                   <span className="flex-1" />

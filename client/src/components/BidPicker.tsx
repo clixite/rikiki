@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 
 interface Props {
   cardsCount: number;
@@ -16,6 +17,7 @@ interface Props {
  * ses cartes.
  */
 export default function BidPicker({ cardsCount, legalBids, bidsSoFar, onBid }: Props) {
+  const t = useT();
   const [pending, setPending] = useState<number | null>(null);
   const all = Array.from({ length: cardsCount + 1 }, (_, i) => i);
   const forbidden = all.find((b) => !legalBids.includes(b));
@@ -30,9 +32,9 @@ export default function BidPicker({ cardsCount, legalBids, bidsSoFar, onBid }: P
       data-testid="bid-picker"
     >
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <p className="text-sm font-semibold text-paper-50">{fr.yourBid}</p>
+        <p className="text-sm font-semibold text-paper-50">{t.yourBid}</p>
         <p className="text-[11px] tabular-nums text-paper-50/55">
-          {fr.bidsTotal(bidsSoFar, cardsCount)}
+          {t.bidsTotal(bidsSoFar, cardsCount)}
         </p>
       </div>
 
@@ -46,7 +48,7 @@ export default function BidPicker({ cardsCount, legalBids, bidsSoFar, onBid }: P
               type="button"
               data-testid={`bid-${b}`}
               disabled={!legal || pending !== null}
-              title={legal ? undefined : fr.hookForbidden(cardsCount)}
+              title={legal ? undefined : t.hookForbidden(cardsCount)}
               onClick={() => {
                 setPending(b);
                 onBid(b);
@@ -72,7 +74,7 @@ export default function BidPicker({ cardsCount, legalBids, bidsSoFar, onBid }: P
 
       {forbidden !== undefined && (
         <p className="mt-1.5 text-[11px] leading-snug text-brass-200/70">
-          ⛓ {fr.hookExplain(forbidden, cardsCount)}
+          ⛓ {t.hookExplain(forbidden, cardsCount)}
         </p>
       )}
     </motion.div>

@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useWakeLock } from '../hooks/useWakeLock';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 import { useGame } from '../store/game';
 import { useSession } from '../store/session';
 import GameOver from './GameOver';
@@ -8,6 +9,7 @@ import Lobby from './Lobby';
 import Table from './Table';
 
 export default function Game() {
+  const t = useT();
   const view = useGame((s) => s.view);
   const { roomCode, user } = useSession();
   useWakeLock(view !== null && view.phase !== 'lobby' && view.phase !== 'game-over');
@@ -17,7 +19,7 @@ export default function Game() {
     // Après un refresh, App tente de re-rejoindre la room sauvegardée
     if (!roomCode) return <Navigate to="/" replace />;
     return (
-      <div className="flex h-dvh items-center justify-center text-white/70">{fr.loading}</div>
+      <div className="flex h-dvh items-center justify-center text-white/70">{t.loading}</div>
     );
   }
 

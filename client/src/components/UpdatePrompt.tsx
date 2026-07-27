@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 import { useGame } from '../store/game';
 
 /** Intervalle de vérification d'une nouvelle version (application ouverte). */
@@ -20,6 +21,7 @@ const CHECK_EVERY_MS = 5 * 60_000;
  * recharger en pleine partie couperait le joueur.
  */
 export default function UpdatePrompt() {
+  const t = useT();
   const [needRefresh, setNeedRefresh] = useState(false);
   const inGame = useGame((s) => s.view !== null && s.view.phase !== 'lobby');
   /**
@@ -74,14 +76,14 @@ export default function UpdatePrompt() {
           data-testid="update-prompt"
         >
           <div className="flex items-center gap-3 rounded-full bg-brass-400 py-1.5 pl-4 pr-1.5 text-felt-950 shadow-lg">
-            <span className="text-sm font-semibold">{fr.updateAvailable}</span>
+            <span className="text-sm font-semibold">{t.updateAvailable}</span>
             <button
               type="button"
               data-testid="update-reload"
               onClick={() => window.location.reload()}
               className="h-9 rounded-full bg-felt-900 px-4 text-sm font-bold text-brass-300 transition active:scale-95"
             >
-              {fr.updateReload}
+              {t.updateReload}
             </button>
           </div>
         </motion.div>

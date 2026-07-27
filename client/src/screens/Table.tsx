@@ -12,7 +12,8 @@ import TrickArea from '../components/TrickArea';
 import TrumpBadge from '../components/TrumpBadge';
 import PlayerAvatar from '../components/PlayerAvatar';
 import { vibrate } from '../haptics';
-import { fr } from '../i18n/fr';
+import { useT } from '../i18n';
+
 import { placeBid, playCard } from '../socket';
 import { useGame } from '../store/game';
 
@@ -28,6 +29,7 @@ interface Props {
  * Chaque zone occupe sa propre ligne d'une colonne flex, sans superposition.
  */
 export default function Table({ view }: Props) {
+  const t = useT();
   const frozenTrick = useGame((s) => s.frozenTrick);
   const [scoresOpen, setScoresOpen] = useState(false);
   const round = view.round!;
@@ -58,13 +60,13 @@ export default function Table({ view }: Props) {
   };
 
   const statusText = frozenTrick
-    ? fr.trickWonBy(view.players.find((p) => p.id === frozenTrick.winnerId)?.pseudo ?? '')
+    ? t.trickWonBy(view.players.find((p) => p.id === frozenTrick.winnerId)?.pseudo ?? '')
     : myTurn
       ? view.phase === 'playing'
-        ? fr.yourTurn
+        ? t.yourTurn
         : ''
       : currentPlayer
-        ? fr.turnOf(currentPlayer.pseudo)
+        ? t.turnOf(currentPlayer.pseudo)
         : '';
 
   return (
@@ -73,9 +75,9 @@ export default function Table({ view }: Props) {
       <header className="flex shrink-0 items-center gap-2 px-3 pb-1 pt-2">
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-paper-50/50">
-            {fr.round} {round.roundIndex + 1}/{view.roundsSequence.length}
+            {t.round} {round.roundIndex + 1}/{view.roundsSequence.length}
           </p>
-          <p className="truncate text-sm font-medium text-paper-50">{fr.cards(round.cardsCount)}</p>
+          <p className="truncate text-sm font-medium text-paper-50">{t.cards(round.cardsCount)}</p>
         </div>
 
         <SoundToggle />
@@ -84,7 +86,7 @@ export default function Table({ view }: Props) {
           type="button"
           data-testid="open-scores"
           onClick={() => setScoresOpen(true)}
-          aria-label={fr.scoreboard}
+          aria-label={t.scoreboard}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/55 text-lg ring-1 ring-white/10 transition active:scale-90"
         >
           <span aria-hidden="true">🏆</span>
@@ -148,7 +150,7 @@ export default function Table({ view }: Props) {
           <PlayerAvatar avatar={me.avatar} size={20} />
           <span className="max-w-20 truncate text-sm font-medium text-paper-50">{me.pseudo}</span>
           {round.dealerSeat === me.seat && (
-            <span className="rounded-full bg-brass-400 px-1.5 text-[9px] font-bold text-felt-950" title={fr.dealer}>
+            <span className="rounded-full bg-brass-400 px-1.5 text-[9px] font-bold text-felt-950" title={t.dealer}>
               D
             </span>
           )}
@@ -164,10 +166,10 @@ export default function Table({ view }: Props) {
                     : 'bg-brass-400/15 text-brass-300'
             }`}
           >
-            {myBid === null ? fr.noBidYet : fr.tricksOfContract(myTricks, myBid)}
+            {myBid === null ? t.noBidYet : t.tricksOfContract(myTricks, myBid)}
           </span>
           <span className="text-[11px] tabular-nums text-paper-50/45">
-            {fr.total} {me.totalScore}
+            {t.total} {me.totalScore}
           </span>
         </div>
 
