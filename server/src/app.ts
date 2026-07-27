@@ -14,15 +14,29 @@ import { authRoutes } from './auth/routes';
 import { groupRoutes } from './groups/routes';
 import { magicLinkRoutes } from './auth/magicLink';
 import { createMailer, type Mailer } from './mail/mailer';
+import { PushRepo } from './db/push.repo';
+import { SettingsRepo } from './db/settings.repo';
+import { PushService, shouldNotifyTurn } from './push/PushService';
+import { pushRoutes } from './push/routes';
+import { createWebPushSender, type PushSender } from './push/sender';
+import { resolveVapidKeys } from './push/vapid';
 import { RoomManager } from './rooms/RoomManager';
 import { registerSocketHandlers } from './sockets/handlers';
 
-export function createApp(config: Config, overrides: { mailer?: Mailer } = {}) {
+export function createApp(config: Config, overrides: { mailer?: Mailer; pushSender?: PushSender } = {}) {
   const db = openDb(config.DB_PATH);
   const users = new UsersRepo(db);
   const liveRooms = new LiveRoomsRepo(db);
   const groups = new GroupsRepo(db);
   const mailer = overrides.mailer ?? createMailer(config);
+
+  // Notifications « c'est ton tour » : clés VAPID stables entre redémarrages.
+  const vapid = resolveVapidKeys(new SettingsRepo(db), config);
+  const push = new PushService(
+    new PushRepo(db),
+    overrides.pushSender ?? createWebPushSender(vapid),
+    vapid.publicKey,
+  );
 
   const app = express();
   app.disable('x-powered-by');
@@ -34,6 +48,7 @@ export function createApp(config: Config, overrides: { mailer?: Mailer } = {}) {
   app.use('/api', authRoutes(users, config));
   app.use('/api', groupRoutes(groups, users, config));
   app.use('/api', magicLinkRoutes(db, users, config, mailer));
+  app.use('/api', pushRoutes(push, users, config));
 
   const httpServer = http.createServer(app);
   const io = new Server(httpServer, {
@@ -81,7 +96,16 @@ export function createApp(config: Config, overrides: { mailer?: Mailer } = {}) {
         );
       }
     },
-    { botDelayMs: config.BOT_DELAY_MS },
+    {
+      botDelayMs: config.BOT_DELAY_MS,
+      // Un joueur devient le joueur attendu : on le prévient uniquement s'il
+      // n'a plus aucun socket sur cette partie (application rangée / fermée).
+      onTurn: (room, playerId) => {
+        if (!shouldNotifyTurn(playerId, room.sockets.has(playerId))) return;
+        const phase = room.state.phase === 'bidding' ? 'bidding' : 'playing';
+        push.notifyTurn(playerId, { code: room.code, phase }).catch(() => undefined);
+      },
+    },
     // Les parties en cours sont persistées : elles survivent à un redémarrage.
     liveRooms,
   );
@@ -100,5 +124,5 @@ export function createApp(config: Config, overrides: { mailer?: Mailer } = {}) {
     });
   }
 
-  return { app, httpServer, io, rooms, db, users, liveRooms, groups };
+  return { app, httpServer, io, rooms, db, users, liveRooms, groups, push };
 }

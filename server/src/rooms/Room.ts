@@ -62,6 +62,8 @@ export class Room {
   private bestRounds: Record<string, number> = {};
   private persistTimer: ReturnType<typeof setTimeout> | null = null;
   private dirty = false;
+  /** Signature du tour déjà signalé, pour ne notifier qu'une fois par tour. */
+  private lastTurnKey: string | null = null;
   lastActivity = Date.now();
 
   constructor(
@@ -197,6 +199,25 @@ export class Room {
     for (const [userId, socket] of this.sockets) {
       socket.emit('game:view', projectView(this.state, userId));
     }
+    this.signalTurnChange();
+  }
+
+  /** Détecte le changement de joueur attendu et prévient l'observateur (push). */
+  private signalTurnChange(): void {
+    const onTurn = this.options.onTurn;
+    if (!onTurn) return;
+    const s = this.state;
+    const inTurn = (s.phase === 'bidding' || s.phase === 'playing') && s.round !== null;
+    if (!inTurn) {
+      this.lastTurnKey = null;
+      return;
+    }
+    const r = s.round!;
+    const key = `${s.phase}:${r.roundIndex}:${r.currentSeat}:${Object.values(r.tricksWon).reduce((a, b) => a + b, 0)}:${r.currentTrick.plays.length}`;
+    if (key === this.lastTurnKey) return;
+    this.lastTurnKey = key;
+    const playerId = s.players.find((p) => p.seat === r.currentSeat)?.id;
+    if (playerId) onTurn(this, playerId);
   }
 
   isMember(userId: string): boolean {
