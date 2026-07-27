@@ -1,5 +1,6 @@
 import type { Server, Socket } from 'socket.io';
 import type { ErrorCode, ProtocolError, PublicUser } from '@rikiki/shared';
+import { isBotId } from '@rikiki/shared';
 import type { Config } from '../config';
 import type { UsersRepo } from '../db/users.repo';
 import { verifyToken } from '../auth/tokens';
@@ -110,6 +111,28 @@ export function registerSocketHandlers(io: Server, rooms: RoomManager, users: Us
       if (room.state.phase !== 'lobby') return ack(protoErr('BAD_PHASE'));
       const targetId = String(payload?.playerId ?? '');
       if (!room.isMember(targetId) || targetId === user.id) return ack(protoErr('PLAYER_NOT_FOUND'));
+      room.kick(targetId);
+      ack({ ok: true });
+    });
+
+    socket.on('room:addBot', (ack: Ack) => {
+      if (typeof ack !== 'function') return;
+      const room = currentRoom();
+      if (!room) return ack(protoErr('NOT_IN_ROOM'));
+      if (room.state.hostId !== user.id) return ack(protoErr('NOT_HOST'));
+      if (room.state.phase !== 'lobby') return ack(protoErr('BAD_PHASE'));
+      const res = room.addBot();
+      ack(res.ok ? { ok: true, playerId: res.player.id } : protoErr(res.error));
+    });
+
+    socket.on('room:removeBot', (payload: { playerId?: string } | undefined, ack: Ack) => {
+      if (typeof ack !== 'function') return;
+      const room = currentRoom();
+      if (!room) return ack(protoErr('NOT_IN_ROOM'));
+      if (room.state.hostId !== user.id) return ack(protoErr('NOT_HOST'));
+      if (room.state.phase !== 'lobby') return ack(protoErr('BAD_PHASE'));
+      const targetId = String(payload?.playerId ?? '');
+      if (!isBotId(targetId) || !room.isMember(targetId)) return ack(protoErr('PLAYER_NOT_FOUND'));
       room.kick(targetId);
       ack({ ok: true });
     });

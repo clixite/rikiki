@@ -63,7 +63,7 @@ async function playOneRound(roundLabel, screenshotPrefix = null) {
   let emptyChecks = 0;
   for (let guard = 0; guard < 60; guard++) {
     const pickers = await Promise.all(
-      phones.map((p) => p.page.locator('[data-testid^="bid-"]:not([disabled])').count().catch(() => 0)),
+      phones.map((p) => p.page.locator('button[data-testid^="bid-"]:not([disabled])').count().catch(() => 0)),
     );
     const idx = pickers.findIndex((c) => c > 0);
     if (idx === -1) {
@@ -76,7 +76,7 @@ async function playOneRound(roundLabel, screenshotPrefix = null) {
     emptyChecks = 0;
     const phone = phones[idx];
     if (screenshotPrefix && guard === 0) await phone.page.screenshot({ path: `${SHOTS}/${screenshotPrefix}-bidding.png` });
-    await phone.page.locator('[data-testid^="bid-"]:not([disabled])').first().click();
+    await phone.page.locator('button[data-testid^="bid-"]:not([disabled])').first().click();
     await phone.page.waitForTimeout(250);
   }
 

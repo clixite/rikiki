@@ -86,6 +86,8 @@ export async function leaveRoom(): Promise<void> {
   useGame.getState().reset();
 }
 
+export const addBot = () => emitAck<{ playerId: string }>('room:addBot');
+export const removeBot = (playerId: string) => emitAck('room:removeBot', { playerId });
 export const startGame = () => emitAck('game:start');
 export const placeBid = (bid: number) => emitAck('game:bid', { bid });
 export const playCard = (cardId: string) => emitAck('game:playCard', { cardId });

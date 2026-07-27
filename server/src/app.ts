@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { Server } from 'socket.io';
+import { isBotId } from '@rikiki/shared';
 import type { Config } from './config';
 import { openDb } from './db/db';
 import { UsersRepo } from './db/users.repo';
@@ -33,12 +34,17 @@ export function createApp(config: Config, overrides: { mailer?: Mailer } = {}) {
     cors: { origin: true, credentials: false },
   });
 
-  const rooms = new RoomManager(io, (state, bestRounds) => {
-    const maxScore = Math.max(...state.players.map((p) => p.totalScore));
-    for (const p of state.players) {
-      users.recordGameResult(p.id, p.totalScore, p.totalScore === maxScore, bestRounds[p.id] ?? 0);
-    }
-  });
+  const rooms = new RoomManager(
+    io,
+    (state, bestRounds) => {
+      const maxScore = Math.max(...state.players.map((p) => p.totalScore));
+      // Les joueurs automatiques n'ont pas de compte : pas de stats pour eux.
+      for (const p of state.players.filter((pl) => !isBotId(pl.id))) {
+        users.recordGameResult(p.id, p.totalScore, p.totalScore === maxScore, bestRounds[p.id] ?? 0);
+      }
+    },
+    { botDelayMs: config.BOT_DELAY_MS },
+  );
   registerSocketHandlers(io, rooms, users, config);
 
   // En production, le serveur sert aussi le build du client (SPA)

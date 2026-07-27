@@ -1,6 +1,6 @@
 import type { Server } from 'socket.io';
 import type { Player } from '@rikiki/shared';
-import { Room, type RoomCallbacks } from './Room';
+import { Room, type RoomCallbacks, type RoomOptions } from './Room';
 import { randomCode } from './roomCodes';
 
 const LOBBY_TTL_MS = 30 * 60_000;
@@ -14,6 +14,7 @@ export class RoomManager {
   constructor(
     private io: Server,
     private onGameOver?: RoomCallbacks['onGameOver'],
+    private roomOptions: RoomOptions = {},
   ) {
     this.sweepInterval = setInterval(() => this.sweep(), 60_000);
     this.sweepInterval.unref?.();
@@ -22,10 +23,16 @@ export class RoomManager {
   create(host: Pick<Player, 'id' | 'pseudo' | 'avatar'>): Room {
     let code = randomCode();
     while (this.rooms.has(code)) code = randomCode();
-    const room = new Room(this.io, code, host, {
-      onGameOver: this.onGameOver,
-      onEmpty: (r) => this.remove(r.code, 'empty'),
-    });
+    const room = new Room(
+      this.io,
+      code,
+      host,
+      {
+        onGameOver: this.onGameOver,
+        onEmpty: (r) => this.remove(r.code, 'empty'),
+      },
+      this.roomOptions,
+    );
     this.rooms.set(code, room);
     return room;
   }

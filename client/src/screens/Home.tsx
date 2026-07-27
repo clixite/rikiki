@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import type { UserStats } from '@rikiki/shared';
 import { fetchMe } from '../api';
+import SoundToggle from '../components/SoundToggle';
+import { unlockAudio } from '../audio';
 import { fr } from '../i18n/fr';
 import { createRoom, joinRoom } from '../socket';
 import { useGame } from '../store/game';
@@ -12,6 +15,7 @@ export default function Home() {
   const socketConnected = useGame((s) => s.socketConnected);
   const navigate = useNavigate();
   const [stats, setStats] = useState<UserStats | null>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -26,69 +30,126 @@ export default function Home() {
   if (!user) return <Navigate to="/profile" replace />;
 
   const onCreate = async () => {
+    unlockAudio();
+    setBusy(true);
     const res = await createRoom();
+    setBusy(false);
     if (res.ok) navigate('/game');
     else useGame.getState().showToast(res.error.message);
   };
 
   const onResume = async () => {
     if (!roomCode) return;
+    unlockAudio();
     const res = await joinRoom(roomCode);
     if (res.ok) navigate('/game');
     else useSession.getState().setRoomCode(null);
   };
 
-  return (
-    <div className="mx-auto flex h-dvh max-w-md flex-col items-center justify-between px-6 py-8">
-      <button
-        type="button"
-        onClick={() => navigate('/profile')}
-        className="flex items-center gap-2 self-end rounded-full bg-black/25 px-3 py-1.5 text-sm active:scale-95"
-      >
-        <span className="text-xl">{user.avatar}</span>
-        <span className="font-medium">{user.pseudo}</span>
-        <span className="text-white/50">✏️</span>
-      </button>
+  const disabled = !socketConnected || busy;
 
-      <div className="text-center">
-        <div className="mb-2 text-6xl">🃏</div>
-        <h1 className="font-display text-5xl font-bold tracking-wide text-gold-300">{fr.appName}</h1>
-        <p className="mt-3 text-sm text-white/70">{fr.tagline}</p>
-        {stats && stats.gamesPlayed > 0 && (
-          <p className="mt-3 text-xs text-white/50">
-            🎮 {stats.gamesPlayed} {fr.gamesPlayed.toLowerCase()} · 🏆 {stats.gamesWon} {fr.gamesWon.toLowerCase()}
-          </p>
-        )}
+  return (
+    <div className="mx-auto flex h-dvh w-full max-w-md flex-col px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3">
+      {/* Barre du haut : profil + son */}
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          data-testid="open-profile"
+          onClick={() => navigate('/profile')}
+          className="flex h-11 min-w-0 items-center gap-2 rounded-full bg-felt-900/45 pl-2.5 pr-3.5 ring-1 ring-white/8 transition active:scale-95"
+        >
+          <span className="text-xl leading-none" aria-hidden="true">
+            {user.avatar}
+          </span>
+          <span className="max-w-32 truncate text-sm font-medium">{user.pseudo}</span>
+          {!user.isGuest && (
+            <span className="text-xs text-success" title={fr.accountSaved} aria-label={fr.accountSaved}>
+              ✓
+            </span>
+          )}
+        </button>
+        <div className="flex-1" />
+        <SoundToggle />
       </div>
 
-      <div className="w-full space-y-3 pb-4">
+      {/* Identité de marque */}
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+          className="text-center"
+        >
+          {/* Deux cartes croisées, dessinées en CSS */}
+          <div className="relative mx-auto mb-5 h-24 w-24" aria-hidden="true">
+            <div
+              className="absolute left-2 top-1 h-20 w-14 -rotate-12 rounded-lg bg-linear-to-b from-paper-50 to-paper-100 ring-1 ring-black/15"
+              style={{ boxShadow: 'var(--shadow-card)' }}
+            >
+              <span className="absolute inset-0 flex items-center justify-center text-2xl text-suit-red">♥</span>
+            </div>
+            <div
+              className="absolute left-8 top-3 h-20 w-14 rotate-[10deg] rounded-lg bg-linear-to-b from-paper-50 to-paper-100 ring-1 ring-black/15"
+              style={{ boxShadow: 'var(--shadow-card-lifted)' }}
+            >
+              <span className="absolute inset-0 flex items-center justify-center text-2xl text-suit-black">♠</span>
+            </div>
+          </div>
+
+          <h1 className="font-display text-5xl font-bold tracking-tight text-brass-300">{fr.appName}</h1>
+          <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-snug text-paper-50/55">{fr.tagline}</p>
+
+          {stats && stats.gamesPlayed > 0 && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="mt-4 text-xs tabular-nums text-paper-50/45"
+            >
+              {stats.gamesPlayed} {fr.gamesPlayed} · {stats.gamesWon} {fr.gamesWon}
+            </motion.p>
+          )}
+        </motion.div>
+      </div>
+
+      {/* Actions principales */}
+      <div className="space-y-2.5">
         {roomCode && (
           <button
             type="button"
             onClick={onResume}
-            disabled={!socketConnected}
-            className="w-full rounded-2xl bg-white/15 py-3.5 text-base font-semibold shadow-lg active:scale-95 disabled:opacity-50"
+            disabled={disabled}
+            className="w-full rounded-2xl bg-white/8 py-3 text-sm font-semibold ring-1 ring-white/10 transition active:scale-[0.98] disabled:opacity-40"
           >
-            ↩️ {fr.resumeGame} · {roomCode}
+            {fr.resumeGame} · {roomCode}
           </button>
         )}
         <button
           type="button"
           data-testid="create-game"
           onClick={onCreate}
-          disabled={!socketConnected}
-          className="w-full rounded-2xl bg-gold-400 py-4 text-lg font-bold text-felt-900 shadow-lg active:scale-95 disabled:opacity-50"
+          disabled={disabled}
+          className="w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-4 text-lg font-bold text-felt-950 transition active:scale-[0.98] disabled:opacity-40"
+          style={{ boxShadow: '0 4px 20px -6px rgb(0 0 0 / 0.6)' }}
         >
           {fr.createGame}
         </button>
         <button
           type="button"
-          onClick={() => navigate('/join')}
-          disabled={!socketConnected}
-          className="w-full rounded-2xl border-2 border-gold-400/70 py-3.5 text-lg font-bold text-gold-300 shadow-lg active:scale-95 disabled:opacity-50"
+          data-testid="goto-join"
+          onClick={() => {
+            unlockAudio();
+            navigate('/join');
+          }}
+          disabled={disabled}
+          className="w-full rounded-2xl bg-white/8 py-3.5 text-base font-semibold ring-1 ring-white/10 transition active:scale-[0.98] disabled:opacity-40"
         >
           {fr.joinGame}
         </button>
+
+        {!socketConnected && (
+          <p className="pt-1 text-center text-xs text-paper-50/40">{fr.reconnecting}</p>
+        )}
       </div>
     </div>
   );

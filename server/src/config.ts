@@ -12,6 +12,8 @@ const envSchema = z.object({
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().optional(),
   NODE_ENV: z.string().default('development'),
+  /** Délai minimal (ms) avant qu'un joueur automatique ne joue. 0 = instantané. */
+  BOT_DELAY_MS: z.coerce.number().min(0).default(800),
 });
 
 export type Config = ReturnType<typeof loadConfig>;

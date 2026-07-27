@@ -80,6 +80,8 @@ beforeAll(async () => {
     DB_PATH: ':memory:',
     JWT_SECRET: 'secret-de-test',
     PORT: '0',
+    // Les bots jouent instantanément en test (sinon ~350 actions × 1 s).
+    BOT_DELAY_MS: '0',
   } as NodeJS.ProcessEnv);
   server = createApp(config);
   await new Promise<void>((resolve) => server.httpServer.listen(0, resolve));
@@ -245,5 +247,134 @@ describe('partie complète à 3 joueurs', () => {
   it('ferme proprement', () => {
     for (const c of clients) c.socket.close();
     carol.socket.close();
+  });
+});
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+/**
+ * Joue le rôle de l'humain (option légale la plus simple) jusqu'à `game-over`,
+ * les bots jouant tout seuls entre-temps.
+ */
+async function playUntilGameOver(c: TestClient, timeoutMs = 60_000): Promise<GameView> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const v = c.view!;
+    if (v.phase === 'game-over') return v;
+    if (v.phase === 'round-scoring') {
+      await c.emit('game:nextRound').catch(() => undefined);
+    } else if (v.round?.legalBids) {
+      await c.emit('game:bid', { bid: v.round.legalBids[0] }).catch(() => undefined);
+    } else if (v.round?.legalCardIds) {
+      await c.emit('game:playCard', { cardId: v.round.legalCardIds[0] }).catch(() => undefined);
+    } else {
+      await sleep(5);
+    }
+  }
+  throw new Error(`partie non terminée (phase ${c.view?.phase})`);
+}
+
+describe('joueurs automatiques', () => {
+  let alice: TestClient, dave: TestClient;
+  let code: string;
+
+  it('refuse l’ajout d’un bot par un non-hôte', async () => {
+    alice = await createUser('AliceBot');
+    dave = await createUser('DaveBot');
+    await Promise.all([alice.connect(), dave.connect()]);
+
+    const created = await alice.emit<{ ok: boolean; code: string }>('room:create');
+    code = created.code;
+    expect((await dave.emit('room:join', { code })).ok).toBe(true);
+
+    const res = await dave.emit<{ ok: boolean; error?: { code: string } }>('room:addBot');
+    expect(res.ok).toBe(false);
+    expect(res.error!.code).toBe('NOT_HOST');
+
+    expect((await dave.emit('room:leave')).ok).toBe(true);
+    await alice.waitView((v) => v.players.length === 1, 'dave parti');
+  });
+
+  it('ajoute des bots depuis le lobby', async () => {
+    const first = await alice.emit<{ ok: boolean; playerId: string }>('room:addBot');
+    expect(first.ok).toBe(true);
+    expect(first.playerId.startsWith('bot:')).toBe(true);
+    expect((await alice.emit('room:addBot')).ok).toBe(true);
+    expect((await alice.emit('room:addBot')).ok).toBe(true);
+
+    const v = await alice.waitView((view) => view.players.length === 4, '1 humain + 3 bots');
+    const bots = v.players.filter((p) => p.id.startsWith('bot:'));
+    expect(bots).toHaveLength(3);
+    // Pseudos distincts, toujours « connectés », et jamais hôte
+    expect(new Set(bots.map((b) => b.pseudo)).size).toBe(3);
+    expect(bots.every((b) => b.connected)).toBe(true);
+    expect(v.hostId).toBe(alice.userId);
+  });
+
+  it('retire un bot et refuse de retirer un humain', async () => {
+    const botId = alice.view!.players.find((p) => p.id.startsWith('bot:'))!.id;
+    expect((await alice.emit('room:removeBot', { playerId: botId })).ok).toBe(true);
+    await alice.waitView((v) => v.players.length === 3, 'bot retiré');
+
+    const human = await alice.emit<{ ok: boolean; error?: { code: string } }>('room:removeBot', {
+      playerId: alice.userId,
+    });
+    expect(human.ok).toBe(false);
+    expect(human.error!.code).toBe('PLAYER_NOT_FOUND');
+  });
+
+  it(
+    'joue une partie complète 1 humain + 2 bots jusqu’à game-over',
+    async () => {
+      expect((await alice.emit('game:start')).ok).toBe(true);
+      await alice.waitView((v) => v.phase === 'bidding', 'phase bidding');
+
+      const before = alice.views.length;
+      const final = await playUntilGameOver(alice);
+
+      expect(final.phase).toBe('game-over');
+      expect(final.players).toHaveLength(3);
+      // L'humain a bien reçu un flux de vues tout au long de la partie
+      expect(alice.views.length - before).toBeGreaterThan(100);
+      for (const p of final.players) {
+        expect(Number.isInteger(p.totalScore)).toBe(true);
+      }
+      // Les bots ont réellement joué : au moins un a remporté des plis sur la partie
+      expect(final.players.some((p) => p.id.startsWith('bot:') && p.totalScore !== 0)).toBe(true);
+      expect(final.round!.roundIndex).toBe(final.roundsSequence.length - 1);
+    },
+    60_000,
+  );
+
+  it('n’enregistre pas de statistiques pour les bots', () => {
+    const bots = alice.view!.players.filter((p) => p.id.startsWith('bot:'));
+    expect(bots.length).toBeGreaterThan(0);
+    for (const b of bots) {
+      expect(server.users.getStats(b.id)).toEqual({ gamesPlayed: 0, gamesWon: 0, totalPoints: 0, bestRound: 0 });
+    }
+    // L'humain, lui, a bien une partie enregistrée
+    expect(server.users.getStats(alice.userId).gamesPlayed).toBe(1);
+  });
+
+  it('ferme la room quand il ne resterait plus que des bots', async () => {
+    const eve = await createUser('EveBot');
+    await eve.connect();
+    const created = await eve.emit<{ ok: boolean; code: string }>('room:create');
+    expect((await eve.emit('room:addBot')).ok).toBe(true);
+    expect((await eve.emit('room:addBot')).ok).toBe(true);
+    await eve.waitView((v) => v.players.length === 3, 'lobby avec bots');
+
+    expect(server.rooms.get(created.code)).toBeDefined();
+    expect((await eve.emit('room:leave')).ok).toBe(true);
+    expect(server.rooms.get(created.code)).toBeUndefined();
+    eve.socket.close();
+  });
+
+  it('refuse d’ajouter un bot une fois la partie lancée', async () => {
+    const res = await alice.emit<{ ok: boolean; error?: { code: string } }>('room:addBot');
+    expect(res.ok).toBe(false);
+    expect(res.error!.code).toBe('BAD_PHASE');
+    alice.socket.close();
+    dave.socket.close();
   });
 });

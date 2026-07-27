@@ -1,46 +1,80 @@
 import { useState } from 'react';
+import { motion } from 'motion/react';
 import { fr } from '../i18n/fr';
 
 interface Props {
   cardsCount: number;
   legalBids: number[];
+  /** Somme des annonces déjà faites (pour expliquer la règle du crochet). */
+  bidsSoFar: number;
   onBid: (bid: number) => void;
 }
 
-export default function BidPicker({ cardsCount, legalBids, onBid }: Props) {
+/**
+ * Barre d'annonce compacte, volontairement NON modale : la main du joueur
+ * reste visible en dessous — on ne peut pas choisir un contrat sans voir
+ * ses cartes.
+ */
+export default function BidPicker({ cardsCount, legalBids, bidsSoFar, onBid }: Props) {
   const [pending, setPending] = useState<number | null>(null);
-  const forbidden = Array.from({ length: cardsCount + 1 }, (_, i) => i).filter((b) => !legalBids.includes(b));
+  const all = Array.from({ length: cardsCount + 1 }, (_, i) => i);
+  const forbidden = all.find((b) => !legalBids.includes(b));
 
   return (
-    <div className="animate-slide-up rounded-t-2xl bg-felt-800/95 px-4 pb-6 pt-4 shadow-2xl backdrop-blur">
-      <p className="mb-3 text-center text-base font-semibold">{fr.yourBid}</p>
-      <div className="flex flex-wrap justify-center gap-2">
-        {Array.from({ length: cardsCount + 1 }, (_, b) => b).map((b) => {
-          const isLegal = legalBids.includes(b);
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+      className="mx-3 rounded-2xl bg-felt-900/75 px-3 py-2.5 ring-1 ring-white/10 backdrop-blur-md"
+      style={{ boxShadow: 'var(--shadow-panel)' }}
+      data-testid="bid-picker"
+    >
+      <div className="mb-2 flex items-baseline justify-between gap-2">
+        <p className="text-sm font-semibold text-paper-50">{fr.yourBid}</p>
+        <p className="text-[11px] tabular-nums text-paper-50/55">
+          {fr.bidsTotal(bidsSoFar, cardsCount)}
+        </p>
+      </div>
+
+      <div className="rk-scroll -mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5">
+        {all.map((b) => {
+          const legal = legalBids.includes(b);
+          const isPending = pending === b;
           return (
             <button
               key={b}
               type="button"
               data-testid={`bid-${b}`}
-              disabled={!isLegal || pending !== null}
+              disabled={!legal || pending !== null}
+              title={legal ? undefined : fr.hookForbidden(cardsCount)}
               onClick={() => {
                 setPending(b);
                 onBid(b);
               }}
-              className={`h-12 w-12 rounded-full text-lg font-bold transition ${
-                isLegal
-                  ? 'bg-gold-400 text-felt-900 shadow-md active:scale-90'
-                  : 'bg-white/10 text-white/30'
-              } ${pending === b ? 'scale-90 opacity-60' : ''}`}
+              className={`relative h-12 min-w-12 shrink-0 rounded-xl text-lg font-bold tabular-nums transition-all duration-150 ${
+                legal
+                  ? 'bg-linear-to-b from-brass-300 to-brass-500 text-felt-950 ring-1 ring-brass-200/50 active:scale-90'
+                  : 'bg-white/6 text-paper-50/25 ring-1 ring-white/8'
+              } ${isPending ? 'scale-90 opacity-60' : ''}`}
+              style={legal ? { boxShadow: '0 2px 8px -2px rgb(0 0 0 / 0.5)' } : undefined}
             >
               {b}
+              {!legal && (
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-1/2 top-1/2 h-[1.5px] w-7 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-full bg-paper-50/35"
+                />
+              )}
             </button>
           );
         })}
       </div>
-      {forbidden.length > 0 && (
-        <p className="mt-3 text-center text-xs text-white/60">{fr.hookForbidden(cardsCount)}</p>
+
+      {forbidden !== undefined && (
+        <p className="mt-1.5 text-[11px] leading-snug text-brass-200/70">
+          ⛓ {fr.hookExplain(forbidden, cardsCount)}
+        </p>
       )}
-    </div>
+    </motion.div>
   );
 }

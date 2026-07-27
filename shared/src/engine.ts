@@ -1,3 +1,4 @@
+import { isBotId } from './bot';
 import { cardFromId, cardId, fullDeck, hashSeed, mulberry32, shuffle, sortHand } from './cards';
 import { MAX_PLAYERS, MIN_PLAYERS, legalBids, legalCards, roundsSequence, scoreRound, trickWinner } from './rules';
 import type { CardId, GameState, Player, RoundState } from './types';
@@ -110,7 +111,9 @@ export function applyAction(prev: GameState, action: GameAction): EngineResult {
       state.players.splice(idx, 1);
       state.players.forEach((p, i) => (p.seat = i));
       if (state.hostId === action.playerId && state.players.length > 0) {
-        state.hostId = state.players[0].id;
+        // Un bot ne devient jamais hôte tant qu'il reste un humain.
+        const human = state.players.find((p) => !isBotId(p.id));
+        state.hostId = (human ?? state.players[0]).id;
       }
       return { ok: true, state };
     }

@@ -37,6 +37,10 @@ export interface ClientToServerEvents {
   'room:join': (payload: { code: string }, ack: (res: Ack<{ code: string }>) => void) => void;
   'room:leave': (ack: (res: Ack) => void) => void;
   'room:kick': (payload: { playerId: string }, ack: (res: Ack) => void) => void;
+  /** Ajoute un joueur automatique (hôte, lobby uniquement). */
+  'room:addBot': (ack: (res: Ack<{ playerId: string }>) => void) => void;
+  /** Retire un joueur automatique (hôte, lobby uniquement). */
+  'room:removeBot': (payload: { playerId: string }, ack: (res: Ack) => void) => void;
   'room:rematch': (ack: (res: Ack<{ code: string }>) => void) => void;
   'game:start': (ack: (res: Ack) => void) => void;
   'game:bid': (payload: { bid: number }, ack: (res: Ack) => void) => void;

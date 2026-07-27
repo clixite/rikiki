@@ -1,4 +1,6 @@
+import { AnimatePresence, motion } from 'motion/react';
 import type { CompletedTrick, GameView, Trick } from '@rikiki/shared';
+import { cardId } from '@rikiki/shared';
 import CardFace from './CardFace';
 
 interface Props {
@@ -6,33 +8,67 @@ interface Props {
   frozenTrick: CompletedTrick | null;
 }
 
+/**
+ * Centre du tapis. Les cartes conservent le `layoutId` qu'elles avaient dans
+ * la main : elles y « volent » naturellement (technique FLIP) au lieu
+ * d'apparaître d'un coup.
+ */
 export default function TrickArea({ view, frozenTrick }: Props) {
   const round = view.round!;
   const trick: Trick = frozenTrick ?? round.currentTrick;
   const winnerId = frozenTrick?.winnerId;
+  const empty = trick.plays.length === 0;
 
   return (
-    <div className="flex min-h-28 flex-wrap items-center justify-center gap-2 px-2">
-      {trick.plays.length === 0 && !frozenTrick ? (
-        <div className="h-17 w-12 rounded-lg border-2 border-dashed border-white/20" />
+    <div className="flex min-h-[7.5rem] w-full items-center justify-center px-3" data-testid="trick-area">
+      {empty ? (
+        <div className="flex h-24 w-16 items-center justify-center rounded-lg border border-dashed border-white/12">
+          <span className="text-xl text-white/12">♠</span>
+        </div>
       ) : (
-        trick.plays.map(({ playerId, card }) => {
-          const player = view.players.find((p) => p.id === playerId);
-          const isWinner = winnerId === playerId;
-          return (
-            <div
-              key={playerId}
-              className={`animate-card-in flex flex-col items-center gap-1 rounded-lg p-1 transition ${
-                isWinner ? 'bg-gold-400/25 ring-2 ring-gold-400' : ''
-              }`}
-            >
-              <CardFace card={card} size="md" />
-              <span className="max-w-14 truncate text-[10px] text-white/80">
-                {playerId === view.you ? '✦' : ''} {player?.pseudo}
-              </span>
-            </div>
-          );
-        })
+        <div className="flex flex-wrap items-end justify-center gap-x-2 gap-y-1">
+          <AnimatePresence mode="popLayout">
+            {trick.plays.map(({ playerId, card }) => {
+              const player = view.players.find((p) => p.id === playerId);
+              const isWinner = winnerId === playerId;
+              const isMine = playerId === view.you;
+              return (
+                <motion.div
+                  key={playerId}
+                  layout
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{
+                    opacity: 1,
+                    scale: isWinner ? 1.06 : 1,
+                    y: isWinner ? -4 : 0,
+                  }}
+                  exit={{ opacity: 0, scale: 0.7, transition: { duration: 0.18 } }}
+                  transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+                  className="flex flex-col items-center gap-1"
+                >
+                  <div className="relative">
+                    <CardFace card={card} size="md" layoutId={`card-${cardId(card)}`} />
+                    {isWinner && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="pointer-events-none absolute -inset-1 rounded-lg ring-2 ring-brass-300"
+                      />
+                    )}
+                  </div>
+                  <span
+                    className={`max-w-[4.5rem] truncate text-[10px] leading-tight ${
+                      isWinner ? 'font-semibold text-brass-200' : 'text-paper-50/60'
+                    }`}
+                  >
+                    {isMine ? '● ' : ''}
+                    {player?.pseudo}
+                  </span>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
       )}
     </div>
   );
