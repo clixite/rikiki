@@ -293,14 +293,17 @@ export const sl: Messages = {
   updateReload: 'Posodobi',
   version: (v: string) => `različica ${v}`,
 
-  // Accessibilité
+  // Dostopnost
   accessibility: 'Dostopnost',
-  colorblindMode: 'Ločene barve',
-  colorblindHint: 'Vsaka barva svojo barvo, da se ♥ ♦ ♠ ♣ ločijo tudi brez rdeče',
-  suitNames: { S: 'pik', H: 'srce', D: 'karo', C: 'križ' } as Record<string, string>,
+  colorblindMode: 'Ločeni odtenki',
+  colorblindHint:
+    'Vsaka barva ima svoj odtenek, da ♥ ♦ ♠ ♣ ločiš tudi brez rdeče',
+  // Rodilnik množine, da »as src« ali »kralj pikov« zveni pravilno
+  suitNames: { S: 'pikov', H: 'src', D: 'karov', C: 'križev' } as Record<string, string>,
   rankNames: { 11: 'fant', 12: 'dama', 13: 'kralj', 14: 'as' } as Record<number, string>,
   cardOf: (rank: string, suit: string) => `${rank} ${suit}`,
-  handOf: (n: number) => (n === 1 ? 'Tvoja roka: 1 karta' : n === 2 ? 'Tvoja roka: 2 karti' : n === 3 || n === 4 ? `Tvoja roka: ${n} karte` : `Tvoja roka: ${n} kart`),
+  handOf: (n: number) =>
+    `Tvoja roka: ${plural(n, '1 karta', `${n} karti`, `${n} karte`, `${n} kart`)}`,
 
   language: 'Jezik',
   languageHint: 'Izberi jezik aplikacije',

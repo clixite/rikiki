@@ -88,8 +88,8 @@ export const et: Messages = {
   bidsPending: (announced: number, cards: number) =>
     `${announced} / ${cards} — pakkumised käivad`,
   bidsBalanced: (cards: number) => `Täpselt paras: lubatud ${cards} tihi`,
-  bidsUnder: (n: number) => `${n} tihi jääb üle korjata`,
   bidsOver: (n: number) => `${n} tihi liiga palju: keegi kukub läbi`,
+  bidsUnder: (n: number) => `${n} tihi jääb üle korjata`,
   noBidYet: 'Pole veel pakkunud',
   tricksOfContract: (tricks: number, bid: number) => `${tricks}/${bid} tihi`,
   yourTurn: 'Sinu kord',

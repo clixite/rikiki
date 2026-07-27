@@ -284,14 +284,17 @@ export const pl: Messages = {
   updateReload: 'Zaktualizuj',
   version: (v: string) => `wersja ${v}`,
 
-  // Accessibilité
+  // Dostępność
   accessibility: 'Dostępność',
-  colorblindMode: 'Osobne kolory',
-  colorblindHint: 'Jeden kolor na figurę, by odróżnić ♥ ♦ ♠ ♣ bez polegania na czerwieni',
+  colorblindMode: 'Osobne odcienie',
+  colorblindHint:
+    'Inny odcień dla każdego koloru, by odróżniać ♥ ♦ ♠ ♣ bez polegania na czerwieni',
+  // Mianownik dla ♠♦, dopełniacz mnogi dla ♥♣ : « as pik », « król kier »
   suitNames: { S: 'pik', H: 'kier', D: 'karo', C: 'trefl' } as Record<string, string>,
   rankNames: { 11: 'walet', 12: 'dama', 13: 'król', 14: 'as' } as Record<number, string>,
   cardOf: (rank: string, suit: string) => `${rank} ${suit}`,
-  handOf: (n: number) => (n === 1 ? 'Twoja ręka: 1 karta' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? `Twoja ręka: ${n} karty` : `Twoja ręka: ${n} kart`),
+  handOf: (n: number) =>
+    `Twoja ręka: ${plural(n, '1 karta', `${n} karty`, `${n} kart`)}`,
 
   language: 'Język',
   languageHint: 'Wybierz język aplikacji',

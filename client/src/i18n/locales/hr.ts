@@ -70,12 +70,12 @@ export const hr: Messages = {
     blitz: 'Munjevita',
     normal: 'Normalna',
     climb: 'Rastuća',
-  } as unknown as Messages['formatNames'],
+  },
   formatDescriptions: {
     blitz: 'Gore i dolje do 5 karata',
     normal: 'Puni uspon pa spust',
     climb: 'Samo uzlazno, bez spusta',
-  } as unknown as Messages['formatDescriptions'],
+  },
   formatRounds: (n: number) => plural(n, `${n} runda`, `${n} runde`, `${n} rundi`),
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Format bira domaćin',
@@ -285,6 +285,18 @@ export const hr: Messages = {
   updateAvailable: 'Nova verzija',
   updateReload: 'Ažuriraj',
   version: (v: string) => `verzija ${v}`,
+
+  // Pristupačnost
+  accessibility: 'Pristupačnost',
+  colorblindMode: 'Odvojene nijanse',
+  colorblindHint:
+    'Svaka boja ima svoju nijansu, da ♥ ♦ ♠ ♣ razlikuješ i bez oslanjanja na crvenu',
+  // Genitiv, da „as herca” ili „kralj pika” zvuči ispravno
+  suitNames: { S: 'pika', H: 'herca', D: 'kara', C: 'trefa' } as Record<string, string>,
+  rankNames: { 11: 'dečko', 12: 'dama', 13: 'kralj', 14: 'as' } as Record<number, string>,
+  cardOf: (rank: string, suit: string) => `${rank} ${suit}`,
+  handOf: (n: number) =>
+    `Tvoje karte: ${plural(n, `${n} karta`, `${n} karte`, `${n} karata`)}`,
 
   language: 'Jezik',
   languageHint: 'Odaberi jezik aplikacije',

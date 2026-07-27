@@ -275,10 +275,10 @@ export const lv: Messages = {
   accessibility: 'Pieejamība',
   colorblindMode: 'Atšķirīgas krāsas',
   colorblindHint: 'Katrai mastai sava krāsa, lai ♥ ♦ ♠ ♣ atšķirtos arī bez sarkanās',
-  suitNames: { S: 'pīķi', H: 'ercens', D: 'kāravs', C: 'kreiss' } as Record<string, string>,
+  suitNames: { S: 'pīķa', H: 'ercena', D: 'kāravas', C: 'kreiča' } as Record<string, string>,
   rankNames: { 11: 'kalps', 12: 'dāma', 13: 'kungs', 14: 'dūzis' } as Record<number, string>,
   cardOf: (rank: string, suit: string) => `${suit} ${rank}`,
-  handOf: (n: number) => (n % 10 === 1 && n % 100 !== 11 ? `Tava roka: ${n} kārts` : `Tava roka: ${n} kārtis`),
+  handOf: (n: number) => `Tava roka: ${lvN(n, 'kārts', 'kārtis', 'kāršu')}`,
 
   language: 'Valoda',
   languageHint: 'Izvēlies lietotnes valodu',

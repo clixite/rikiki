@@ -12,7 +12,9 @@ const STORAGE_KEY = 'rikiki-locale';
  * 24 traductions dans le fichier principal. Le français, lui, est inclus
  * d'office — il sert de secours immédiat le temps du chargement.
  */
-const loaders = import.meta.glob<{ default: Messages }>('./locales/*.ts');
+// `import: 'default'` : chaque module de langue est résolu directement sur sa
+// traduction, sans passer par un objet intermédiaire.
+const loaders = import.meta.glob<Messages>('./locales/*.ts', { import: 'default' });
 
 const loaded = new Map<Locale, Messages>([['fr', fr]]);
 const listeners = new Set<() => void>();
@@ -67,8 +69,7 @@ async function load(locale: Locale): Promise<Messages> {
   const loader = loaders[`./locales/${locale}.ts`];
   if (!loader) return fr;
   try {
-    const mod = await loader();
-    const msgs = mod.default;
+    const msgs = await loader();
     loaded.set(locale, msgs);
     return msgs;
   } catch {

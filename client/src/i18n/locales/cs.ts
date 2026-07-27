@@ -282,14 +282,17 @@ export const cs: Messages = {
   updateReload: 'Aktualizovat',
   version: (v: string) => `verze ${v}`,
 
-  // Accessibilité
+  // Přístupnost
   accessibility: 'Přístupnost',
-  colorblindMode: 'Odlišné barvy',
-  colorblindHint: 'Jedna barva pro každou barvu karet, aby ♥ ♦ ♠ ♣ šly rozlišit i bez červené',
-  suitNames: { S: 'piky', H: 'srdce', D: 'káry', C: 'kříže' } as Record<string, string>,
+  colorblindMode: 'Odlišené barvy',
+  colorblindHint:
+    'Vlastní odstín pro každou barvu, ať ♥ ♦ ♠ ♣ rozlišíš i bez spoléhání na červenou',
+  // Druhý pád, aby « eso srdcí » nebo « král piků » dávalo smysl
+  suitNames: { S: 'piků', H: 'srdcí', D: 'kár', C: 'křížů' } as Record<string, string>,
   rankNames: { 11: 'kluk', 12: 'dáma', 13: 'král', 14: 'eso' } as Record<number, string>,
   cardOf: (rank: string, suit: string) => `${rank} ${suit}`,
-  handOf: (n: number) => (n === 1 ? 'Tvoje karty: 1 karta' : n >= 2 && n <= 4 ? `Tvoje karty: ${n} karty` : `Tvoje karty: ${n} karet`),
+  handOf: (n: number) =>
+    `Tvoje karty: ${plural(n, '1 karta', `${n} karty`, `${n} karet`)}`,
 
   language: 'Jazyk',
   languageHint: 'Vyber jazyk aplikace',
