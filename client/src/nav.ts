@@ -15,14 +15,36 @@ import { useNavigate, type NavigateOptions, type To } from 'react-router-dom';
  * régression.
  */
 
-type StartViewTransition = (cb: () => void | Promise<void>) => { finished: Promise<void> };
+interface ViewTransition {
+  finished: Promise<void>;
+  ready: Promise<void>;
+  updateCallbackDone: Promise<void>;
+}
+
+type StartViewTransition = (cb: () => void | Promise<void>) => ViewTransition;
 
 function startViewTransition(): StartViewTransition | null {
   if (typeof document === 'undefined') return null;
   const fn = (document as Document & { startViewTransition?: StartViewTransition }).startViewTransition;
   if (typeof fn !== 'function') return null;
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return null;
+  // Onglet en arrière-plan : le navigateur écarterait la transition aussitôt.
+  // Autant naviguer directement — il n'y a rien à animer sur un écran caché.
+  if (document.visibilityState !== 'visible') return null;
   return fn.bind(document);
+}
+
+/**
+ * Une transition écartée rejette ses trois promesses. Elles sont créées par le
+ * navigateur, pas par nous : si personne ne les observe, le rejet remonte en
+ * « unhandled rejection » alors qu'il ne signale aucune anomalie. On les
+ * observe donc toutes, et on ne réagit qu'à la fin de `finished`.
+ */
+function settle(transition: ViewTransition, onDone: () => void): void {
+  const ignore = (): void => {};
+  transition.ready.then(ignore, ignore);
+  transition.updateCallbackDone.then(ignore, ignore);
+  transition.finished.then(onDone, onDone);
 }
 
 /** Filet de sécurité : au-delà, on considère la navigation faite. */
@@ -94,15 +116,9 @@ export function useNav(): Nav {
         // Aller : la transition doit voir le DOM final tout de suite.
         flushSync(go);
       });
-      // `finished` est rejetée quand la transition est écartée — une seconde
-      // navigation lancée avant la fin de la première, un onglet passé en
-      // arrière-plan. Ce n'est pas une erreur : on nettoie dans les deux cas,
-      // et surtout on traite le rejet, sous peine de le voir remonter en
-      // « unhandled rejection ».
-      const clear = (): void => {
+      settle(transition, () => {
         delete document.documentElement.dataset.nav;
-      };
-      transition.finished.then(clear, clear);
+      });
     },
     [navigate],
   ) as Nav;
