@@ -20,6 +20,17 @@ export interface PublicUser {
   isGuest: boolean;
 }
 
+/** Une partie terminée, telle qu'affichée dans l'historique d'un joueur. */
+export interface GameHistoryEntry {
+  code: string;
+  playedAt: number;
+  playersCount: number;
+  myScore: number;
+  myRank: number;
+  won: boolean;
+  standings: { pseudo: string; avatar: string; score: number }[];
+}
+
 export interface UserStats {
   gamesPlayed: number;
   gamesWon: number;

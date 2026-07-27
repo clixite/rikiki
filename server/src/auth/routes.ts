@@ -37,6 +37,15 @@ export function authRoutes(users: UsersRepo, config: Config): Router {
     res.json({ user, stats: users.getStats(user.id) });
   });
 
+  router.get('/me/history', (req, res) => {
+    const userId = bearerUserId(req.headers.authorization, config.JWT_SECRET);
+    if (!userId || !users.getById(userId)) {
+      res.status(401).json({ error: 'INVALID_TOKEN', message: 'Session invalide.' });
+      return;
+    }
+    res.json({ games: users.getHistory(userId, 20) });
+  });
+
   router.patch('/me', (req, res) => {
     const userId = bearerUserId(req.headers.authorization, config.JWT_SECRET);
     const user = userId ? users.getById(userId) : null;

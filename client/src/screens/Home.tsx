@@ -100,14 +100,18 @@ export default function Home() {
           <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-snug text-paper-50/55">{fr.tagline}</p>
 
           {stats && stats.gamesPlayed > 0 && (
-            <motion.p
+            <motion.button
+              type="button"
+              data-testid="open-history"
+              onClick={() => navigate('/history')}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="mt-4 text-xs tabular-nums text-paper-50/45"
+              className="mx-auto mt-4 flex h-11 items-center gap-1.5 rounded-full bg-felt-900/40 px-4 text-xs tabular-nums text-paper-50/60 ring-1 ring-white/8 transition active:scale-95"
             >
               {stats.gamesPlayed} {fr.gamesPlayed} · {stats.gamesWon} {fr.gamesWon}
-            </motion.p>
+              <span className="text-paper-50/35">›</span>
+            </motion.button>
           )}
         </motion.div>
       </div>

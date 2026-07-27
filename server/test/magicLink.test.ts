@@ -101,3 +101,48 @@ describe('magic link', () => {
     expect(res.status).toBe(400);
   });
 });
+
+describe('historique des parties', () => {
+  it("est vide pour un nouveau joueur puis se remplit", async () => {
+    const guestRes = await post('/api/auth/guest', { pseudo: 'Historien', avatar: '🦉' });
+    const guest = (await guestRes.json()) as { token: string; user: { id: string } };
+
+    const empty = await fetch(`${baseUrl}/api/me/history`, {
+      headers: { Authorization: `Bearer ${guest.token}` },
+    });
+    expect(empty.status).toBe(200);
+    expect(((await empty.json()) as { games: unknown[] }).games).toEqual([]);
+
+    // Simule une partie terminée enregistrée par le serveur
+    server.users.addHistoryEntry({
+      userId: guest.user.id,
+      code: 'ABCD',
+      playedAt: 1_700_000_000_000,
+      playersCount: 3,
+      myScore: 42,
+      myRank: 1,
+      won: true,
+      standings: [
+        { pseudo: 'Historien', avatar: '🦉', score: 42 },
+        { pseudo: 'Ada', avatar: '🤖', score: 30 },
+      ],
+    });
+
+    const filled = await fetch(`${baseUrl}/api/me/history`, {
+      headers: { Authorization: `Bearer ${guest.token}` },
+    });
+    const { games } = (await filled.json()) as {
+      games: { code: string; myScore: number; won: boolean; standings: unknown[] }[];
+    };
+    expect(games).toHaveLength(1);
+    expect(games[0].code).toBe('ABCD');
+    expect(games[0].myScore).toBe(42);
+    expect(games[0].won).toBe(true);
+    expect(games[0].standings).toHaveLength(2);
+  });
+
+  it('refuse un historique sans session valide', async () => {
+    const res = await fetch(`${baseUrl}/api/me/history`);
+    expect(res.status).toBe(401);
+  });
+});

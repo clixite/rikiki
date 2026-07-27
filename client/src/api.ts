@@ -1,4 +1,4 @@
-import type { PublicUser, UserStats } from '@rikiki/shared';
+import type { GameHistoryEntry, PublicUser, UserStats } from '@rikiki/shared';
 import { useSession } from './store/session';
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -34,6 +34,34 @@ export function updateProfile(pseudo: string, avatar: string) {
     method: 'PATCH',
     body: JSON.stringify({ pseudo, avatar }),
   });
+}
+
+const HISTORY_CACHE_KEY = 'rikiki-history-cache';
+
+/** Historique en cache : affichage instantané, y compris hors ligne. */
+export function readCachedHistory(userId: string): GameHistoryEntry[] | null {
+  try {
+    const raw = localStorage.getItem(HISTORY_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { userId: string; games: GameHistoryEntry[] };
+    return parsed.userId === userId ? parsed.games : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedHistory(userId: string, games: GameHistoryEntry[]): void {
+  try {
+    localStorage.setItem(HISTORY_CACHE_KEY, JSON.stringify({ userId, games }));
+  } catch {
+    // quota plein ou navigation privée : le cache est optionnel
+  }
+}
+
+export async function fetchHistory(userId: string): Promise<GameHistoryEntry[]> {
+  const { games } = await request<{ games: GameHistoryEntry[] }>('/api/me/history');
+  writeCachedHistory(userId, games);
+  return games;
 }
 
 export function requestMagicLink(email: string) {

@@ -38,9 +38,24 @@ export function createApp(config: Config, overrides: { mailer?: Mailer } = {}) {
     io,
     (state, bestRounds) => {
       const maxScore = Math.max(...state.players.map((p) => p.totalScore));
-      // Les joueurs automatiques n'ont pas de compte : pas de stats pour eux.
+      const ranked = [...state.players].sort((a, b) => b.totalScore - a.totalScore);
+      const standings = ranked.map((p) => ({ pseudo: p.pseudo, avatar: p.avatar, score: p.totalScore }));
+      const playedAt = Date.now();
+
+      // Les joueurs automatiques n'ont pas de compte : ni stats ni historique.
       for (const p of state.players.filter((pl) => !isBotId(pl.id))) {
-        users.recordGameResult(p.id, p.totalScore, p.totalScore === maxScore, bestRounds[p.id] ?? 0);
+        const won = p.totalScore === maxScore;
+        users.recordGameResult(p.id, p.totalScore, won, bestRounds[p.id] ?? 0);
+        users.addHistoryEntry({
+          userId: p.id,
+          code: state.code,
+          playedAt,
+          playersCount: state.players.length,
+          myScore: p.totalScore,
+          myRank: ranked.findIndex((r) => r.id === p.id) + 1,
+          won,
+          standings,
+        });
       }
     },
     { botDelayMs: config.BOT_DELAY_MS },

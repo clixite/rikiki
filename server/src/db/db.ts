@@ -20,6 +20,22 @@ CREATE TABLE IF NOT EXISTS magic_links (
   used_at INTEGER
 );
 
+CREATE TABLE IF NOT EXISTS game_history (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  code TEXT NOT NULL,
+  played_at INTEGER NOT NULL,
+  players_count INTEGER NOT NULL,
+  my_score INTEGER NOT NULL,
+  my_rank INTEGER NOT NULL,
+  won INTEGER NOT NULL,
+  /* Classement complet sérialisé : [{pseudo, avatar, score}] */
+  standings TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_game_history_user
+  ON game_history(user_id, played_at DESC);
+
 CREATE TABLE IF NOT EXISTS stats (
   user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
   games_played INTEGER NOT NULL DEFAULT 0,

@@ -1,6 +1,6 @@
 import type Database from 'better-sqlite3';
 import crypto from 'node:crypto';
-import type { PublicUser, UserStats } from '@rikiki/shared';
+import type { GameHistoryEntry, PublicUser, UserStats } from '@rikiki/shared';
 
 interface UserRow {
   id: string;
@@ -73,6 +73,64 @@ export class UsersRepo {
       totalPoints: row?.total_points ?? 0,
       bestRound: row?.best_round ?? 0,
     };
+  }
+
+  /** Enregistre une partie terminée dans l'historique du joueur. */
+  addHistoryEntry(entry: {
+    userId: string;
+    code: string;
+    playedAt: number;
+    playersCount: number;
+    myScore: number;
+    myRank: number;
+    won: boolean;
+    standings: { pseudo: string; avatar: string; score: number }[];
+  }): void {
+    this.db
+      .prepare(
+        `INSERT INTO game_history
+           (user_id, code, played_at, players_count, my_score, my_rank, won, standings)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .run(
+        entry.userId,
+        entry.code,
+        entry.playedAt,
+        entry.playersCount,
+        entry.myScore,
+        entry.myRank,
+        entry.won ? 1 : 0,
+        JSON.stringify(entry.standings),
+      );
+  }
+
+  /** Dernières parties terminées, les plus récentes d'abord. */
+  getHistory(userId: string, limit = 20): GameHistoryEntry[] {
+    const rows = this.db
+      .prepare(
+        `SELECT code, played_at, players_count, my_score, my_rank, won, standings
+           FROM game_history WHERE user_id = ?
+          ORDER BY played_at DESC LIMIT ?`,
+      )
+      .all(userId, limit) as {
+      code: string;
+      played_at: number;
+      players_count: number;
+      my_score: number;
+      my_rank: number;
+      won: number;
+      standings: string;
+    }[];
+
+    return rows.map((r) => ({
+      code: r.code,
+      playedAt: r.played_at,
+      playersCount: r.players_count,
+      myScore: r.my_score,
+      myRank: r.my_rank,
+      won: r.won === 1,
+      standings: JSON.parse(r.standings) as GameHistoryEntry['standings'],
+    }));
   }
 
   recordGameResult(userId: string, points: number, won: boolean, bestRound: number): void {
