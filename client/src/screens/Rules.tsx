@@ -96,12 +96,16 @@ export default function Rules() {
           <div className="flex gap-2">
             <div className="flex-1 rounded-xl bg-success/10 p-2.5 ring-1 ring-success/20">
               <p className="text-xs font-semibold text-success">{fr.rulesScoreOk}</p>
-              <p className="mt-1 text-lg font-bold tabular-nums text-success">10 + 2 × plis</p>
+              <p className="mt-1 whitespace-nowrap text-[15px] font-bold tabular-nums text-success">
+                10 + 2 × plis
+              </p>
               <p className="mt-0.5 text-[11px] leading-snug text-paper-50/55">{fr.rulesScoreOkExample}</p>
             </div>
             <div className="flex-1 rounded-xl bg-danger/10 p-2.5 ring-1 ring-danger/20">
               <p className="text-xs font-semibold text-danger">{fr.rulesScoreKo}</p>
-              <p className="mt-1 text-lg font-bold tabular-nums text-danger">−2 × écart</p>
+              <p className="mt-1 whitespace-nowrap text-[15px] font-bold tabular-nums text-danger">
+                −2 × écart
+              </p>
               <p className="mt-0.5 text-[11px] leading-snug text-paper-50/55">{fr.rulesScoreKoExample}</p>
             </div>
           </div>

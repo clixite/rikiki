@@ -6,6 +6,8 @@ import { connectSocket, joinRoom } from './socket';
 import { useGame } from './store/game';
 import { useSession } from './store/session';
 import Game from './screens/Game';
+import GroupDetail from './screens/GroupDetail';
+import Groups from './screens/Groups';
 import History from './screens/History';
 import Home from './screens/Home';
 import Join from './screens/Join';
@@ -54,6 +56,8 @@ export default function App() {
         <Route path="/j/:code" element={<Join />} />
         <Route path="/game" element={<Game />} />
         <Route path="/history" element={<History />} />
+        <Route path="/groups" element={<Groups />} />
+        <Route path="/groups/:id" element={<GroupDetail />} />
         <Route path="/rules" element={<Rules />} />
         <Route path="/verify" element={<VerifyEmail />} />
         <Route path="*" element={<Navigate to="/" replace />} />
