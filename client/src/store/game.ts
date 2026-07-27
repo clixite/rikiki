@@ -1,8 +1,9 @@
 import { create } from 'zustand';
-import type { CompletedTrick, GameView, TransientEvent } from '@rikiki/shared';
+import type { Card, CompletedTrick, GameView, TransientEvent } from '@rikiki/shared';
 import { playSound } from '../audio';
 import { vibrate } from '../haptics';
 import { t as tr } from '../i18n';
+import { applyOptimistic, EMPTY_OPTIMISTIC, type OptimisticState } from './optimistic';
 
 
 const TRICK_FREEZE_MS = 1600;
@@ -18,7 +19,16 @@ interface GameStore {
   celebrate: number;
   closedReason: string | null;
   toast: string | null;
+  /** Coup joué localement, en attente de confirmation du serveur. */
+  optimistic: OptimisticState;
   setView: (view: GameView) => void;
+  /** Applique un coup immédiatement à l'écran (sans attendre le serveur). */
+  playOptimistic: (card: Card) => void;
+  bidOptimistic: (bid: number) => void;
+  /** Abandonne le coup local : la vue du serveur reprend la main. */
+  rollbackOptimistic: () => void;
+  /** Vue à afficher : serveur + coup local éventuel. */
+  displayView: () => GameView | null;
   onEvent: (event: TransientEvent) => void;
   setSocketConnected: (connected: boolean) => void;
   setClosed: (reason: string | null) => void;
@@ -50,6 +60,22 @@ export const useGame = create<GameStore>((set, get) => ({
   celebrate: 0,
   closedReason: null,
   toast: null,
+  optimistic: EMPTY_OPTIMISTIC,
+
+  playOptimistic: (card) => {
+    const view = get().view;
+    if (!view) return;
+    set({ optimistic: { ...get().optimistic, playedCard: { card, playerId: view.you } } });
+  },
+
+  bidOptimistic: (bid) => set({ optimistic: { ...get().optimistic, bid } }),
+
+  rollbackOptimistic: () => set({ optimistic: EMPTY_OPTIMISTIC }),
+
+  displayView: () => {
+    const { view, optimistic } = get();
+    return view ? applyOptimistic(view, optimistic) : null;
+  },
 
   setView: (view) => {
     const prev = get().view;
@@ -108,7 +134,8 @@ export const useGame = create<GameStore>((set, get) => ({
       playSound('gameStart');
     }
 
-    set({ view, closedReason: null });
+    // La vue du serveur fait foi : le coup local n'a plus lieu d'être
+    set({ view, closedReason: null, optimistic: EMPTY_OPTIMISTIC });
   },
 
   onEvent: (event) => {
@@ -145,7 +172,7 @@ export const useGame = create<GameStore>((set, get) => ({
 
   setClosed: (reason) => {
     if (freezeTimer) clearTimeout(freezeTimer);
-    set({ closedReason: reason, view: null, frozenTrick: null, roundOutcome: null });
+    set({ closedReason: reason, view: null, frozenTrick: null, roundOutcome: null, optimistic: EMPTY_OPTIMISTIC });
   },
 
   showToast: (message) => {
@@ -156,6 +183,6 @@ export const useGame = create<GameStore>((set, get) => ({
 
   reset: () => {
     if (freezeTimer) clearTimeout(freezeTimer);
-    set({ view: null, frozenTrick: null, roundOutcome: null, closedReason: null, toast: null });
+    set({ view: null, frozenTrick: null, roundOutcome: null, closedReason: null, toast: null, optimistic: EMPTY_OPTIMISTIC });
   },
 }));

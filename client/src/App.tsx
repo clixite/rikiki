@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import Confetti from './components/Confetti';
+import LiveAnnouncer from './components/LiveAnnouncer';
 import Toast from './components/Toast';
 import UpdatePrompt from './components/UpdatePrompt';
 import { useT } from './i18n';
@@ -56,6 +57,7 @@ export default function App() {
   return (
     <>
       <Confetti trigger={celebrate} intensity={celebrateIntensity} />
+      <LiveAnnouncer />
       <Toast />
       <UpdatePrompt />
       <Routes>

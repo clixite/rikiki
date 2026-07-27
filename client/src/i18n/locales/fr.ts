@@ -1,3 +1,5 @@
+import type { GameFormat } from '@rikiki/shared';
+
 export const fr = {
   appName: 'Rikiki',
   tagline: 'Le jeu de plis entre amis, chacun sur son téléphone',
@@ -46,12 +48,12 @@ export const fr = {
     blitz: 'Éclair',
     normal: 'Normale',
     climb: 'Montante',
-  } as const,
+  } as Record<GameFormat, string>,
   formatDescriptions: {
     blitz: 'Montée et descente jusqu’à 5 cartes',
     normal: 'Montée puis descente complètes',
     climb: 'Montée seule, sans redescente',
-  } as const,
+  } as Record<GameFormat, string>,
   formatRounds: (n: number) => (n > 1 ? `${n} manches` : '1 manche'),
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Format choisi par l’hôte',
@@ -244,6 +246,15 @@ export const fr = {
   updateAvailable: 'Nouvelle version',
   updateReload: 'Mettre à jour',
   version: (v: string) => `version ${v}`,
+
+  // Accessibilité
+  accessibility: 'Accessibilité',
+  colorblindMode: 'Couleurs distinctes',
+  colorblindHint: 'Une teinte par enseigne, pour distinguer ♥ ♦ ♠ ♣ sans dépendre du rouge',
+  suitNames: { S: 'pique', H: 'cœur', D: 'carreau', C: 'trèfle' } as Record<string, string>,
+  rankNames: { 11: 'valet', 12: 'dame', 13: 'roi', 14: 'as' } as Record<number, string>,
+  cardOf: (rank: string, suit: string) => `${rank} de ${suit}`,
+  handOf: (n: number) => (n > 1 ? `Ta main : ${n} cartes` : 'Ta main : 1 carte'),
 
   language: 'Langue',
   languageHint: 'Choisis la langue de l’application',

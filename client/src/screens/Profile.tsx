@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { createGuestAccount, requestMagicLink, updateProfile } from '../api';
 import Avatar, { AVATAR_IDS, DEFAULT_AVATAR_ID } from '../components/Avatar';
+import AccessibilitySection from '../components/AccessibilitySection';
 import LocalePicker from '../components/LocalePicker';
 import SoundToggle from '../components/SoundToggle';
 import { unlockAudio } from '../audio';
@@ -133,6 +134,7 @@ export default function Profile() {
         {error && <p className="mt-3 text-center text-sm text-danger">{error}</p>}
 
         <LocalePicker className="mt-6" />
+        <AccessibilitySection className="mt-3" />
 
         {user && <NotificationsSection />}
         {user && <AccountSection isGuest={user.isGuest} email={user.email} />}

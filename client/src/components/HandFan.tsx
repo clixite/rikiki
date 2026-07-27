@@ -30,6 +30,13 @@ const RAISE_PX = 12; // remontée d'une carte jouable
 const DEAL_STAGGER_S = 0.055;
 
 /**
+ * Distance de glissement vers le haut au-delà de laquelle la carte est jouée.
+ * Assez grande pour qu'un frôlement ne déclenche rien, assez courte pour
+ * rester un geste du pouce.
+ */
+const DRAG_TO_PLAY_PX = 64;
+
+/**
  * Main en éventail. L'espacement se resserre automatiquement pour que
  * TOUTES les cartes tiennent à l'écran, même à 10 cartes sur un petit
  * téléphone : jamais de défilement horizontal, jamais de carte hors champ.
@@ -108,11 +115,24 @@ export default function HandFan({
                 delay: i * DEAL_STAGGER_S,
                 opacity: { duration: 0.12, delay: i * DEAL_STAGGER_S },
               }}
+              // Glisser la carte vers le haut pour la jouer : geste naturel des
+              // jeux de cartes, et surtout impossible à déclencher par erreur —
+              // contrairement au simple appui, irréversible au moindre faux
+              // contact. L'appui reste actif pour qui préfère.
+              drag={legal ? 'y' : false}
+              dragConstraints={{ top: -140, bottom: 0 }}
+              dragElastic={0.18}
+              dragSnapToOrigin
+              onDragEnd={(_, info) => {
+                if (legal && info.offset.y < -DRAG_TO_PLAY_PX) onPlay(id);
+              }}
+              whileDrag={{ scale: 1.06, zIndex: 99 }}
               style={{
                 left: i * step,
                 transformOrigin: 'bottom center',
                 marginBottom: maxLift - lift,
                 zIndex: i,
+                touchAction: legal ? 'none' : undefined,
               }}
             >
               <CardFace

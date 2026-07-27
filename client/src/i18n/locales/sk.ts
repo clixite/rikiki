@@ -1,0 +1,301 @@
+import type { Messages } from '../types';
+
+/**
+ * Pluriel slovaque : trois formes.
+ *   1        → nominatif singulier (1 karta)
+ *   2-4      → nominatif pluriel   (3 karty)
+ *   0, 5+    → génitif pluriel     (7 kariet, 21 kariet)
+ */
+function plural(n: number, one: string, few: string, many: string): string {
+  if (n === 1) return one;
+  if (n >= 2 && n <= 4) return few;
+  return many;
+}
+
+const zdvihy = (n: number): string =>
+  plural(n, '1 zdvih', `${n} zdvihy`, `${n} zdvihov`);
+
+export const sk: Messages = {
+  appName: 'Rikiki',
+  tagline: 'Zdvihová hra s priateľmi, každý na svojom telefóne',
+
+  // Úvod
+  createGame: 'Založiť hru',
+  joinGame: 'Pripojiť sa k hre',
+  resumeGame: 'Pokračovať v hre',
+  myGames: 'Moje hry',
+
+  // Profil
+  yourPseudo: 'Tvoja prezývka',
+  pickAvatar: 'Vyber si avatara',
+  letsGo: 'Ideme na to!',
+  save: 'Uložiť',
+  editProfile: 'Môj profil',
+  changeAvatar: 'Zmeniť avatara',
+
+  // Pripojenie
+  enterCode: 'Kód hry',
+  join: 'Pripojiť sa',
+  gameCode: 'Kód hry',
+  copyLink: 'Kopírovať odkaz',
+  copied: 'Odkaz skopírovaný!',
+
+  // Čakáreň
+  invite: 'Pozvať priateľov',
+  players: 'Hráči',
+  host: 'Hostiteľ',
+  you: 'ty',
+  waitingForHost: 'Čakáme, kým hostiteľ spustí hru…',
+  needPlayers: (missing: number) =>
+    plural(
+      missing,
+      'Ešte 1 hráč a začíname',
+      `Ešte ${missing} hráči a začíname`,
+      `Ešte ${missing} hráčov a začíname`,
+    ),
+  startGame: 'Spustiť hru',
+  leave: 'Odísť',
+  kick: 'Vyhodiť',
+  addBot: 'Pridať robota',
+  addBotHint: 'Doplň stôl automatickým hráčom',
+  botsFull: 'Stôl je plný',
+  removeBot: 'Odobrať robota',
+
+  // Formát hry (dĺžka)
+  gameFormat: 'Formát hry',
+  gameFormatHint: 'Vyber dĺžku pred spustením',
+  formatNames: {
+    blitz: 'Bleskovka',
+    normal: 'Normálna',
+    climb: 'Stúpajúca',
+  },
+  formatDescriptions: {
+    blitz: 'Hore a dole až po 5 kariet',
+    normal: 'Celý výstup aj zostup',
+    climb: 'Len hore, bez zostupu',
+  },
+  formatRounds: (n: number) => plural(n, '1 kolo', `${n} kolá`, `${n} kôl`),
+  formatDuration: (minutes: number) => `≈ ${minutes} min`,
+  formatLocked: 'Formát určuje hostiteľ',
+
+  // Stôl
+  round: 'Kolo',
+  cards: (n: number) => plural(n, '1 karta', `${n} karty`, `${n} kariet`),
+  trump: 'Tromf',
+  noTrump: 'Bez tromfov',
+  dealer: 'Rozdávajúci',
+  offline: 'offline',
+  thinking: '…',
+  yourBid: 'Koľko zdvihov?',
+  bidsTotal: (sum: number, cards: number) => `Hlásenia: ${sum} / ${zdvihy(cards)}`,
+  hookForbidden: (n: number) => `Zakázané: súčet by bol presne ${n}`,
+  hookExplain: (forbidden: number, cards: number) =>
+    `${forbidden} je zakázané: súčet hlásení sa nesmie rovnať ${cards} (pravidlo háčika).`,
+  bid: 'Hlásenie',
+  tricks: 'Zdvihy',
+
+  // Prehľad hlásení kola
+  bidsAnnounced: 'Nahlásené',
+  bidsPending: (announced: number, cards: number) => `${announced} z ${cards} — hlási sa`,
+  bidsBalanced: (cards: number) => `Súčet sedí: ${zdvihy(cards)}`,
+  bidsOver: (n: number) =>
+    plural(
+      n,
+      'O 1 zdvih viac: niekto to odnesie',
+      `O ${n} zdvihy viac: niekto to odnesie`,
+      `O ${n} zdvihov viac: niekto to odnesie`,
+    ),
+  bidsUnder: (n: number) =>
+    plural(
+      n,
+      'Zostáva 1 zdvih navyše na pobratie',
+      `Zostávajú ${n} zdvihy navyše na pobratie`,
+      `Zostáva ${n} zdvihov navyše na pobratie`,
+    ),
+  noBidYet: 'Zatiaľ bez hlásenia',
+  tricksOfContract: (tricks: number, bid: number) => `${tricks}/${bid} zdvihov`,
+  yourTurn: 'Si na ťahu',
+  turnOf: (p: string) => `Na ťahu: ${p}`,
+  trickWonBy: (p: string) => `${p} berie zdvih`,
+  scoreboard: 'Skóre',
+  total: 'Spolu',
+
+  // Zhrnutie
+  roundRecap: 'Koniec kola',
+  contractKept: 'Záväzok splnený',
+  contractMissed: 'Záväzok nesplnený',
+  contract: 'Záväzok',
+  points: 'Body',
+  nextRound: 'Ďalšie kolo',
+  seeResults: 'Zobraziť výsledky',
+  waitingNextRound: 'Hostiteľ spustí ďalšie kolo…',
+
+  // Koniec hry
+  gameOver: 'Koniec hry',
+  playAgain: 'Odveta',
+  backHome: 'Domov',
+
+  // Zvuk
+  soundOn: 'Zapnúť zvuk',
+  soundOff: 'Vypnúť zvuk',
+
+  // Sieť
+  reconnecting: 'Obnovujem spojenie…',
+  playerDisconnected: (p: string) => `${p} stráca spojenie`,
+  playerReconnected: (p: string) => `${p} je späť`,
+  playerJoined: (p: string) => `${p} sa pripája k hre`,
+  playerLeft: (p: string) => `${p} opúšťa hru`,
+  roomClosed: 'Hra bola ukončená.',
+  roomClosedKicked: 'Vyhodili ťa z hry.',
+  roomClosedExpired: 'Hra vypršala.',
+
+  // Pozvánky
+  inviteMessage: (code: string, url: string) =>
+    `Poď si s nami zahrať Rikiki! 🃏\nKód hry: ${code}\nPripoj sa tu: ${url}`,
+  inviteWhatsApp: 'WhatsApp',
+  inviteSms: 'SMS',
+  inviteShare: 'Zdieľať',
+
+  // Účet
+  saveAccount: 'Uložiť môj postup',
+  saveAccountHint: 'Pošleme ti odkaz e-mailom — žiadne heslo si nemusíš pamätať',
+  emailPlaceholder: 'tvoj@email.sk',
+  sendMagicLink: 'Poslať mi odkaz',
+  magicLinkSent: 'E-mail odoslaný! Otvor odkaz a potvrď.',
+  accountSaved: 'Postup uložený',
+  verifying: 'Overujem…',
+  verified: 'Účet potvrdený! Tvoj postup je uložený.',
+  verifyFailed: 'Odkaz je neplatný alebo vypršal. Vyžiadaj si nový vo svojom profile.',
+
+  // Štatistiky a história
+  stats: 'Štatistiky',
+  gamesPlayed: 'hier',
+  gamesWon: 'výhier',
+  bestRound: 'najlepšie kolo',
+  noHistory: 'Zatiaľ žiadna dohraná hra.',
+  historyTitle: 'Moje posledné hry',
+  wonBadge: 'Výhra',
+  lostBadge: 'Prehra',
+  playersCount: (n: number) => plural(n, '1 hráč', `${n} hráči`, `${n} hráčov`),
+
+  // Skupiny priateľov
+  groups: 'Moje skupiny',
+  groupsTitle: 'Moje skupiny',
+  groupsSubtitle: 'Priebežné poradie pre tých, čo hrávajú stále spolu',
+  noGroups: 'Zatiaľ nie si v žiadnej skupine.',
+  createGroup: 'Vytvoriť skupinu',
+  createGroupCta: 'Vytvoriť skupinu',
+  groupNamePlaceholder: 'Utorková partia',
+  groupNameLabel: 'Názov skupiny',
+  groupNameTooShort: 'Názov musí mať 2 až 30 znakov.',
+  joinGroup: 'Pripojiť sa k skupine',
+  joinGroupCta: 'Pripojiť sa',
+  groupCodeLabel: 'Kód skupiny',
+  groupCodePlaceholder: 'ABCDEF',
+  groupCodeHint: '6 písmen, bez I, L a O',
+  groupCode: 'Kód skupiny',
+  groupShareHint: 'Zdieľaj tento kód, nech sa priatelia pridajú do skupiny',
+  copyGroupCode: 'Kopírovať kód',
+  groupCodeCopied: 'Kód skopírovaný!',
+  groupMembers: (n: number) => plural(n, '1 člen', `${n} členovia`, `${n} členov`),
+  groupGames: (n: number) =>
+    n === 0 ? 'žiadna hra' : plural(n, '1 hra', `${n} hry`, `${n} hier`),
+  groupRanking: 'Celkové poradie',
+  groupRecentGames: 'Posledné hry skupiny',
+  groupNoGames: 'V skupine sa zatiaľ nehralo.',
+  groupNoGamesHint: 'Zahraj si s touto skupinou — výsledky sa objavia tu.',
+  groupPlay: 'Hrať s touto skupinou',
+  groupOwner: 'Zakladateľ',
+  groupLeave: 'Opustiť skupinu',
+  groupLeaveConfirm: 'Opustiť túto skupinu? Tvoje odohrané hry v poradí ostanú.',
+  groupDelete: 'Zmazať skupinu',
+  groupDeleteConfirm: 'Zmazať túto skupinu aj celé jej poradie? Nedá sa to vrátiť.',
+  groupOwnerCannotLeave: 'Toto je tvoja skupina — môžeš ju len zmazať.',
+  groupNotFound: 'Skupina sa nenašla.',
+  groupJoined: (name: string) => `Si v skupine „${name}“!`,
+  groupCreated: (name: string) => `Skupina „${name}“ vytvorená!`,
+  groupAttached: (name: string) => `Hra priradená k skupine „${name}“`,
+  groupTotalPoints: 'bodov',
+  groupRankHeader: '#',
+  groupPlayerHeader: 'Hráč',
+  groupPointsHeader: 'B',
+  groupPlayedHeader: 'H',
+  groupWonHeader: 'V',
+
+  // Pravidlá hry
+  rules: 'Pravidlá hry',
+  rulesTitle: 'Ako sa hrá',
+  rulesSubtitle: 'Rikiki za 2 minúty',
+  rulesGoalTitle: 'O čo ide',
+  rulesGoalText:
+    'Pred každým kolom nahlásiš, koľko zdvihov podľa seba získaš. Celé umenie je trafiť sa presne: ani viac, ani menej. Veľa zdvihov je na nič, ak bolo hlásenie nízke.',
+  rulesDealTitle: 'Rozdávanie',
+  rulesDealText:
+    'Hra má viacero kôl. V prvom dostane každý len jednu kartu, potom dve, potom tri… a potom sa zase klesá. V každom kole majú všetci rovnaký počet kariet.',
+  rulesTrumpText: 'Jedna karta sa otočí: jej farba je tromfom kola.',
+  rulesBidTitle: 'Hlásenie',
+  rulesBidText:
+    'Postupne každý nahlási počet zdvihov, o ktoré sa usiluje — od 0 po počet kariet v ruke. Rozhoduješ sa podľa svojich kariet a tromfu.',
+  rulesHookTitle: 'Pravidlo háčika',
+  rulesHookText:
+    'Posledný hlásiaci (rozdávajúci) si nesmie vybrať číslo, po ktorom by súčet hlásení presne zodpovedal počtu zdvihov v kole. Výsledok: niekto bude určite sklamaný. Zakázané číslo je automaticky prečiarknuté.',
+  rulesPlayTitle: 'Hra o zdvihy',
+  rulesPlayText:
+    'Vynáša hráč naľavo od rozdávajúceho. Každý priloží jednu kartu a najsilnejšia berie zdvih. Víťaz vynáša do ďalšieho zdvihu.',
+  rulesFollowSuit: 'Musíš priznať farbu, ak ju máš.',
+  rulesNoSuit: 'Inak hráš, čo chceš: prebiješ tromfom alebo odhodíš.',
+  rulesWinTrick: 'Vyhráva najvyšší tromf; bez tromfu najvyššia karta vynesenej farby.',
+  rulesScoreTitle: 'Body',
+  rulesScoreOk: 'Záväzok splnený',
+  rulesScoreOkExample: 'Hlásenie 3, získané 3 → 16 bodov',
+  rulesScoreKo: 'Záväzok nesplnený',
+  rulesScoreKoExample: 'Hlásenie 3, získaný 1 → −4 body',
+  rulesScoreZero:
+    'Nahlásiť 0 a nezískať ani jeden zdvih dá 10 bodov: veľmi výnosný záväzok.',
+  rulesEndTitle: 'Koniec hry',
+  rulesEndText:
+    'Keď sa odohrajú všetky kolá, vyhráva hráč s najvyšším súčtom bodov. Tabuľku skóre si môžeš počas hry kedykoľvek otvoriť.',
+  rulesTip:
+    'Tip: v krátkych kolách stačí na zdvih zvyčajne eso alebo vysoký tromf. V dlhých si dávaj pozor na dlhé farby.',
+  rulesGotIt: 'Rozumiem',
+
+  // Upozornenia „si na ťahu“
+  notificationsTitle: 'Upozorniť ma, keď budem na ťahu',
+  notificationsHint:
+    'Odlož telefón: pošleme ti upozornenie, len čo na teba stôl čaká. Ideálne na hry roztiahnuté cez celý deň.',
+  notificationsEnable: 'Zapnúť upozornenia',
+  notificationsOn: 'Upozornenia zapnuté',
+  notificationsOff: 'Upozornenia vypnuté',
+  notificationsChecking: 'Overujem…',
+  notificationsUnsupported: 'Tvoj prehliadač upozornenia nepodporuje.',
+  notificationsNeedsInstall:
+    'Na iPhone a iPade najprv pridaj Rikiki na plochu (Zdieľať → „Pridať na plochu“) a potom sa sem vráť.',
+  notificationsDenied:
+    'Upozornenia sú pre túto stránku zablokované. Povoľ ich znova v nastaveniach prehliadača.',
+  notificationsNoServiceWorker:
+    'Upozornenia tu nie sú dostupné (nainštaluj aplikáciu alebo obnov stránku).',
+  notificationsServerOff: 'Upozornenia nie sú na serveri nastavené.',
+  notificationsError: 'Upozornenia sa nepodarilo zmeniť.',
+
+  updateAvailable: 'Nová verzia',
+  updateReload: 'Aktualizovať',
+  version: (v: string) => `verzia ${v}`,
+
+  // Accessibilité
+  accessibility: 'Prístupnosť',
+  colorblindMode: 'Odlišné farby',
+  colorblindHint: 'Jedna farba na každú kartovú farbu, aby ♥ ♦ ♠ ♣ boli rozlíšiteľné aj bez červenej',
+  suitNames: { S: 'piky', H: 'srdcia', D: 'káry', C: 'krížy' } as Record<string, string>,
+  rankNames: { 11: 'dolník', 12: 'dáma', 13: 'kráľ', 14: 'eso' } as Record<number, string>,
+  cardOf: (rank: string, suit: string) => `${rank} ${suit}`,
+  handOf: (n: number) => (n === 1 ? 'Tvoje karty: 1 karta' : n >= 2 && n <= 4 ? `Tvoje karty: ${n} karty` : `Tvoje karty: ${n} kariet`),
+
+  language: 'Jazyk',
+  languageHint: 'Vyber jazyk aplikácie',
+
+  loading: 'Načítavam…',
+  errorTitle: 'Ejha',
+  copyright: '© 2026 Nicolas Simon',
+};
+
+export default sk;

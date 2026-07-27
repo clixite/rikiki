@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
+import { cardId } from '@rikiki/shared';
 import BidPicker from '../components/BidPicker';
 import BidsSummary from '../components/BidsSummary';
 import HandFan from '../components/HandFan';
@@ -16,6 +17,7 @@ import { useT } from '../i18n';
 
 import { placeBid, playCard } from '../socket';
 import { useGame } from '../store/game';
+import { applyOptimistic } from '../store/optimistic';
 
 interface Props {
   view: GameView;
@@ -28,9 +30,12 @@ interface Props {
  * n'est jamais recouverte — ni pendant les annonces, ni pendant le jeu.
  * Chaque zone occupe sa propre ligne d'une colonne flex, sans superposition.
  */
-export default function Table({ view }: Props) {
+export default function Table({ view: serverView }: Props) {
   const t = useT();
   const frozenTrick = useGame((s) => s.frozenTrick);
+  const optimistic = useGame((s) => s.optimistic);
+  // Le coup local s'affiche sans attendre la réponse du serveur
+  const view = applyOptimistic(serverView, optimistic);
   const [scoresOpen, setScoresOpen] = useState(false);
   const round = view.round!;
   const me = view.players.find((p) => p.id === view.you)!;
@@ -48,15 +53,26 @@ export default function Table({ view }: Props) {
   const trickBusy = round.currentTrick.plays.length > 0 || frozenTrick !== null;
 
   const onPlay = async (id: string) => {
+    const card = round.myHand.find((c) => cardId(c) === id);
+    if (!card) return;
     vibrate('tap');
+    useGame.getState().playOptimistic(card);
     const res = await playCard(id);
-    if (!res.ok) useGame.getState().showToast(res.error.message);
+    if (!res.ok) {
+      // Coup refusé : on rend la carte à la main et on explique
+      useGame.getState().rollbackOptimistic();
+      useGame.getState().showToast(res.error.message);
+    }
   };
 
   const onBid = async (bid: number) => {
     vibrate('tap');
+    useGame.getState().bidOptimistic(bid);
     const res = await placeBid(bid);
-    if (!res.ok) useGame.getState().showToast(res.error.message);
+    if (!res.ok) {
+      useGame.getState().rollbackOptimistic();
+      useGame.getState().showToast(res.error.message);
+    }
   };
 
   const statusText = frozenTrick

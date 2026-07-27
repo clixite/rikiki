@@ -160,6 +160,28 @@ a[role='button'] {
   animation: rk-shimmer 2.4s linear infinite;
 }
 
+/*
+ * Mode « couleurs distinctes » (daltonisme).
+ *
+ * Rouge et noir sont le seul repère entre les couleurs d'un jeu de cartes :
+ * pour une deutéranopie ou une protanopie, ♥ et ♠ deviennent identiques.
+ * Le standard des jeux de cartes est le paquet à quatre couleurs — on le
+ * propose en option, sans toucher au rendu classique par défaut.
+ */
+:root[data-colorblind='true'] {
+  --color-suit-red: #c62828; /* cœur : rouge franc */
+  --color-suit-black: #1a1a1a; /* pique : noir */
+  --color-suit-diamond: #1565c0; /* carreau : bleu */
+  --color-suit-club: #2e7d32; /* trèfle : vert */
+}
+
+/* Contraste renforcé si le système le demande */
+@media (prefers-contrast: more) {
+  :root {
+    --color-paper-50: #ffffff;
+  }
+}
+
 /* Accessibilité : on coupe tout mouvement non essentiel */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -189,4 +211,17 @@ a[role='button'] {
 :focus-visible {
   outline: 2px solid var(--color-brass-400);
   outline-offset: 2px;
+}
+
+/* Visible des seuls lecteurs d'écran */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }

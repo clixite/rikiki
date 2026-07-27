@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import type { Card, Suit } from '@rikiki/shared';
+import { t } from '../i18n';
 
 const SUIT_SYMBOL: Record<Suit, string> = { S: '♠', H: '♥', D: '♦', C: '♣' };
 const RANK_LABEL: Record<number, string> = { 11: 'V', 12: 'D', 13: 'R', 14: 'A' };
@@ -14,6 +15,25 @@ export function rankLabel(rank: number): string {
 
 export function isRedSuit(suit: Suit): boolean {
   return suit === 'H' || suit === 'D';
+}
+
+/**
+ * Couleur d'encre d'une carte.
+ * En mode « couleurs distinctes », les quatre enseignes ont chacune leur
+ * teinte (paquet dit à quatre couleurs) : indispensable pour distinguer ♥ de
+ * ♠ quand on ne perçoit pas le rouge.
+ */
+function suitInkClass(suit: Suit): string {
+  switch (suit) {
+    case 'H':
+      return 'text-suit-red';
+    case 'D':
+      return 'text-[var(--color-suit-diamond,var(--color-suit-red))]';
+    case 'C':
+      return 'text-[var(--color-suit-club,var(--color-suit-black))]';
+    default:
+      return 'text-suit-black';
+  }
 }
 
 export type CardSize = 'xs' | 'sm' | 'md' | 'lg';
@@ -42,11 +62,14 @@ interface Props {
   ariaLabel?: string;
 }
 
-const SUIT_NAMES: Record<Suit, string> = { S: 'pique', H: 'cœur', D: 'carreau', C: 'trèfle' };
-const RANK_NAMES: Record<number, string> = { 11: 'valet', 12: 'dame', 13: 'roi', 14: 'as' };
-
+/**
+ * Nom de la carte lu par les lecteurs d'écran, dans la langue de l'interface.
+ * Sans cela, une carte n'est qu'un symbole muet pour qui navigue à la voix.
+ */
 export function cardLabel(card: Card): string {
-  return `${RANK_NAMES[card.rank] ?? card.rank} de ${SUIT_NAMES[card.suit]}`;
+  const m = t();
+  const rank = m.rankNames[card.rank] ?? String(card.rank);
+  return m.cardOf(rank, m.suitNames[card.suit] ?? card.suit);
 }
 
 export default function CardFace({
@@ -61,7 +84,6 @@ export default function CardFace({
   ariaLabel,
 }: Props) {
   const s = SIZES[size];
-  const red = isRedSuit(card.suit);
   const interactive = Boolean(onClick);
 
   const content = (
@@ -84,7 +106,7 @@ export default function CardFace({
   const base = `${s.w} aspect-[2/3] ${s.radius} relative flex items-center justify-center
     bg-linear-to-b from-paper-50 to-paper-100
     ${trump ? 'ring-2 ring-brass-400' : 'ring-1 ring-black/15'}
-    ${red ? 'text-suit-red' : 'text-suit-black'}
+    ${suitInkClass(card.suit)}
     ${dimmed ? 'opacity-35 saturate-50' : ''}
     ${className}`;
 
