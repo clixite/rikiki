@@ -141,6 +141,15 @@ export const pt: Messages = {
   verified: 'Conta confirmada! O teu progresso está guardado.',
   verifyFailed: 'Link inválido ou expirado. Pede outro no teu perfil.',
 
+  privacyPolicy: 'Privacidade',
+  deleteAccount: 'Eliminar a minha conta',
+  deleteAccountHint: 'Apaga o teu perfil, o histórico e os grupos.',
+  deleteAccountWarning: 'A tua alcunha, as tuas partidas, as tuas estatísticas e os teus grupos serão apagados. Esta ação é definitiva.',
+  deleteAccountAction: 'Sim, apagar tudo',
+  deleteAccountDone: 'Conta eliminada.',
+  cancel: 'Cancelar',
+  botTag: 'bot',
+
   // Estatísticas e histórico
   stats: 'Estatísticas',
   gamesPlayed: 'jogos',

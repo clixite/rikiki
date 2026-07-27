@@ -139,6 +139,17 @@ export const fr = {
   verified: 'Compte confirmé ! Ta progression est sauvegardée.',
   verifyFailed: 'Lien invalide ou expiré. Redemande un lien depuis ton profil.',
 
+  // Confidentialité et suppression du compte
+  privacyPolicy: 'Confidentialité',
+  deleteAccount: 'Supprimer mon compte',
+  deleteAccountHint: 'Efface ton profil, ton historique et tes groupes.',
+  deleteAccountWarning:
+    'Ton pseudo, tes parties, tes statistiques et tes groupes seront effacés. Cette action est définitive.',
+  deleteAccountAction: 'Oui, tout supprimer',
+  deleteAccountDone: 'Compte supprimé.',
+  cancel: 'Annuler',
+  botTag: 'robot',
+
   // Statistiques et historique
   stats: 'Statistiques',
   gamesPlayed: 'parties',

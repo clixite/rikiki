@@ -58,10 +58,9 @@ export default function GameOver({ view }: Props) {
             initial={{ y: -10 }}
             animate={{ y: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.1 }}
-            className="my-2 text-7xl"
-            aria-hidden="true"
+            className="my-2"
           >
-            {winner.avatar}
+            <PlayerAvatar avatar={winner.avatar} size={96} className="mx-auto" />
           </motion.div>
           <p className="font-display text-2xl font-bold text-brass-300">{winner.pseudo}</p>
           <p className="mt-0.5 text-sm text-paper-50/60">

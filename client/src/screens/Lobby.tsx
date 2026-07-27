@@ -96,7 +96,7 @@ export default function Lobby({ view }: Props) {
                 <span className="min-w-0 flex-1 truncate text-[15px] font-medium">
                   {p.pseudo}
                   {p.id === view.you && <span className="ml-1.5 text-xs text-paper-50/45">({t.you})</span>}
-                  {bot && <span className="ml-1.5 text-xs text-paper-50/45">· robot</span>}
+                  {bot && <span className="ml-1.5 text-xs text-paper-50/45">· {t.botTag}</span>}
                 </span>
                 {p.id === view.hostId && (
                   <span className="rounded-full bg-brass-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brass-300">

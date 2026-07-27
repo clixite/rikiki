@@ -165,3 +165,62 @@ describe('historique des parties', () => {
     expect(res.status).toBe(401);
   });
 });
+
+describe('suppression de compte', () => {
+  it('efface le compte et tout ce qui en dépend', async () => {
+    const guestRes = await post('/api/auth/guest', { pseudo: 'Éphémère', avatar: 'a2' });
+    const guest = (await guestRes.json()) as { token: string; user: { id: string } };
+    const auth = { Authorization: `Bearer ${guest.token}` };
+
+    server.users.addHistoryEntry({
+      userId: guest.user.id,
+      code: 'ZZZZ',
+      playedAt: 1_700_000_000_000,
+      playersCount: 3,
+      myScore: 10,
+      myRank: 2,
+      won: false,
+      standings: [{ pseudo: 'Éphémère', avatar: 'a2', score: 10 }],
+    });
+
+    const del = await fetch(`${baseUrl}/api/me`, { method: 'DELETE', headers: auth });
+    expect(del.status).toBe(200);
+
+    // Le jeton reste cryptographiquement valide : c'est l'absence du compte
+    // qui doit fermer la porte.
+    const me = await fetch(`${baseUrl}/api/me`, { headers: auth });
+    expect(me.status).toBe(401);
+
+    expect(server.users.getById(guest.user.id)).toBeNull();
+    const rows = server.db
+      .prepare('SELECT COUNT(*) AS n FROM game_history WHERE user_id = ?')
+      .get(guest.user.id) as { n: number };
+    expect(rows.n).toBe(0);
+    const stats = server.db
+      .prepare('SELECT COUNT(*) AS n FROM stats WHERE user_id = ?')
+      .get(guest.user.id) as { n: number };
+    expect(stats.n).toBe(0);
+  });
+
+  it('invalide les liens de connexion en attente du compte supprimé', async () => {
+    const guestRes = await post('/api/auth/guest', { pseudo: 'Passager', avatar: 'a4' });
+    const guest = (await guestRes.json()) as { token: string; user: { id: string } };
+
+    await post('/api/auth/magic-link', { email: 'passager@example.fr' }, guest.token);
+    const link = new URL(sentLinks.at(-1)!.url).searchParams.get('t')!;
+
+    await fetch(`${baseUrl}/api/me`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${guest.token}` },
+    });
+
+    // Sans nettoyage, ce lien rouvrirait une session sur un compte effacé
+    const verify = await fetch(`${baseUrl}/api/auth/verify?t=${link}`);
+    expect(verify.status).toBe(400);
+  });
+
+  it('refuse la suppression sans session valide', async () => {
+    const res = await fetch(`${baseUrl}/api/me`, { method: 'DELETE' });
+    expect(res.status).toBe(401);
+  });
+});

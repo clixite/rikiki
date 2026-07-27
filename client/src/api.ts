@@ -1,9 +1,10 @@
 import type { GameHistoryEntry, Group, GroupDetail, PublicUser, UserStats } from '@rikiki/shared';
+import { API_BASE } from './config';
 import { useSession } from './store/session';
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = useSession.getState().token;
-  const res = await fetch(path, {
+  const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -34,6 +35,14 @@ export function updateProfile(pseudo: string, avatar: string) {
     method: 'PATCH',
     body: JSON.stringify({ pseudo, avatar }),
   });
+}
+
+/**
+ * Suppression définitive du compte et de tout ce qui s'y rattache.
+ * L'App Store l'exige dès lors qu'une création de compte est proposée.
+ */
+export function deleteAccount() {
+  return request<{ ok: true }>('/api/me', { method: 'DELETE' });
 }
 
 const HISTORY_CACHE_KEY = 'rikiki-history-cache';

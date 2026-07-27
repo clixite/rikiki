@@ -141,6 +141,15 @@ export const de: Messages = {
   verified: 'Konto bestätigt! Dein Fortschritt ist gesichert.',
   verifyFailed: 'Link ungültig oder abgelaufen. Fordere in deinem Profil einen neuen an.',
 
+  privacyPolicy: 'Datenschutz',
+  deleteAccount: 'Mein Konto löschen',
+  deleteAccountHint: 'Löscht dein Profil, deinen Verlauf und deine Gruppen.',
+  deleteAccountWarning: 'Dein Spitzname, deine Partien, deine Statistiken und deine Gruppen werden gelöscht. Das lässt sich nicht rückgängig machen.',
+  deleteAccountAction: 'Ja, alles löschen',
+  deleteAccountDone: 'Konto gelöscht.',
+  cancel: 'Abbrechen',
+  botTag: 'Bot',
+
   // Statistik und Verlauf
   stats: 'Statistik',
   gamesPlayed: 'Spiele',

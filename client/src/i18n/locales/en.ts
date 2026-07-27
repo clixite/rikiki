@@ -141,6 +141,15 @@ export const en: Messages = {
   verified: 'Account confirmed! Your progress is saved.',
   verifyFailed: 'Invalid or expired link. Request a new one from your profile.',
 
+  privacyPolicy: 'Privacy',
+  deleteAccount: 'Delete my account',
+  deleteAccountHint: 'Erases your profile, history and groups.',
+  deleteAccountWarning: 'Your nickname, games, statistics and groups will be erased. This cannot be undone.',
+  deleteAccountAction: 'Yes, delete everything',
+  deleteAccountDone: 'Account deleted.',
+  cancel: 'Cancel',
+  botTag: 'bot',
+
   // Stats and history
   stats: 'Stats',
   gamesPlayed: 'games',

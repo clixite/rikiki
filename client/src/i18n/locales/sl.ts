@@ -178,6 +178,15 @@ export const sl: Messages = {
   verified: 'Račun potrjen! Tvoj napredek je shranjen.',
   verifyFailed: 'Povezava ni veljavna ali je potekla. Zaprosi za novo v svojem profilu.',
 
+  privacyPolicy: 'Zasebnost',
+  deleteAccount: 'Izbriši moj račun',
+  deleteAccountHint: 'Izbriše tvoj profil, zgodovino in skupine.',
+  deleteAccountWarning: 'Tvoj vzdevek, igre, statistika in skupine bodo izbrisani. Dejanja ni mogoče razveljaviti.',
+  deleteAccountAction: 'Da, izbriši vse',
+  deleteAccountDone: 'Račun je izbrisan.',
+  cancel: 'Prekliči',
+  botTag: 'bot',
+
   // Statistika in zgodovina
   stats: 'Statistika',
   gamesPlayed: 'iger',

@@ -2,6 +2,7 @@ import { io, type Socket } from 'socket.io-client';
 import type { Ack, ClientToServerEvents, GameFormat, ServerToClientEvents } from '@rikiki/shared';
 import { useGame } from './store/game';
 import { useSession } from './store/session';
+import { API_BASE } from './config';
 
 type TypedSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
@@ -13,7 +14,7 @@ export function connectSocket(token: string): TypedSocket {
   socket?.close();
 
   socketToken = token;
-  socket = io({ auth: { token } });
+  socket = API_BASE ? io(API_BASE, { auth: { token } }) : io({ auth: { token } });
 
   socket.on('connect', () => useGame.getState().setSocketConnected(true));
   socket.on('disconnect', () => useGame.getState().setSocketConnected(false));

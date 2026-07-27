@@ -63,6 +63,27 @@ export class UsersRepo {
     return this.getById(id)!;
   }
 
+  /**
+   * Efface le compte et tout ce qui s'y rattache.
+   *
+   * Les tables liées déclarent `ON DELETE CASCADE` et le PRAGMA correspondant
+   * est actif : historique, statistiques, abonnements aux notifications et
+   * appartenances aux groupes partent avec l'utilisateur. Les liens magiques
+   * ne sont pas rattachés par clé étrangère (ils peuvent précéder le compte),
+   * on les supprime donc explicitement — un lien encore valide rouvrirait
+   * sinon une session sur un compte effacé.
+   */
+  deleteAccount(id: string): void {
+    const user = this.getById(id);
+    if (!user) return;
+    const run = this.db.transaction(() => {
+      if (user.email) this.db.prepare('DELETE FROM magic_links WHERE email = ?').run(user.email);
+      this.db.prepare('DELETE FROM magic_links WHERE user_id = ?').run(id);
+      this.db.prepare('DELETE FROM users WHERE id = ?').run(id);
+    });
+    run();
+  }
+
   getStats(userId: string): UserStats {
     const row = this.db.prepare('SELECT * FROM stats WHERE user_id = ?').get(userId) as
       | { games_played: number; games_won: number; total_points: number; best_round: number }

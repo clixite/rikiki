@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { useNav } from '../nav';
-import { createGuestAccount, requestMagicLink, updateProfile } from '../api';
+import { createGuestAccount, deleteAccount, requestMagicLink, updateProfile } from '../api';
 import Avatar, { AVATAR_IDS, DEFAULT_AVATAR_ID } from '../components/Avatar';
 import AccessibilitySection from '../components/AccessibilitySection';
 import LocalePicker from '../components/LocalePicker';
@@ -138,6 +138,7 @@ export default function Profile() {
 
         {user && <NotificationsSection />}
         {user && <AccountSection isGuest={user.isGuest} email={user.email} />}
+        {user && <DangerZone />}
       </div>
 
       <button
@@ -315,6 +316,94 @@ function AccountSection({ isGuest, email }: { isGuest: boolean; email: string | 
       {message && (
         <p className={`mt-2 text-xs ${sent ? 'text-success' : 'text-danger'}`}>{message}</p>
       )}
+    </div>
+  );
+}
+
+/**
+ * Suppression du compte et lien vers la politique de confidentialité.
+ *
+ * L'App Store impose que toute application permettant de créer un compte
+ * permette aussi de le supprimer, depuis l'application elle-même et sans
+ * passer par un e-mail au support (règle 5.1.1(v)). La confirmation se fait
+ * en deux temps : un bouton discret, puis un avertissement explicite.
+ */
+function DangerZone() {
+  const t = useT();
+  const navigate = useNav();
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const remove = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      await deleteAccount();
+      // Plus rien ne doit subsister sur l'appareil : session, caches de parties
+      // et de groupes, code de partie en attente.
+      useSession.getState().clear();
+      try {
+        localStorage.removeItem('rikiki-history-cache');
+        localStorage.removeItem('rikiki-groups-cache');
+        localStorage.removeItem('rikiki-group-detail-cache');
+        sessionStorage.removeItem('rikiki-pending-code');
+      } catch {
+        // stockage indisponible : la session est déjà effacée en mémoire
+      }
+      navigate('/', { replace: true });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erreur inconnue');
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="mt-6 border-t border-white/8 pt-4">
+      <a
+        href="/privacy.html"
+        target="_blank"
+        rel="noreferrer"
+        className="flex min-h-11 items-center text-sm text-paper-50/55 underline decoration-white/20 underline-offset-4"
+      >
+        {t.privacyPolicy}
+      </a>
+
+      {!confirming ? (
+        <button
+          type="button"
+          data-testid="delete-account"
+          onClick={() => setConfirming(true)}
+          className="mt-1 flex min-h-11 w-full items-center text-left text-sm text-danger"
+        >
+          {t.deleteAccount}
+        </button>
+      ) : (
+        <div className="mt-2 rounded-xl bg-danger/10 p-3.5 ring-1 ring-danger/25">
+          <p className="text-sm leading-snug text-paper-50/85">{t.deleteAccountWarning}</p>
+          <div className="mt-3 flex gap-2">
+            <button
+              type="button"
+              onClick={() => setConfirming(false)}
+              disabled={busy}
+              className="min-h-11 flex-1 rounded-lg bg-white/10 px-3 text-sm font-semibold transition active:scale-95 disabled:opacity-40"
+            >
+              {t.cancel}
+            </button>
+            <button
+              type="button"
+              data-testid="delete-account-confirm"
+              onClick={remove}
+              disabled={busy}
+              className="min-h-11 flex-1 rounded-lg bg-danger px-3 text-sm font-semibold text-white transition active:scale-95 disabled:opacity-40"
+            >
+              {t.deleteAccountAction}
+            </button>
+          </div>
+          {error && <p className="mt-2 text-xs text-danger">{error}</p>}
+        </div>
+      )}
+      <p className="mt-1 text-xs leading-snug text-paper-50/35">{t.deleteAccountHint}</p>
     </div>
   );
 }

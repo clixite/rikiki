@@ -162,6 +162,15 @@ export const lt: Messages = {
   verified: 'Paskyra patvirtinta! Tavo pažanga išsaugota.',
   verifyFailed: 'Nuoroda netinkama arba nebegalioja. Paprašyk naujos savo profilyje.',
 
+  privacyPolicy: 'Privatumas',
+  deleteAccount: 'Ištrinti mano paskyrą',
+  deleteAccountHint: 'Ištrina tavo profilį, istoriją ir grupes.',
+  deleteAccountWarning: 'Tavo slapyvardis, partijos, statistika ir grupės bus ištrinti. Veiksmo atšaukti negalima.',
+  deleteAccountAction: 'Taip, ištrinti viską',
+  deleteAccountDone: 'Paskyra ištrinta.',
+  cancel: 'Atšaukti',
+  botTag: 'botas',
+
   // Statistika ir istorija
   stats: 'Statistika',
   gamesPlayed: 'partijos',

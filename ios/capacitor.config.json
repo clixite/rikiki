@@ -1,0 +1,17 @@
+{
+  "appId": "be.clixite.rikiki",
+  "appName": "Rikiki",
+  "webDir": "../client/dist",
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#0a1b13"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "launchShowDuration": 600,
+      "backgroundColor": "#0a1b13",
+      "showSpinner": false
+    }
+  }
+}

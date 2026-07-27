@@ -150,6 +150,15 @@ export const fi: Messages = {
   verified: 'Tili vahvistettu! Edistymisesi on tallessa.',
   verifyFailed: 'Linkki on virheellinen tai vanhentunut. Pyydä uusi profiilistasi.',
 
+  privacyPolicy: 'Tietosuoja',
+  deleteAccount: 'Poista tilini',
+  deleteAccountHint: 'Poistaa profiilisi, historiasi ja ryhmäsi.',
+  deleteAccountWarning: 'Nimimerkkisi, pelisi, tilastosi ja ryhmäsi poistetaan. Toimintoa ei voi perua.',
+  deleteAccountAction: 'Kyllä, poista kaikki',
+  deleteAccountDone: 'Tili poistettu.',
+  cancel: 'Peruuta',
+  botTag: 'botti',
+
   // Tilastot ja historia
   stats: 'Tilastot',
   gamesPlayed: 'peliä',

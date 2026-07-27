@@ -177,6 +177,15 @@ export const mt: Messages = {
   verified: 'Kont ikkonfermat! Il-progress tiegħek huwa maħżun.',
   verifyFailed: 'Link invalidu jew skadut. Itlob ieħor mill-profil tiegħek.',
 
+  privacyPolicy: 'Privatezza',
+  deleteAccount: 'Ħassar il-kont tiegħi',
+  deleteAccountHint: 'Iħassar il-profil, l-istorja u l-gruppi tiegħek.',
+  deleteAccountWarning: 'Il-laqam, il-logħbiet, l-istatistika u l-gruppi tiegħek jitħassru. Din l-azzjoni ma tistax titreġġa’ lura.',
+  deleteAccountAction: 'Iva, ħassar kollox',
+  deleteAccountDone: 'Il-kont tħassar.',
+  cancel: 'Ikkanċella',
+  botTag: 'bot',
+
   // Statistika u storja
   stats: 'Statistika',
   gamesPlayed: 'logħbiet',

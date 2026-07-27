@@ -172,6 +172,15 @@ export const pl: Messages = {
   verified: 'Konto potwierdzone! Twoje postępy są zapisane.',
   verifyFailed: 'Link nieprawidłowy lub wygasł. Poproś o nowy w swoim profilu.',
 
+  privacyPolicy: 'Prywatność',
+  deleteAccount: 'Usuń moje konto',
+  deleteAccountHint: 'Usuwa profil, historię i grupy.',
+  deleteAccountWarning: 'Twój pseudonim, rozgrywki, statystyki i grupy zostaną usunięte. Tej operacji nie można cofnąć.',
+  deleteAccountAction: 'Tak, usuń wszystko',
+  deleteAccountDone: 'Konto usunięte.',
+  cancel: 'Anuluj',
+  botTag: 'bot',
+
   // Statystyki i historia
   stats: 'Statystyki',
   gamesPlayed: 'partie',

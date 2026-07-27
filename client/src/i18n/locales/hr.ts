@@ -173,6 +173,15 @@ export const hr: Messages = {
   verified: 'Račun potvrđen! Tvoj napredak je spremljen.',
   verifyFailed: 'Poveznica nije valjana ili je istekla. Zatraži novu u svom profilu.',
 
+  privacyPolicy: 'Privatnost',
+  deleteAccount: 'Izbriši moj račun',
+  deleteAccountHint: 'Briše tvoj profil, povijest i grupe.',
+  deleteAccountWarning: 'Tvoj nadimak, partije, statistika i grupe bit će izbrisani. Radnju nije moguće poništiti.',
+  deleteAccountAction: 'Da, izbriši sve',
+  deleteAccountDone: 'Račun je izbrisan.',
+  cancel: 'Odustani',
+  botTag: 'bot',
+
   // Statistika i povijest
   stats: 'Statistika',
   gamesPlayed: 'igara',

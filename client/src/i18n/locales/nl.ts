@@ -141,6 +141,15 @@ export const nl: Messages = {
   verified: 'Account bevestigd! Je voortgang is bewaard.',
   verifyFailed: 'Link ongeldig of verlopen. Vraag een nieuwe aan via je profiel.',
 
+  privacyPolicy: 'Privacy',
+  deleteAccount: 'Mijn account verwijderen',
+  deleteAccountHint: 'Wist je profiel, geschiedenis en groepen.',
+  deleteAccountWarning: 'Je bijnaam, je partijen, je statistieken en je groepen worden gewist. Dit kan niet ongedaan worden gemaakt.',
+  deleteAccountAction: 'Ja, alles verwijderen',
+  deleteAccountDone: 'Account verwijderd.',
+  cancel: 'Annuleren',
+  botTag: 'bot',
+
   // Statistieken en geschiedenis
   stats: 'Statistieken',
   gamesPlayed: 'spellen',

@@ -20,7 +20,12 @@ export default function TrickArea({ view, frozenTrick }: Props) {
   const empty = trick.plays.length === 0;
 
   return (
-    <div className="flex min-h-[7.5rem] w-full items-center justify-center px-3" data-testid="trick-area">
+    <div
+      className="flex min-h-[7.5rem] w-full items-center justify-center px-3"
+      data-testid="trick-area"
+      // Nombre de cartes posées : lisible par les scripts de capture et de test
+      data-trick-cards={trick.plays.length}
+    >
       {empty ? (
         <div className="flex h-24 w-16 items-center justify-center rounded-lg border border-dashed border-white/12">
           <span className="text-xl text-white/12">♠</span>

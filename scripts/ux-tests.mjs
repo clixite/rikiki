@@ -373,6 +373,67 @@ console.log('\n▸ Accessibilité et préférences système');
 }
 
 {
+  // Suppression de compte : exigée par l'App Store dès qu'un compte peut être
+  // créé (règle 5.1.1(v)). Elle doit rester accessible depuis l'application,
+  // sans passer par un e-mail au support, et vider la session sur l'appareil.
+  const ctx = await browser.newContext({ ...PROFILES[0], ignoreHTTPSErrors: true });
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/`);
+  await createProfile(page, 'Suppr');
+  await page.waitForSelector('[data-testid="open-profile"]', { timeout: 15000 });
+  await page.click('[data-testid="open-profile"]');
+  await page.waitForSelector('[data-testid="delete-account"]', { timeout: 10000 });
+  check('compte : suppression accessible depuis le profil', true);
+
+  const delBox = await page.locator('[data-testid="delete-account"]').boundingBox();
+  check('compte : cible de suppression ≥ 44px', (delBox?.height ?? 0) >= MIN_TOUCH - 0.5, JSON.stringify(delBox));
+
+  const privacyHref = await page.locator('a[href="/privacy.html"]').first().getAttribute('href');
+  check('compte : lien vers la politique de confidentialité', privacyHref === '/privacy.html');
+
+  // Rien ne doit partir sans confirmation explicite
+  await page.click('[data-testid="delete-account"]');
+  await page.waitForSelector('[data-testid="delete-account-confirm"]', { timeout: 5000 });
+  check('compte : confirmation demandée avant suppression', true);
+
+  // On attend la réponse du serveur : la page est déjà sur /profile, guetter un
+  // changement d'URL se résoudrait immédiatement, avant même l'appel réseau.
+  const deleted = page.waitForResponse(
+    (r) => r.url().endsWith('/api/me') && r.request().method() === 'DELETE',
+    { timeout: 15000 },
+  );
+  await page.click('[data-testid="delete-account-confirm"]');
+  const delRes = await deleted.catch(() => null);
+  check('compte : suppression acceptée par le serveur', delRes?.status() === 200, String(delRes?.status()));
+
+  const cleared = await page
+    .waitForFunction(
+      () => {
+        try {
+          const raw = localStorage.getItem('rikiki-session');
+          return !raw || !JSON.parse(raw)?.state?.token;
+        } catch {
+          return true;
+        }
+      },
+      { timeout: 10000 },
+    )
+    .then(() => true)
+    .catch(() => false);
+  check('compte : session effacée de l’appareil après suppression', cleared);
+
+  const privacy = await page.request.get(`${BASE}/privacy.html`);
+  check('confidentialité : page servie en 200', privacy.status() === 200, String(privacy.status()));
+  const privacyBody = await privacy.text();
+  check(
+    'confidentialité : mentionne la suppression du compte',
+    /Supprimer mon compte/.test(privacyBody) && /Delete my account/.test(privacyBody),
+  );
+
+  await ctx.close();
+}
+
+{
   // Écran de règles : accessible et lisible d'un bout à l'autre
   const ctx = await browser.newContext({ ...PROFILES[0], ignoreHTTPSErrors: true });
   const page = await ctx.newPage();

@@ -170,6 +170,15 @@ export const sk: Messages = {
   verified: 'Účet potvrdený! Tvoj postup je uložený.',
   verifyFailed: 'Odkaz je neplatný alebo vypršal. Vyžiadaj si nový vo svojom profile.',
 
+  privacyPolicy: 'Súkromie',
+  deleteAccount: 'Zmazať môj účet',
+  deleteAccountHint: 'Zmaže tvoj profil, históriu a skupiny.',
+  deleteAccountWarning: 'Tvoja prezývka, hry, štatistiky a skupiny budú zmazané. Túto akciu nemožno vrátiť späť.',
+  deleteAccountAction: 'Áno, zmazať všetko',
+  deleteAccountDone: 'Účet bol zmazaný.',
+  cancel: 'Zrušiť',
+  botTag: 'robot',
+
   // Štatistiky a história
   stats: 'Štatistiky',
   gamesPlayed: 'hier',

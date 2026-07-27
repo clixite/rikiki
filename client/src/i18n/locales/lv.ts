@@ -160,6 +160,15 @@ export const lv: Messages = {
   verified: 'Konts apstiprināts! Tavs progress ir saglabāts.',
   verifyFailed: 'Saite nederīga vai novecojusi. Pieprasi jaunu savā profilā.',
 
+  privacyPolicy: 'Privātums',
+  deleteAccount: 'Dzēst manu kontu',
+  deleteAccountHint: 'Dzēš tavu profilu, vēsturi un grupas.',
+  deleteAccountWarning: 'Tavs segvārds, spēles, statistika un grupas tiks dzēstas. Šo darbību nevar atsaukt.',
+  deleteAccountAction: 'Jā, dzēst visu',
+  deleteAccountDone: 'Konts ir dzēsts.',
+  cancel: 'Atcelt',
+  botTag: 'bots',
+
   // Statistika un vēsture
   stats: 'Statistika',
   gamesPlayed: 'spēles',

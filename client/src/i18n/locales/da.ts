@@ -140,6 +140,15 @@ export const da: Messages = {
   verified: 'Kontoen er bekræftet! Dine fremskridt er gemt.',
   verifyFailed: 'Linket er ugyldigt eller udløbet. Bed om et nyt fra din profil.',
 
+  privacyPolicy: 'Privatliv',
+  deleteAccount: 'Slet min konto',
+  deleteAccountHint: 'Sletter din profil, din historik og dine grupper.',
+  deleteAccountWarning: 'Dit kaldenavn, dine spil, dine statistikker og dine grupper bliver slettet. Det kan ikke fortrydes.',
+  deleteAccountAction: 'Ja, slet alt',
+  deleteAccountDone: 'Kontoen er slettet.',
+  cancel: 'Annuller',
+  botTag: 'bot',
+
   // Statistik og historik
   stats: 'Statistik',
   gamesPlayed: 'spil',

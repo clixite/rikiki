@@ -176,6 +176,15 @@ export const ga: Messages = {
   verified: 'Cuntas dearbhaithe! Tá do dhul chun cinn sábháilte.',
   verifyFailed: 'Nasc neamhbhailí nó as dáta. Iarr ceann nua ó do phróifíl.',
 
+  privacyPolicy: 'Príobháideacht',
+  deleteAccount: 'Scrios mo chuntas',
+  deleteAccountHint: 'Scriosann sé do phróifíl, do stair agus do ghrúpaí.',
+  deleteAccountWarning: 'Scriosfar do leasainm, do chluichí, do staitisticí agus do ghrúpaí. Ní féidir é seo a chur ar ceal.',
+  deleteAccountAction: 'Sea, scrios gach rud',
+  deleteAccountDone: 'Cuntas scriosta.',
+  cancel: 'Cealaigh',
+  botTag: 'róbat',
+
   // Staitisticí agus stair
   stats: 'Staitisticí',
   gamesPlayed: 'cluichí',

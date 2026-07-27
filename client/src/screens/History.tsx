@@ -8,6 +8,7 @@ import SoundToggle from '../components/SoundToggle';
 import { useT } from '../i18n';
 
 import { useSession } from '../store/session';
+import PlayerAvatar from '../components/PlayerAvatar';
 
 function formatDate(ts: number): string {
   return new Date(ts).toLocaleDateString('fr-FR', {
@@ -108,7 +109,7 @@ export default function History() {
                       className="flex items-center gap-1 text-[11px] text-paper-50/55"
                       title={`${s.pseudo} · ${s.score}`}
                     >
-                      <span aria-hidden="true">{s.avatar}</span>
+                      <PlayerAvatar avatar={s.avatar} size={16} />
                       <span className="max-w-16 truncate">{s.pseudo}</span>
                       <span className="tabular-nums text-paper-50/35">{s.score}</span>
                     </span>

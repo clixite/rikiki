@@ -152,6 +152,15 @@ export const bg: Messages = {
   verified: 'Профилът е потвърден! Напредъкът ти е запазен.',
   verifyFailed: 'Невалиден или изтекъл линк. Поискай нов от профила си.',
 
+  privacyPolicy: 'Поверителност',
+  deleteAccount: 'Изтриване на профила ми',
+  deleteAccountHint: 'Изтрива профила, историята и групите ти.',
+  deleteAccountWarning: 'Псевдонимът, игрите, статистиките и групите ти ще бъдат изтрити. Действието е окончателно.',
+  deleteAccountAction: 'Да, изтрий всичко',
+  deleteAccountDone: 'Профилът е изтрит.',
+  cancel: 'Отказ',
+  botTag: 'бот',
+
   // Статистика и история
   stats: 'Статистика',
   gamesPlayed: 'игри',

@@ -148,6 +148,15 @@ export const et: Messages = {
   verified: 'Konto kinnitatud! Sinu edenemine on salvestatud.',
   verifyFailed: 'Link on vigane või aegunud. Küsi profiililt uus link.',
 
+  privacyPolicy: 'Privaatsus',
+  deleteAccount: 'Kustuta minu konto',
+  deleteAccountHint: 'Kustutab sinu profiili, ajaloo ja rühmad.',
+  deleteAccountWarning: 'Sinu hüüdnimi, mängud, statistika ja rühmad kustutatakse. Toimingut ei saa tagasi võtta.',
+  deleteAccountAction: 'Jah, kustuta kõik',
+  deleteAccountDone: 'Konto on kustutatud.',
+  cancel: 'Loobu',
+  botTag: 'robot',
+
   // Statistika ja ajalugu
   stats: 'Statistika',
   gamesPlayed: 'mängu',

@@ -11,6 +11,7 @@ import { useT } from '../i18n';
 import { createRoom, setRoomGroup } from '../socket';
 import { useGame } from '../store/game';
 import { useSession } from '../store/session';
+import PlayerAvatar from '../components/PlayerAvatar';
 
 function formatDate(ts: number): string {
   return new Date(ts).toLocaleDateString('fr-FR', {
@@ -40,9 +41,7 @@ function Podium({ standings }: { standings: GroupStanding[] }) {
             transition={{ delay: 0.05 * i, type: 'spring', stiffness: 240, damping: 22 }}
             className="flex w-[5.5rem] flex-col items-center"
           >
-            <span className="text-2xl leading-none" aria-hidden="true">
-              {s.avatar}
-            </span>
+            <PlayerAvatar avatar={s.avatar} size={30} />
             <span className="mt-1 max-w-full truncate text-[11px] font-medium">{s.pseudo}</span>
             <div
               className={`mt-1.5 flex w-full flex-col items-center justify-center rounded-t-xl ring-1 ring-white/8 ${PODIUM_HEIGHTS[i]} ${
@@ -220,7 +219,7 @@ export default function GroupDetail() {
                     <td className="py-2 tabular-nums text-paper-50/40">{i + 1}</td>
                     <td className="py-2">
                       <span className="flex items-center gap-1.5">
-                        <span aria-hidden="true">{s.avatar}</span>
+                        <PlayerAvatar avatar={s.avatar} size={18} />
                         <span className="max-w-28 truncate">{s.pseudo}</span>
                         {s.userId === data.group.ownerId && (
                           <span className="text-[9px] uppercase tracking-wide text-paper-50/30">
@@ -263,7 +262,7 @@ export default function GroupDetail() {
                             }`}
                             title={`${r.pseudo} · ${r.score}`}
                           >
-                            <span aria-hidden="true">{r.avatar}</span>
+                            <PlayerAvatar avatar={r.avatar} size={16} />
                             <span className="max-w-16 truncate">{r.pseudo}</span>
                             <span className="tabular-nums text-paper-50/35">{r.score}</span>
                           </span>

@@ -171,6 +171,15 @@ export const cs: Messages = {
   verified: 'Účet potvrzen! Tvůj postup je uložený.',
   verifyFailed: 'Odkaz je neplatný nebo vypršel. Vyžádej si nový ve svém profilu.',
 
+  privacyPolicy: 'Soukromí',
+  deleteAccount: 'Smazat můj účet',
+  deleteAccountHint: 'Smaže tvůj profil, historii a skupiny.',
+  deleteAccountWarning: 'Tvoje přezdívka, hry, statistiky a skupiny budou smazány. Tuto akci nelze vrátit zpět.',
+  deleteAccountAction: 'Ano, smazat vše',
+  deleteAccountDone: 'Účet byl smazán.',
+  cancel: 'Zrušit',
+  botTag: 'robot',
+
   // Statistiky a historie
   stats: 'Statistiky',
   gamesPlayed: 'her',

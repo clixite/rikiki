@@ -7,13 +7,13 @@ import { fetchMe } from '../api';
 import SoundToggle from '../components/SoundToggle';
 import { unlockAudio } from '../audio';
 import { useT } from '../i18n';
-
-
-/** Injectée à la compilation : permet d'identifier la version installée. */
-const APP_VERSION = __APP_VERSION__;
+import PlayerAvatar from '../components/PlayerAvatar';
 import { createRoom, joinRoom } from '../socket';
 import { useGame } from '../store/game';
 import { useSession } from '../store/session';
+
+/** Injectée à la compilation : permet d'identifier la version installée. */
+const APP_VERSION = __APP_VERSION__;
 
 export default function Home() {
   const t = useT();
@@ -64,9 +64,7 @@ export default function Home() {
           onClick={() => navigate('/profile')}
           className="flex h-11 min-w-0 items-center gap-2 rounded-full bg-felt-900/45 pl-2.5 pr-3.5 ring-1 ring-white/8 transition active:scale-95"
         >
-          <span className="text-xl leading-none" aria-hidden="true">
-            {user.avatar}
-          </span>
+          <PlayerAvatar avatar={user.avatar} size={26} />
           <span className="max-w-32 truncate text-sm font-medium">{user.pseudo}</span>
           {!user.isGuest && (
             <span className="text-xs text-success" title={t.accountSaved} aria-label={t.accountSaved}>

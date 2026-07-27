@@ -141,6 +141,15 @@ export const sv: Messages = {
   verified: 'Kontot är bekräftat! Dina framsteg är sparade.',
   verifyFailed: 'Länken är ogiltig eller har gått ut. Be om en ny från din profil.',
 
+  privacyPolicy: 'Integritet',
+  deleteAccount: 'Radera mitt konto',
+  deleteAccountHint: 'Raderar din profil, din historik och dina grupper.',
+  deleteAccountWarning: 'Ditt smeknamn, dina partier, din statistik och dina grupper raderas. Det går inte att ångra.',
+  deleteAccountAction: 'Ja, radera allt',
+  deleteAccountDone: 'Kontot raderat.',
+  cancel: 'Avbryt',
+  botTag: 'bot',
+
   // Statistik och historik
   stats: 'Statistik',
   gamesPlayed: 'partier',

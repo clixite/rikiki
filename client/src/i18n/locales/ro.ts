@@ -170,6 +170,15 @@ export const ro: Messages = {
   verified: 'Cont confirmat! Progresul tău e salvat.',
   verifyFailed: 'Link invalid sau expirat. Cere altul din profilul tău.',
 
+  privacyPolicy: 'Confidențialitate',
+  deleteAccount: 'Șterge contul meu',
+  deleteAccountHint: 'Îți șterge profilul, istoricul și grupurile.',
+  deleteAccountWarning: 'Porecla, partidele, statisticile și grupurile tale vor fi șterse. Acțiunea este definitivă.',
+  deleteAccountAction: 'Da, șterge tot',
+  deleteAccountDone: 'Cont șters.',
+  cancel: 'Anulează',
+  botTag: 'robot',
+
   // Statistici și istoric
   stats: 'Statistici',
   gamesPlayed: 'partide',

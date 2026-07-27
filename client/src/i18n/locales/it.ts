@@ -141,6 +141,15 @@ export const it: Messages = {
   verified: 'Account confermato! I tuoi progressi sono salvati.',
   verifyFailed: 'Link non valido o scaduto. Chiedine un altro dal tuo profilo.',
 
+  privacyPolicy: 'Privacy',
+  deleteAccount: 'Elimina il mio account',
+  deleteAccountHint: 'Cancella il tuo profilo, la cronologia e i gruppi.',
+  deleteAccountWarning: 'Il tuo soprannome, le partite, le statistiche e i gruppi saranno cancellati. L’operazione è definitiva.',
+  deleteAccountAction: 'Sì, elimina tutto',
+  deleteAccountDone: 'Account eliminato.',
+  cancel: 'Annulla',
+  botTag: 'bot',
+
   // Statistiche e cronologia
   stats: 'Statistiche',
   gamesPlayed: 'partite',

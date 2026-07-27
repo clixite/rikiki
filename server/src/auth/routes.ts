@@ -62,5 +62,18 @@ export function authRoutes(users: UsersRepo, config: Config): Router {
     res.json({ user: users.getById(user.id) });
   });
 
+  // Suppression du compte depuis l'application — exigée par l'App Store dès
+  // lors qu'une création de compte est proposée (règle 5.1.1(v)).
+  router.delete('/me', (req, res) => {
+    const userId = bearerUserId(req.headers.authorization, config.JWT_SECRET);
+    const user = userId ? users.getById(userId) : null;
+    if (!user) {
+      res.status(401).json({ error: 'INVALID_TOKEN', message: 'Session invalide.' });
+      return;
+    }
+    users.deleteAccount(user.id);
+    res.json({ ok: true });
+  });
+
   return router;
 }

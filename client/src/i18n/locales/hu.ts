@@ -144,6 +144,15 @@ export const hu: Messages = {
   verified: 'Fiók megerősítve! A haladásod mentve van.',
   verifyFailed: 'Érvénytelen vagy lejárt link. Kérj újat a profilodból.',
 
+  privacyPolicy: 'Adatvédelem',
+  deleteAccount: 'Fiókom törlése',
+  deleteAccountHint: 'Törli a profilodat, az előzményeidet és a csoportjaidat.',
+  deleteAccountWarning: 'A beceneved, a játszmáid, a statisztikáid és a csoportjaid törlődnek. A művelet nem vonható vissza.',
+  deleteAccountAction: 'Igen, törlök mindent',
+  deleteAccountDone: 'A fiók törölve.',
+  cancel: 'Mégse',
+  botTag: 'bot',
+
   // Statisztika és előzmények
   stats: 'Statisztika',
   gamesPlayed: 'játék',

@@ -42,6 +42,30 @@ export function createApp(config: Config, overrides: { mailer?: Mailer; pushSend
   app.disable('x-powered-by');
   app.use(express.json());
 
+  /**
+   * Origines autorisées à appeler l'API.
+   *
+   * Sur le web, le client est servi par ce même serveur : aucune requête
+   * croisée, donc rien à autoriser. L'application iOS, elle, embarque ses
+   * fichiers et se présente sous `capacitor://localhost` — sans cet en-tête,
+   * la WebView bloque tous les appels et l'application est inutilisable.
+   */
+  const NATIVE_ORIGINS = new Set(['capacitor://localhost', 'ionic://localhost', 'http://localhost']);
+  app.use('/api', (req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && NATIVE_ORIGINS.has(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
+      if (req.method === 'OPTIONS') {
+        res.status(204).end();
+        return;
+      }
+    }
+    next();
+  });
+
   app.get('/api/health', (_req, res) => {
     res.json({ ok: true });
   });
