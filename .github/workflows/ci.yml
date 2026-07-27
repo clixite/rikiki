@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Types, tests unitaires et intégration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Vérifier les types
+        run: npm run typecheck
+
+      - name: Tests (règles, moteur, robots, sockets, comptes)
+        run: npx vitest run
+
+      - name: Compiler le client et le serveur
+        run: npm run build
+
+  ergonomie:
+    name: Tests d'ergonomie (Playwright)
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Installer Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Compiler le client
+        run: npm run build -w client
+
+      - name: Démarrer le serveur
+        run: |
+          PORT=3111 \
+          DB_PATH=/tmp/ci-rikiki.db \
+          JWT_SECRET=ci-secret \
+          BOT_DELAY_MS=150 \
+          npx tsx server/src/index.ts &
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:3111/api/health >/dev/null 2>&1 && break
+            sleep 1
+          done
+          curl -fsS http://localhost:3111/api/health
+
+      - name: Vérifications d'ergonomie
+        env:
+          BASE_URL: http://localhost:3111
+          SHOTS_DIR: /tmp/shots
+        run: |
+          mkdir -p /tmp/shots
+          node scripts/ux-tests.mjs
+
+      - name: Conserver les captures en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: captures-ergonomie
+          path: /tmp/shots
+          retention-days: 7

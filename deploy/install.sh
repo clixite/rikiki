@@ -83,7 +83,7 @@ esac
 echo "--- 2/6 Docker et paquets"
 command -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | sh
 apt-get update -y -qq
-apt-get install -y -qq git openssl
+apt-get install -y -qq git openssl sqlite3
 if [ "$PROXY_MODE" = "none" ] || [ "$PROXY_MODE" = "nginx" ]; then
   apt-get install -y -qq nginx certbot python3-certbot-nginx
 fi
@@ -271,6 +271,18 @@ for _ in $(seq 1 45); do
 done
 [ "$HEALTHY" = "1" ] || fail_with_logs "Le serveur ne répond pas."
 echo "    ✅ application démarrée et fonctionnelle"
+
+# ---------------------------------------------------------------- sauvegarde quotidienne
+# La base contient comptes, statistiques, historiques et groupes : une copie
+# quotidienne (conservée 14 jours) évite toute perte définitive.
+if ! crontab -l 2>/dev/null | grep -q 'rikiki/deploy/backup.sh'; then
+  chmod +x "$APP_DIR/deploy/backup.sh"
+  (crontab -l 2>/dev/null; echo "0 4 * * * DB_PATH=${APP_DIR}/data/rikiki.db BACKUP_DIR=${APP_DIR}/backups ${APP_DIR}/deploy/backup.sh >> ${APP_DIR}/backups/backup.log 2>&1") | crontab -
+  mkdir -p "$APP_DIR/backups"
+  echo "    sauvegarde quotidienne installée (4h, 14 jours conservés)"
+else
+  echo "    sauvegarde quotidienne déjà en place"
+fi
 
 # ---------------------------------------------------------------- 6/6 exposition publique
 echo "--- 6/6 Exposition publique"

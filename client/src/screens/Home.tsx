@@ -154,6 +154,7 @@ export default function Home() {
         {!socketConnected && (
           <p className="pt-1 text-center text-xs text-paper-50/40">{fr.reconnecting}</p>
         )}
+        <p className="pt-0.5 text-center text-[10px] text-paper-50/25">{fr.copyright}</p>
       </div>
     </div>
   );

@@ -1,7 +1,11 @@
 {
   "name": "rikiki",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "description": "Jeu de Rikiki (Oh Hell) multijoueur : créez une partie, partagez un code à 4 lettres, jouez chacun depuis son téléphone.",
+  "author": "Nicolas Simon",
+  "license": "UNLICENSED",
+  "homepage": "https://rikiki.clixite-prod.cloud",
   "type": "module",
   "workspaces": [
     "shared",
