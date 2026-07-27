@@ -61,12 +61,16 @@ async function getRegistration(): Promise<ServiceWorkerRegistration> {
   return Promise.race([navigator.serviceWorker.ready, timeout]);
 }
 
-/** Clé publique VAPID (base64url) → format binaire attendu par PushManager. */
-function urlBase64ToUint8Array(base64: string): Uint8Array {
+/**
+ * Clé publique VAPID (base64url) → format binaire attendu par PushManager.
+ * Le tampon est alloué explicitement : `subscribe` attend un `BufferSource`,
+ * ce qu'un `Uint8Array` au tampon indéterminé ne satisfait pas.
+ */
+function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
   const padding = '='.repeat((4 - (base64.length % 4)) % 4);
   const normalized = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/');
   const raw = atob(normalized);
-  const out = new Uint8Array(raw.length);
+  const out = new Uint8Array(new ArrayBuffer(raw.length));
   for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
   return out;
 }

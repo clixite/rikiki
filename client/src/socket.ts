@@ -89,6 +89,8 @@ export async function leaveRoom(): Promise<void> {
 export const addBot = () => emitAck<{ playerId: string }>('room:addBot');
 export const removeBot = (playerId: string) => emitAck('room:removeBot', { playerId });
 export const setFormat = (format: GameFormat) => emitAck('room:setFormat', { format });
+/** Rattache la partie en cours à un groupe (hôte, lobby) ; `null` la détache. */
+export const setRoomGroup = (groupId: string | null) => emitAck('room:setGroup', { groupId });
 export const startGame = () => emitAck('game:start');
 export const placeBid = (bid: number) => emitAck('game:bid', { bid });
 export const playCard = (cardId: string) => emitAck('game:playCard', { cardId });

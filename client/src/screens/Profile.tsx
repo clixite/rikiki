@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { createGuestAccount, requestMagicLink, updateProfile } from '../api';
 import SoundToggle from '../components/SoundToggle';
 import { unlockAudio } from '../audio';
 import { fr } from '../i18n/fr';
+import { disablePush, enablePush, readPushState, type PushAvailability } from '../push';
 import { connectSocket, updateProfileOnSocket } from '../socket';
 import { useSession } from '../store/session';
 
@@ -128,6 +129,7 @@ export default function Profile() {
 
         {error && <p className="mt-3 text-center text-sm text-danger">{error}</p>}
 
+        {user && <NotificationsSection />}
         {user && <AccountSection isGuest={user.isGuest} email={user.email} />}
       </div>
 
@@ -141,6 +143,97 @@ export default function Profile() {
       >
         {user ? fr.save : fr.letsGo}
       </button>
+    </div>
+  );
+}
+
+/**
+ * Interrupteur des notifications « c'est ton tour ».
+ * La permission n'est demandée qu'ici, sur clic explicite du joueur, et l'état
+ * affiché est toujours l'état réel de l'abonnement du navigateur.
+ */
+function NotificationsSection() {
+  const [availability, setAvailability] = useState<PushAvailability | null>(null);
+  const [enabled, setEnabled] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    let alive = true;
+    readPushState().then((state) => {
+      if (!alive) return;
+      setAvailability(state.availability);
+      setEnabled(state.enabled);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const toggle = async () => {
+    setBusy(true);
+    setMessage('');
+    try {
+      if (enabled) {
+        await disablePush();
+      } else {
+        await enablePush();
+      }
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : fr.notificationsError);
+    } finally {
+      // On relit l'état réel plutôt que de supposer que l'action a abouti.
+      const state = await readPushState();
+      setAvailability(state.availability);
+      setEnabled(state.enabled);
+      setBusy(false);
+    }
+  };
+
+  const blocked =
+    availability === 'unsupported'
+      ? fr.notificationsUnsupported
+      : availability === 'needs-install'
+        ? fr.notificationsNeedsInstall
+        : availability === 'denied'
+          ? fr.notificationsDenied
+          : null;
+
+  return (
+    <div className="mt-6 rounded-xl bg-felt-900/40 p-3.5 ring-1 ring-white/6">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-paper-50/90">{fr.notificationsTitle}</p>
+          <p className="mt-0.5 text-xs leading-snug text-paper-50/45">{fr.notificationsHint}</p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={enabled}
+          aria-label={enabled ? fr.notificationsOn : fr.notificationsEnable}
+          data-testid="push-toggle"
+          onClick={toggle}
+          disabled={busy || availability === null || blocked !== null}
+          className={`relative mt-0.5 h-7 w-12 shrink-0 rounded-full transition disabled:opacity-40 ${
+            enabled ? 'bg-brass-400' : 'bg-white/15'
+          }`}
+        >
+          <span
+            className={`absolute top-1 h-5 w-5 rounded-full bg-paper-50 transition-all ${
+              enabled ? 'left-6' : 'left-1'
+            }`}
+          />
+        </button>
+      </div>
+      <p className={`mt-2 text-xs ${message ? 'text-danger' : 'text-paper-50/50'}`}>
+        {message ||
+          blocked ||
+          (availability === null
+            ? fr.notificationsChecking
+            : enabled
+              ? fr.notificationsOn
+              : fr.notificationsOff)}
+      </p>
     </div>
   );
 }

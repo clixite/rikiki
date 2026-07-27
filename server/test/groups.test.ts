@@ -264,6 +264,176 @@ describe('groupes d’amis — classement cumulé', () => {
   });
 });
 
+/* ------------------------------------------------------------------ */
+/* Rattachement d'une vraie partie à un groupe (bout en bout)          */
+/* ------------------------------------------------------------------ */
+
+/** Client socket minimal : suit les vues reçues et sait attendre une condition. */
+class SocketClient {
+  socket!: Socket;
+  views: GameView[] = [];
+  constructor(private token: string) {}
+
+  connect(): Promise<void> {
+    this.socket = ioc(baseUrl, { auth: { token: this.token }, transports: ['websocket'], reconnection: false });
+    this.socket.on('game:view', (view: GameView) => this.views.push(view));
+    return new Promise((resolve, reject) => {
+      this.socket.once('connect', () => resolve());
+      this.socket.once('connect_error', reject);
+    });
+  }
+
+  get view(): GameView | undefined {
+    return this.views.at(-1);
+  }
+
+  emit<T = { ok: boolean }>(event: string, ...args: unknown[]): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error(`ack timeout: ${event}`)), 3000);
+      this.socket.emit(event, ...args, (res: T) => {
+        clearTimeout(timer);
+        resolve(res);
+      });
+    });
+  }
+
+  waitView(pred: (v: GameView) => boolean, label = 'view', timeoutMs = 5000): Promise<GameView> {
+    const existing = this.views.at(-1);
+    if (existing && pred(existing)) return Promise.resolve(existing);
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error(`waitView timeout: ${label}`)), timeoutMs);
+      const handler = (view: GameView) => {
+        if (pred(view)) {
+          clearTimeout(timer);
+          this.socket.off('game:view', handler);
+          resolve(view);
+        }
+      };
+      this.socket.on('game:view', handler);
+    });
+  }
+}
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+/** Joue l'option légale la plus simple jusqu'à `game-over`. */
+async function playUntilGameOver(c: SocketClient, timeoutMs = 60_000): Promise<GameView> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const v = c.view!;
+    if (v.phase === 'game-over') return v;
+    if (v.phase === 'round-scoring') {
+      await c.emit('game:nextRound').catch(() => undefined);
+    } else if (v.round?.legalBids) {
+      await c.emit('game:bid', { bid: v.round.legalBids[0] }).catch(() => undefined);
+    } else if (v.round?.legalCardIds) {
+      await c.emit('game:playCard', { cardId: v.round.legalCardIds[0] }).catch(() => undefined);
+    } else {
+      await sleep(5);
+    }
+  }
+  throw new Error(`partie non terminée (phase ${c.view?.phase})`);
+}
+
+describe('groupes d’amis — rattachement d’une partie', () => {
+  it(
+    'alimente le classement du groupe à la fin d’une vraie partie, sans les robots',
+    async () => {
+      const alice = await createUser('AliceSocket');
+      const bob = await createUser('BobSocket');
+      const group = await createGroup(alice, 'Les joueurs du soir');
+      await joinGroup(bob, group.code);
+
+      const client = new SocketClient(alice.token);
+      await client.connect();
+      const created = await client.emit<{ ok: boolean; code: string }>('room:create');
+      expect(created.ok).toBe(true);
+
+      // L'hôte rattache la partie à son groupe : la vue le reflète pour tous
+      expect((await client.emit('room:setGroup', { groupId: group.id })).ok).toBe(true);
+      const lobby = await client.waitView((v) => v.groupId === group.id, 'groupe rattaché');
+      expect(lobby.groupId).toBe(group.id);
+
+      // Deux robots complètent la table : ils ne doivent jamais être classés
+      expect((await client.emit('room:addBot')).ok).toBe(true);
+      expect((await client.emit('room:addBot')).ok).toBe(true);
+      await client.waitView((v) => v.players.length === 3, 'table complète');
+
+      expect((await client.emit('game:start')).ok).toBe(true);
+      await client.waitView((v) => v.phase === 'bidding', 'phase bidding');
+      const final = await playUntilGameOver(client);
+      expect(final.phase).toBe('game-over');
+      // Le groupe est conservé sur l'état de la partie de bout en bout
+      expect(final.groupId).toBe(group.id);
+
+      const { standings, group: fresh, recentGames } = await detail(alice, group.id);
+      expect(fresh.gamesCount).toBe(1);
+
+      // Seuls les deux membres humains figurent au classement
+      expect(standings).toHaveLength(2);
+      const aliceRow = standings.find((s) => s.userId === alice.id)!;
+      expect(aliceRow.gamesPlayed).toBe(1);
+      const bobRow = standings.find((s) => s.userId === bob.id)!;
+      expect(bobRow.gamesPlayed).toBe(0);
+
+      // La partie enregistrée ne contient que l'humain qui a joué
+      expect(recentGames).toHaveLength(1);
+      expect(recentGames[0].code).toBe(created.code);
+      expect(recentGames[0].results).toHaveLength(1);
+      expect(recentGames[0].results[0].userId).toBe(alice.id);
+
+      client.socket.close();
+    },
+    60_000,
+  );
+
+  it('refuse le rattachement à un groupe dont l’hôte n’est pas membre', async () => {
+    const alice = await createUser('AliceRefus');
+    const stranger = await createUser('ÉtrangerRefus');
+    const group = await createGroup(stranger, 'Le groupe des autres');
+
+    const client = new SocketClient(alice.token);
+    await client.connect();
+    await client.emit('room:create');
+
+    const res = await client.emit<{ ok: boolean; error?: { code: string } }>('room:setGroup', {
+      groupId: group.id,
+    });
+    expect(res.ok).toBe(false);
+    expect(res.error!.code).toBe('INVALID_PAYLOAD');
+    expect(client.view!.groupId ?? null).toBe(null);
+
+    // Un identifiant inconnu est refusé de la même façon
+    expect((await client.emit<{ ok: boolean }>('room:setGroup', { groupId: 'inexistant' })).ok).toBe(false);
+    // …et `null` détache toujours la partie sans erreur
+    expect((await client.emit('room:setGroup', { groupId: null })).ok).toBe(true);
+
+    client.socket.close();
+  });
+
+  it('refuse le rattachement par un joueur qui n’est pas l’hôte', async () => {
+    const host = await createUser('HôteGroupe');
+    const guest = await createUser('InvitéGroupe');
+    const group = await createGroup(host, 'Les invités');
+    await joinGroup(guest, group.code);
+
+    const hostClient = new SocketClient(host.token);
+    const guestClient = new SocketClient(guest.token);
+    await Promise.all([hostClient.connect(), guestClient.connect()]);
+    const created = await hostClient.emit<{ ok: boolean; code: string }>('room:create');
+    expect((await guestClient.emit('room:join', { code: created.code })).ok).toBe(true);
+
+    const res = await guestClient.emit<{ ok: boolean; error?: { code: string } }>('room:setGroup', {
+      groupId: group.id,
+    });
+    expect(res.ok).toBe(false);
+    expect(res.error!.code).toBe('NOT_HOST');
+
+    hostClient.socket.close();
+    guestClient.socket.close();
+  });
+});
+
 describe('groupes d’amis — accès et cycle de vie', () => {
   it('refuse toute route de groupe sans session valide', async () => {
     const alice = await createUser('Alice8');
