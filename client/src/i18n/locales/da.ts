@@ -102,6 +102,9 @@ export const da: Messages = {
 
   // Spillet slut
   gameOver: 'Spillet er slut',
+  shareResult: 'Del resultatet',
+  shareTitle: 'Rikiki-parti slut 🃏',
+  shareSaved: 'Billede gemt',
   playAgain: 'Spil igen',
   backHome: 'Forsiden',
 

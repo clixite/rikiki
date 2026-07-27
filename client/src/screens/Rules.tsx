@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNav } from '../nav';
 import { cardFromId } from '@rikiki/shared';
 import CardFace from '../components/CardFace';
 import SoundToggle from '../components/SoundToggle';
@@ -37,7 +37,7 @@ function Section({
 
 export default function Rules() {
   const t = useT();
-  const navigate = useNavigate();
+  const navigate = useNav();
 
   return (
     <div className="mx-auto flex h-dvh w-full max-w-md flex-col px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">

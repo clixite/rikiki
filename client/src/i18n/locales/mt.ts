@@ -139,6 +139,9 @@ export const mt: Messages = {
 
   // Tmiem il-logħba
   gameOver: 'Il-logħba spiċċat',
+  shareResult: 'Aqsam ir-riżultat',
+  shareTitle: 'Il-logħba Rikiki spiċċat 🃏',
+  shareSaved: 'Ritratt salvat',
   playAgain: "Erġa' ilgħab",
   backHome: 'Il-bidu',
 

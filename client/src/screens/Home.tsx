@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import { useNav } from '../nav';
 import type { UserStats } from '@rikiki/shared';
 import { fetchMe } from '../api';
 import SoundToggle from '../components/SoundToggle';
@@ -18,7 +19,7 @@ export default function Home() {
   const t = useT();
   const { user, roomCode } = useSession();
   const socketConnected = useGame((s) => s.socketConnected);
-  const navigate = useNavigate();
+  const navigate = useNav();
   const [stats, setStats] = useState<UserStats | null>(null);
   const [busy, setBusy] = useState(false);
 

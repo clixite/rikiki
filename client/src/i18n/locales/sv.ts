@@ -103,6 +103,9 @@ export const sv: Messages = {
 
   // Partiet slut
   gameOver: 'Partiet är slut',
+  shareResult: 'Dela resultatet',
+  shareTitle: 'Rikiki-parti avslutat 🃏',
+  shareSaved: 'Bild sparad',
   playAgain: 'Spela igen',
   backHome: 'Startsidan',
 

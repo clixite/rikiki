@@ -112,6 +112,9 @@ export const fi: Messages = {
 
   // Pelin päätös
   gameOver: 'Peli päättyi',
+  shareResult: 'Jaa tulos',
+  shareTitle: 'Rikiki-peli päättyi 🃏',
+  shareSaved: 'Kuva tallennettu',
   playAgain: 'Pelaa uudestaan',
   backHome: 'Etusivu',
 

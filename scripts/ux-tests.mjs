@@ -9,11 +9,22 @@
  *   node scripts/ux-tests.mjs                    # contre http://localhost:3111
  *   BASE_URL=https://… node scripts/ux-tests.mjs
  */
+import { existsSync } from 'node:fs';
 import { chromium, devices } from 'playwright';
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:3111';
 const SHOTS = process.env.SHOTS_DIR ?? null;
-const EXEC = process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium';
+
+/**
+ * Chromium préinstallé (image de conteneur) ou celui que Playwright télécharge
+ * lui-même (intégration continue, poste de développement). On ne force le
+ * chemin que s'il existe : sinon Playwright choisit le sien.
+ */
+function chromiumPath() {
+  const explicit = process.env.CHROMIUM_PATH;
+  if (explicit) return explicit;
+  return existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined;
+}
 
 /** Appareils couverts : du plus petit écran courant au grand format. */
 const PROFILES = [
@@ -38,7 +49,9 @@ function check(name, condition, detail = '') {
   }
 }
 
-const launchOpts = { executablePath: EXEC };
+const launchOpts = {};
+const exec = chromiumPath();
+if (exec) launchOpts.executablePath = exec;
 if (process.env.HTTPS_PROXY && BASE.startsWith('https://')) {
   launchOpts.proxy = { server: process.env.HTTPS_PROXY };
 }

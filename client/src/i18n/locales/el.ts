@@ -113,6 +113,9 @@ export const el: Messages = {
 
   // Τέλος παιχνιδιού
   gameOver: 'Το παιχνίδι τελείωσε',
+  shareResult: 'Μοιράσου το αποτέλεσμα',
+  shareTitle: 'Η παρτίδα Rikiki τελείωσε 🃏',
+  shareSaved: 'Η εικόνα αποθηκεύτηκε',
   playAgain: 'Ξανά',
   backHome: 'Αρχική',
 

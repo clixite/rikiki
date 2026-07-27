@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import { useNav } from '../nav';
 import type { Group } from '@rikiki/shared';
 import { createGroup, fetchGroups, joinGroupByCode, readCachedGroups } from '../api';
 import SoundToggle from '../components/SoundToggle';
@@ -15,7 +16,7 @@ type Panel = 'none' | 'create' | 'join';
 export default function Groups() {
   const t = useT();
   const { user } = useSession();
-  const navigate = useNavigate();
+  const navigate = useNav();
   // Comme pour l'historique : le cache local s'affiche tout de suite, le
   // réseau vient rafraîchir derrière.
   const [groups, setGroups] = useState<Group[] | null>(() => (user ? readCachedGroups(user.id) : null));

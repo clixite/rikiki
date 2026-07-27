@@ -135,6 +135,9 @@ export const hr: Messages = {
 
   // Kraj igre
   gameOver: 'Kraj igre',
+  shareResult: 'Podijeli rezultat',
+  shareTitle: 'Partija Rikikija završena 🃏',
+  shareSaved: 'Slika spremljena',
   playAgain: 'Revanš',
   backHome: 'Početna',
 

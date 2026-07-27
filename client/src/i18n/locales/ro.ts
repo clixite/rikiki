@@ -132,6 +132,9 @@ export const ro: Messages = {
 
   // Final de partidă
   gameOver: 'Partidă încheiată',
+  shareResult: 'Distribuie rezultatul',
+  shareTitle: 'Partidă de Rikiki încheiată 🃏',
+  shareSaved: 'Imagine salvată',
   playAgain: 'Încă o partidă',
   backHome: 'Acasă',
 

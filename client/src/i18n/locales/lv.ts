@@ -122,6 +122,9 @@ export const lv: Messages = {
 
   // Spēles beigas
   gameOver: 'Spēle beigusies',
+  shareResult: 'Dalīties ar rezultātu',
+  shareTitle: 'Rikiki spēle beigusies 🃏',
+  shareSaved: 'Attēls saglabāts',
   playAgain: 'Spēlēt vēlreiz',
   backHome: 'Sākums',
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useNav } from '../nav';
 import { useT } from '../i18n';
 
 import { joinRoom } from '../socket';
@@ -11,7 +12,7 @@ export default function Join() {
   const { code: urlCode } = useParams();
   const { user } = useSession();
   const socketConnected = useGame((s) => s.socketConnected);
-  const navigate = useNavigate();
+  const navigate = useNav();
   const [code, setCode] = useState((urlCode ?? '').toUpperCase().slice(0, 4));
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);

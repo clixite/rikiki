@@ -138,6 +138,9 @@ export const ga: Messages = {
 
   // Deireadh an chluiche
   gameOver: 'Cluiche thart',
+  shareResult: 'Roinn an toradh',
+  shareTitle: 'Cluiche Rikiki thart 🃏',
+  shareSaved: 'Íomhá sábháilte',
   playAgain: 'Imir arís',
   backHome: 'Baile',
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNav } from '../nav';
 import { createGuestAccount, requestMagicLink, updateProfile } from '../api';
 import Avatar, { AVATAR_IDS, DEFAULT_AVATAR_ID } from '../components/Avatar';
 import AccessibilitySection from '../components/AccessibilitySection';
@@ -16,7 +16,7 @@ import { useSession } from '../store/session';
 export default function Profile() {
   const t = useT();
   const { user, setSession, setUser } = useSession();
-  const navigate = useNavigate();
+  const navigate = useNav();
   const [pseudo, setPseudo] = useState(user?.pseudo ?? '');
   // Un compte existant peut encore porter un ancien avatar emoji : on le garde
   // tel quel tant que le joueur n'en choisit pas un nouveau (cf. <Avatar />).

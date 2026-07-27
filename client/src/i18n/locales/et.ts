@@ -110,6 +110,9 @@ export const et: Messages = {
 
   // Mängu lõpp
   gameOver: 'Mäng läbi',
+  shareResult: 'Jaga tulemust',
+  shareTitle: 'Rikiki mäng läbi 🃏',
+  shareSaved: 'Pilt salvestatud',
   playAgain: 'Mängi uuesti',
   backHome: 'Avalehele',
 

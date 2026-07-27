@@ -8,9 +8,15 @@ let server: ReturnType<typeof createApp>;
 let baseUrl: string;
 const sentLinks: { email: string; url: string }[] = [];
 
+/** Adresse dont l'envoi échoue toujours : simule une panne SMTP. */
+const BROKEN_EMAIL = 'panne@example.fr';
+/** Doit rester aligné sur `MAX_ACTIVE_LINKS` du serveur. */
+const MAX_ACTIVE_LINKS = 3;
+
 const fakeMailer: Mailer = {
   enabled: true,
   sendMagicLink: async (email, url) => {
+    if (email === BROKEN_EMAIL) throw new Error('SMTP indisponible');
     sentLinks.push({ email, url });
   },
 };
@@ -94,6 +100,19 @@ describe('magic link', () => {
     }
     const res = await post('/api/auth/magic-link', { email: 'spam@example.fr' });
     expect(res.status).toBe(429);
+  });
+
+  it("n'impute pas le quota quand l'envoi échoue", async () => {
+    // Une panne SMTP ne doit pas verrouiller l'adresse : sans nettoyage, les
+    // liens jamais partis compteraient dans le quota pendant 15 minutes.
+    for (let i = 0; i < MAX_ACTIVE_LINKS + 1; i++) {
+      const res = await post('/api/auth/magic-link', { email: BROKEN_EMAIL });
+      expect(res.status).toBe(502);
+    }
+    const active = server.db
+      .prepare('SELECT COUNT(*) AS n FROM magic_links WHERE email = ?')
+      .get(BROKEN_EMAIL) as { n: number };
+    expect(active.n).toBe(0);
   });
 
   it('rejette un e-mail invalide', async () => {

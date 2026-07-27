@@ -103,6 +103,9 @@ export const nl: Messages = {
 
   // Einde van het spel
   gameOver: 'Spel afgelopen',
+  shareResult: 'Resultaat delen',
+  shareTitle: 'Rikiki-partij afgelopen 🃏',
+  shareSaved: 'Afbeelding opgeslagen',
   playAgain: 'Opnieuw spelen',
   backHome: 'Start',
 

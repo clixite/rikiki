@@ -134,6 +134,9 @@ export const pl: Messages = {
 
   // Koniec partii
   gameOver: 'Koniec partii',
+  shareResult: 'Udostępnij wynik',
+  shareTitle: 'Partia Rikiki zakończona 🃏',
+  shareSaved: 'Obraz zapisany',
   playAgain: 'Rewanż',
   backHome: 'Menu główne',
 

@@ -101,6 +101,9 @@ export const fr = {
 
   // Fin de partie
   gameOver: 'Partie terminée',
+  shareResult: 'Partager le résultat',
+  shareTitle: 'Partie de Rikiki terminée 🃏',
+  shareSaved: 'Image enregistrée',
   playAgain: 'Rejouer',
   backHome: 'Accueil',
 

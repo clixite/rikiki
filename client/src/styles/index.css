@@ -182,6 +182,72 @@ a[role='button'] {
   }
 }
 
+/*
+ * Transitions d'écran natives (View Transitions API).
+ *
+ * Le navigateur photographie l'écran avant et après la navigation, puis anime
+ * lui-même le passage de l'un à l'autre. On garde le geste discret — un
+ * glissement de 28 px suffit à indiquer le sens — et bref : au-delà de 300 ms
+ * une navigation cesse d'être ressentie comme instantanée.
+ */
+@keyframes rk-vt-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--rk-vt-from, 28px));
+  }
+}
+
+@keyframes rk-vt-out {
+  to {
+    opacity: 0;
+    transform: translateX(var(--rk-vt-to, -18px));
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-timing-function: var(--ease-out-quint);
+  animation-fill-mode: both;
+  /* Les deux captures se superposent : sans cela le fond transparaît */
+  mix-blend-mode: normal;
+}
+
+/*
+ * L'ancien écran s'efface plus vite que le nouveau n'apparaît, et le nouveau
+ * attend son tour : sans ce décalage les deux textes se superposent au milieu
+ * de l'animation, ce qui donne une image brouillée.
+ */
+::view-transition-old(root) {
+  animation-name: rk-vt-out;
+  animation-duration: 0.16s;
+}
+
+::view-transition-new(root) {
+  animation-name: rk-vt-in;
+  animation-duration: 0.22s;
+  animation-delay: 0.06s;
+}
+
+/* Retour en arrière : le mouvement s'inverse, l'écran précédent revient de la gauche */
+:root[data-nav='back']::view-transition-new(root) {
+  --rk-vt-from: -28px;
+}
+:root[data-nav='back']::view-transition-old(root) {
+  --rk-vt-to: 18px;
+}
+
+/*
+ * Les couches permanentes (toast, bandeau de mise à jour, confettis) ne font
+ * pas partie de l'écran : nommées séparément, elles restent en place au lieu
+ * de glisser avec lui.
+ */
+[data-testid='update-prompt'] {
+  view-transition-name: rk-update-prompt;
+}
+[data-testid='confetti'] {
+  view-transition-name: rk-confetti;
+}
+
 /* Accessibilité : on coupe tout mouvement non essentiel */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -190,6 +256,12 @@ a[role='button'] {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* Le sélecteur universel ne couvre pas les pseudo-éléments de transition */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
   }
 }
 

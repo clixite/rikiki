@@ -103,6 +103,9 @@ export const en: Messages = {
 
   // End of game
   gameOver: 'Game over',
+  shareResult: 'Share result',
+  shareTitle: 'Rikiki game finished 🃏',
+  shareSaved: 'Image saved',
   playAgain: 'Play again',
   backHome: 'Home',
 

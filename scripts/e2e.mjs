@@ -1,11 +1,14 @@
 // Vérification E2E : 3 téléphones simulés jouent une partie de Rikiki
+import { existsSync } from 'node:fs';
 import { chromium } from 'playwright';
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:3111';
 const SHOTS = process.env.SHOTS_DIR ?? '/tmp/shots';
 const FULL_GAME = process.env.FULL_GAME === '1';
 
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+// Chromium préinstallé s'il est là, sinon celui de Playwright (CI, poste local)
+const EXEC = process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium';
+const browser = await chromium.launch(existsSync(EXEC) ? { executablePath: EXEC } : {});
 
 async function newPhone(name) {
   const ctx = await browser.newContext({

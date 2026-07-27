@@ -124,6 +124,9 @@ export const lt: Messages = {
 
   // Partijos pabaiga
   gameOver: 'Partija baigta',
+  shareResult: 'Dalintis rezultatu',
+  shareTitle: 'Rikiki partija baigta 🃏',
+  shareSaved: 'Paveikslėlis išsaugotas',
   playAgain: 'Žaisti dar kartą',
   backHome: 'Pradžia',
 

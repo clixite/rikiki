@@ -114,6 +114,9 @@ export const bg: Messages = {
 
   // Край на играта
   gameOver: 'Край на играта',
+  shareResult: 'Сподели резултата',
+  shareTitle: 'Партия Rikiki приключи 🃏',
+  shareSaved: 'Изображението е запазено',
   playAgain: 'Играй пак',
   backHome: 'Начало',
 

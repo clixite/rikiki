@@ -132,6 +132,9 @@ export const sk: Messages = {
 
   // Koniec hry
   gameOver: 'Koniec hry',
+  shareResult: 'Zdieľať výsledok',
+  shareTitle: 'Partia Rikiki sa skončila 🃏',
+  shareSaved: 'Obrázok uložený',
   playAgain: 'Odveta',
   backHome: 'Domov',
 

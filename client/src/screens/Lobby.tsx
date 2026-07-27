@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNav } from '../nav';
 import type { GameFormat, GameView } from '@rikiki/shared';
 import { GAME_FORMATS, MIN_PLAYERS, formatSummary, isBotId } from '@rikiki/shared';
 import InviteButtons from '../components/InviteButtons';
@@ -17,7 +17,7 @@ interface Props {
 
 export default function Lobby({ view }: Props) {
   const t = useT();
-  const navigate = useNavigate();
+  const navigate = useNav();
   const [busy, setBusy] = useState(false);
   // Format affiché en attendant l'aller-retour serveur (retour tactile immédiat).
   const [pendingFormat, setPendingFormat] = useState<GameFormat | null>(null);

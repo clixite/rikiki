@@ -1,10 +1,12 @@
 import { motion } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNav } from '../nav';
 import type { GameView } from '@rikiki/shared';
 import SoundToggle from '../components/SoundToggle';
 import { useT } from '../i18n';
 
+import { shareResult } from '../shareCard';
 import { leaveRoom, rematch } from '../socket';
+import { vibrate } from '../haptics';
 import { useGame } from '../store/game';
 import PlayerAvatar from '../components/PlayerAvatar';
 
@@ -16,7 +18,7 @@ const MEDALS = ['🥇', '🥈', '🥉'];
 
 export default function GameOver({ view }: Props) {
   const t = useT();
-  const navigate = useNavigate();
+  const navigate = useNav();
   const isHost = view.hostId === view.you;
   const sorted = [...view.players].sort((a, b) => b.totalScore - a.totalScore);
   const winner = sorted[0];
@@ -25,6 +27,12 @@ export default function GameOver({ view }: Props) {
   const onRematch = async () => {
     const res = await rematch();
     if (!res.ok) useGame.getState().showToast(res.error.message);
+  };
+
+  const onShare = async () => {
+    vibrate('select');
+    const res = await shareResult(view);
+    if (res === 'downloaded') useGame.getState().showToast(t.shareSaved);
   };
 
   const onHome = async () => {
@@ -98,13 +106,24 @@ export default function GameOver({ view }: Props) {
             {t.playAgain}
           </button>
         )}
-        <button
-          type="button"
-          onClick={onHome}
-          className="w-full rounded-2xl bg-white/8 py-3 text-base font-medium transition active:scale-[0.98]"
-        >
-          {t.backHome}
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            data-testid="share-result"
+            onClick={onShare}
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-white/10 py-3 text-base font-semibold transition active:scale-[0.98]"
+          >
+            <span aria-hidden="true">📤</span>
+            {t.shareResult}
+          </button>
+          <button
+            type="button"
+            onClick={onHome}
+            className="rounded-2xl bg-white/8 px-5 py-3 text-base font-medium transition active:scale-[0.98]"
+          >
+            {t.backHome}
+          </button>
+        </div>
       </div>
     </div>
   );

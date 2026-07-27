@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
+import { useNav } from '../nav';
 import type { GroupDetail as GroupDetailData, GroupStanding } from '@rikiki/shared';
 import { deleteGroup, fetchGroupDetail, leaveGroup, readCachedGroupDetail } from '../api';
 import SoundToggle from '../components/SoundToggle';
@@ -64,7 +65,7 @@ export default function GroupDetail() {
   const t = useT();
   const { id = '' } = useParams();
   const { user } = useSession();
-  const navigate = useNavigate();
+  const navigate = useNav();
   const [data, setData] = useState<GroupDetailData | null>(() => readCachedGroupDetail(id));
   const [loading, setLoading] = useState(data === null);
   const [busy, setBusy] = useState(false);

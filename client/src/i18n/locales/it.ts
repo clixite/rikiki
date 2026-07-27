@@ -103,6 +103,9 @@ export const it: Messages = {
 
   // Fine partita
   gameOver: 'Partita finita',
+  shareResult: 'Condividi il risultato',
+  shareTitle: 'Partita di Rikiki finita 🃏',
+  shareSaved: 'Immagine salvata',
   playAgain: 'Gioca ancora',
   backHome: 'Home',
 

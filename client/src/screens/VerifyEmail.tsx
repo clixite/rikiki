@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import { useNav } from '../nav';
 import { verifyMagicLink } from '../api';
 import { useT } from '../i18n';
 
@@ -9,7 +10,7 @@ import { useSession } from '../store/session';
 export default function VerifyEmail() {
   const t = useT();
   const [params] = useSearchParams();
-  const navigate = useNavigate();
+  const navigate = useNav();
   const [status, setStatus] = useState<'pending' | 'ok' | 'error'>('pending');
   const tried = useRef(false);
 

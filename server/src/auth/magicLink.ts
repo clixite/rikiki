@@ -44,8 +44,9 @@ export function magicLinkRoutes(db: Database.Database, users: UsersRepo, config:
     const requesterId = bearerUserId(req.headers.authorization, config.JWT_SECRET);
 
     const token = crypto.randomBytes(32).toString('base64url');
+    const tokenHash = hashToken(token);
     db.prepare('INSERT INTO magic_links (token_hash, user_id, email, expires_at) VALUES (?, ?, ?, ?)').run(
-      hashToken(token),
+      tokenHash,
       requesterId,
       email,
       Date.now() + LINK_TTL_MS,
@@ -56,6 +57,10 @@ export function magicLinkRoutes(db: Database.Database, users: UsersRepo, config:
       await mailer.sendMagicLink(email, url);
     } catch (e) {
       console.error('[mail] échec envoi magic link:', e);
+      // Le lien n'est jamais parti : le laisser en base le ferait compter dans
+      // le quota pendant 15 minutes et bloquerait les tentatives suivantes
+      // alors que l'utilisateur n'a rien reçu.
+      db.prepare('DELETE FROM magic_links WHERE token_hash = ?').run(tokenHash);
       res.status(502).json({ error: 'MAIL_FAILED', message: "L'e-mail n'a pas pu être envoyé. Réessaie plus tard." });
       return;
     }

@@ -106,6 +106,9 @@ export const hu: Messages = {
 
   // Játék vége
   gameOver: 'Vége a játéknak',
+  shareResult: 'Eredmény megosztása',
+  shareTitle: 'Rikiki játszma vége 🃏',
+  shareSaved: 'Kép elmentve',
   playAgain: 'Visszavágó',
   backHome: 'Főoldal',
 

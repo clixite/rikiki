@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { useNav } from './nav';
 import Confetti from './components/Confetti';
 import LiveAnnouncer from './components/LiveAnnouncer';
 import Toast from './components/Toast';
@@ -28,7 +29,7 @@ export default function App() {
   const celebrateIntensity = view?.phase === 'game-over' ? 'full' : 'light';
   const socketConnected = useGame((s) => s.socketConnected);
   const closedReason = useGame((s) => s.closedReason);
-  const navigate = useNavigate();
+  const navigate = useNav();
   const rejoinTried = useRef(false);
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import { useNav } from '../nav';
 import type { GameHistoryEntry } from '@rikiki/shared';
 import { fetchHistory, fetchMe, readCachedHistory } from '../api';
 import SoundToggle from '../components/SoundToggle';
@@ -20,7 +21,7 @@ function formatDate(ts: number): string {
 export default function History() {
   const t = useT();
   const { user } = useSession();
-  const navigate = useNavigate();
+  const navigate = useNav();
   // On affiche d'abord le cache local : la liste apparaît instantanément,
   // même sans réseau, puis se rafraîchit en arrière-plan.
   const [games, setGames] = useState<GameHistoryEntry[] | null>(() =>

@@ -140,6 +140,9 @@ export const sl: Messages = {
 
   // Konec igre
   gameOver: 'Konec igre',
+  shareResult: 'Deli rezultat',
+  shareTitle: 'Partija Rikiki končana 🃏',
+  shareSaved: 'Slika shranjena',
   playAgain: 'Še enkrat',
   backHome: 'Domov',
 
