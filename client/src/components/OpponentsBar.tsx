@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
 import { fr } from '../i18n/fr';
+import PlayerAvatar from './PlayerAvatar';
 
 interface Props {
   view: GameView;
@@ -44,9 +45,7 @@ export default function OpponentsBar({ view }: Props) {
               isCurrent ? 'rk-turn bg-felt-700/80' : 'bg-felt-900/45'
             } ${p.connected ? '' : 'opacity-45'}`}
           >
-            <span className="text-xl leading-none" aria-hidden="true">
-              {p.avatar}
-            </span>
+            <PlayerAvatar avatar={p.avatar} size={26} />
             <span className="mt-0.5 max-w-[4.5rem] truncate text-[11px] font-medium leading-tight text-paper-50">
               {p.pseudo}
             </span>

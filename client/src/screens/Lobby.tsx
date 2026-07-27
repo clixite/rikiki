@@ -8,6 +8,7 @@ import SoundToggle from '../components/SoundToggle';
 import { fr } from '../i18n/fr';
 import { addBot, kickPlayer, leaveRoom, removeBot, setFormat, startGame } from '../socket';
 import { useGame } from '../store/game';
+import PlayerAvatar from '../components/PlayerAvatar';
 
 interface Props {
   view: GameView;
@@ -89,9 +90,7 @@ export default function Lobby({ view }: Props) {
                 data-testid={`lobby-player-${p.id}`}
                 className="flex items-center gap-3 rounded-xl bg-felt-900/45 px-3 py-2.5 ring-1 ring-white/6"
               >
-                <span className="text-2xl leading-none" aria-hidden="true">
-                  {p.avatar}
-                </span>
+                <PlayerAvatar avatar={p.avatar} size={30} />
                 <span className="min-w-0 flex-1 truncate text-[15px] font-medium">
                   {p.pseudo}
                   {p.id === view.you && <span className="ml-1.5 text-xs text-paper-50/45">({fr.you})</span>}

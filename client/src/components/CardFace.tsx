@@ -36,6 +36,8 @@ interface Props {
   onClick?: () => void;
   /** Partage l'identité entre la main et le tapis pour animer le trajet. */
   layoutId?: string;
+  /** Carte de la couleur d'atout : liseré laiton discret. */
+  trump?: boolean;
   className?: string;
   ariaLabel?: string;
 }
@@ -54,6 +56,7 @@ export default function CardFace({
   raised,
   onClick,
   layoutId,
+  trump,
   className = '',
   ariaLabel,
 }: Props) {
@@ -79,7 +82,8 @@ export default function CardFace({
   );
 
   const base = `${s.w} aspect-[2/3] ${s.radius} relative flex items-center justify-center
-    bg-linear-to-b from-paper-50 to-paper-100 ring-1 ring-black/15
+    bg-linear-to-b from-paper-50 to-paper-100
+    ${trump ? 'ring-2 ring-brass-400' : 'ring-1 ring-black/15'}
     ${red ? 'text-suit-red' : 'text-suit-black'}
     ${dimmed ? 'opacity-35 saturate-50' : ''}
     ${className}`;

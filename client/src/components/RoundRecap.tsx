@@ -1,7 +1,9 @@
 import { motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
+import PlayerAvatar from './PlayerAvatar';
 import { fr } from '../i18n/fr';
 import { nextRound } from '../socket';
+import { useGame } from '../store/game';
 
 interface Props {
   view: GameView;
@@ -9,9 +11,11 @@ interface Props {
 
 export default function RoundRecap({ view }: Props) {
   const round = view.round!;
+  const outcome = useGame((s) => s.roundOutcome);
   const isHost = view.hostId === view.you;
   const isLastRound = round.roundIndex === view.roundsSequence.length - 1;
   const sorted = [...view.players].sort((a, b) => b.totalScore - a.totalScore);
+  const myPoints = round.roundScores?.[view.you] ?? 0;
 
   return (
     <div className="fixed inset-0 z-30 flex items-end justify-center bg-black/55 backdrop-blur-[2px] sm:items-center">
@@ -26,9 +30,41 @@ export default function RoundRecap({ view }: Props) {
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
 
         <h2 className="text-center text-xl font-bold">{fr.roundRecap}</h2>
-        <p className="mb-4 mt-0.5 text-center text-xs text-paper-50/50">
+        <p className="mt-0.5 text-center text-xs text-paper-50/50">
           {fr.round} {round.roundIndex + 1}/{view.roundsSequence.length} · {fr.cards(round.cardsCount)}
         </p>
+
+        {/* Verdict personnel : la première chose qu'on cherche des yeux */}
+        {outcome && (
+          <motion.div
+            data-testid="round-outcome"
+            data-outcome={outcome}
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 16, delay: 0.05 }}
+            className={`mx-auto my-3 flex w-fit items-center gap-2 rounded-full px-4 py-1.5 ${
+              outcome === 'success'
+                ? 'bg-success/15 text-success ring-1 ring-success/30'
+                : 'bg-danger/15 text-danger ring-1 ring-danger/30'
+            }`}
+          >
+            <motion.span
+              aria-hidden="true"
+              className="text-lg leading-none"
+              initial={{ rotate: outcome === 'success' ? -25 : 0, y: outcome === 'fail' ? -3 : 0 }}
+              animate={{ rotate: 0, y: 0 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 12, delay: 0.12 }}
+            >
+              {outcome === 'success' ? '✓' : '✕'}
+            </motion.span>
+            <span className="text-sm font-bold">
+              {outcome === 'success' ? fr.contractKept : fr.contractMissed}
+            </span>
+            <span className="text-sm font-bold tabular-nums">
+              {myPoints > 0 ? `+${myPoints}` : myPoints}
+            </span>
+          </motion.div>
+        )}
 
         <ul className="space-y-1.5">
           {sorted.map((p, i) => {
@@ -44,9 +80,7 @@ export default function RoundRecap({ view }: Props) {
                 transition={{ delay: 0.05 + i * 0.05 }}
                 className="flex items-center gap-2.5 rounded-xl bg-felt-900/40 px-3 py-2"
               >
-                <span className="text-xl leading-none" aria-hidden="true">
-                  {p.avatar}
-                </span>
+                <PlayerAvatar avatar={p.avatar} size={22} />
                 <span className="min-w-0 flex-1 truncate text-sm font-medium">
                   {p.pseudo}
                   {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({fr.you})</span>}

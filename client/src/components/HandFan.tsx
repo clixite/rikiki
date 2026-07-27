@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import type { Card } from '@rikiki/shared';
+import { motion } from 'motion/react';
+import type { Card, Suit } from '@rikiki/shared';
 import { cardId } from '@rikiki/shared';
 import CardFace from './CardFace';
 
@@ -10,6 +11,13 @@ interface Props {
   onPlay: (cardId: string) => void;
   /** Compacte l'éventail quand la barre d'annonce est affichée. */
   compact?: boolean;
+  /** Couleur d'atout : les cartes concernées sont discrètement marquées. */
+  trumpSuit?: Suit | null;
+  /**
+   * Change à chaque nouvelle donne : relance l'animation de distribution.
+   * (Sert de clé d'animation, pas de simple indicateur.)
+   */
+  dealKey?: number;
 }
 
 const CARD_W_NORMAL = 68; // largeur d'une carte en jeu
@@ -18,12 +26,25 @@ const CARD_RATIO = 1.5; // hauteur = largeur × 1.5 (ratio 2:3 des cartes réell
 const GAP_MAX = 10; // espace maximal entre deux cartes quand la main est petite
 const RAISE_PX = 12; // remontée d'une carte jouable
 
+/** Décalage entre deux cartes distribuées : court, pour rester nerveux. */
+const DEAL_STAGGER_S = 0.055;
+
 /**
  * Main en éventail. L'espacement se resserre automatiquement pour que
  * TOUTES les cartes tiennent à l'écran, même à 10 cartes sur un petit
  * téléphone : jamais de défilement horizontal, jamais de carte hors champ.
+ *
+ * À chaque nouvelle donne, les cartes arrivent depuis le haut de la table en
+ * cascade rapide — l'attente devient un petit moment de jeu.
  */
-export default function HandFan({ hand, legalCardIds, onPlay, compact }: Props) {
+export default function HandFan({
+  hand,
+  legalCardIds,
+  onPlay,
+  compact,
+  trumpSuit,
+  dealKey = 0,
+}: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
 
@@ -64,22 +85,31 @@ export default function HandFan({ hand, legalCardIds, onPlay, compact }: Props) 
         {hand.map((card, i) => {
           const id = cardId(card);
           const legal = myTurn && legalCardIds.includes(id);
+          const isTrump = trumpSuit !== null && trumpSuit !== undefined && card.suit === trumpSuit;
           // Léger arc : rotation et hauteur variables autour du centre
           const centered = i - (n - 1) / 2;
           const tilt = n > 1 ? centered * Math.min(2.6, 22 / n) : 0;
-          // Les extrémités descendent : l'arc reste dans le conteneur, dont la
-          // hauteur intègre déjà cette courbure.
           const lift = centered ** 2 * liftFactor;
 
           return (
-            <div
-              key={id}
+            <motion.div
+              // La clé inclut la donne : une nouvelle main rejoue l'animation
+              key={`${dealKey}-${id}`}
               data-testid={`hand-${id}`}
               data-legal={legal ? 'true' : 'false'}
-              className="absolute bottom-0 transition-transform duration-200"
+              className="absolute bottom-0"
+              // Les cartes tombent depuis le haut de la table, en éventail
+              initial={{ y: -220, opacity: 0, rotate: tilt - 18, scale: 0.9 }}
+              animate={{ y: legal ? -RAISE_PX : 0, opacity: 1, rotate: tilt, scale: 1 }}
+              transition={{
+                type: 'spring',
+                stiffness: 480,
+                damping: 32,
+                delay: i * DEAL_STAGGER_S,
+                opacity: { duration: 0.12, delay: i * DEAL_STAGGER_S },
+              }}
               style={{
                 left: i * step,
-                transform: `translateY(${legal ? -RAISE_PX : 0}px) rotate(${tilt}deg)`,
                 transformOrigin: 'bottom center',
                 marginBottom: maxLift - lift,
                 zIndex: i,
@@ -91,6 +121,7 @@ export default function HandFan({ hand, legalCardIds, onPlay, compact }: Props) 
                 layoutId={`card-${id}`}
                 dimmed={myTurn && !legal}
                 raised={legal}
+                trump={isTrump}
                 onClick={myTurn && legal ? () => onPlay(id) : undefined}
               />
               {legal && (
@@ -99,7 +130,7 @@ export default function HandFan({ hand, legalCardIds, onPlay, compact }: Props) 
                   className="pointer-events-none absolute -top-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-brass-300"
                 />
               )}
-            </div>
+            </motion.div>
           );
         })}
       </div>

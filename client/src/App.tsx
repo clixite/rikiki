@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import Confetti from './components/Confetti';
 import Toast from './components/Toast';
 import UpdatePrompt from './components/UpdatePrompt';
 import { fr } from './i18n/fr';
@@ -19,6 +20,9 @@ import VerifyEmail from './screens/VerifyEmail';
 export default function App() {
   const { token, user, roomCode } = useSession();
   const view = useGame((s) => s.view);
+  const celebrate = useGame((s) => s.celebrate);
+  // Salve nourrie pour une victoire finale, brève pour un contrat tenu
+  const celebrateIntensity = view?.phase === 'game-over' ? 'full' : 'light';
   const socketConnected = useGame((s) => s.socketConnected);
   const closedReason = useGame((s) => s.closedReason);
   const navigate = useNavigate();
@@ -49,6 +53,7 @@ export default function App() {
 
   return (
     <>
+      <Confetti trigger={celebrate} intensity={celebrateIntensity} />
       <Toast />
       <UpdatePrompt />
       <Routes>

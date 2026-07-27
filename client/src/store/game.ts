@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { CompletedTrick, GameView, TransientEvent } from '@rikiki/shared';
 import { playSound } from '../audio';
+import { vibrate } from '../haptics';
 import { fr } from '../i18n/fr';
 
 const TRICK_FREEZE_MS = 1600;
@@ -10,6 +11,10 @@ interface GameStore {
   socketConnected: boolean;
   /** Dernier pli complet affiché quelques instants avant d'être ramassé. */
   frozenTrick: CompletedTrick | null;
+  /** Contrat de la manche qui vient de s'achever : anime le récapitulatif. */
+  roundOutcome: 'success' | 'fail' | null;
+  /** Incrémenté à chaque motif de célébration (contrat tenu, victoire). */
+  celebrate: number;
   closedReason: string | null;
   toast: string | null;
   setView: (view: GameView) => void;
@@ -40,6 +45,8 @@ export const useGame = create<GameStore>((set, get) => ({
   view: null,
   socketConnected: false,
   frozenTrick: null,
+  roundOutcome: null,
+  celebrate: 0,
   closedReason: null,
   toast: null,
 
@@ -51,15 +58,32 @@ export const useGame = create<GameStore>((set, get) => ({
       if (freezeTimer) clearTimeout(freezeTimer);
       const trick = view.round!.lastTrick!;
       set({ frozenTrick: trick });
-      playSound(trick.winnerId === view.you ? 'trickWin' : 'trickLose');
+      const iWonTrick = trick.winnerId === view.you;
+      playSound(iWonTrick ? 'trickWin' : 'trickLose');
+      if (iWonTrick) vibrate('success');
       freezeTimer = setTimeout(() => set({ frozenTrick: null }), TRICK_FREEZE_MS);
     }
 
-    // Nouvelle donne : bruit de distribution
-    if (view.round && prev?.round && view.round.roundIndex !== prev.round.roundIndex) {
-      playSound('cardDeal');
-    } else if (view.round && !prev?.round) {
-      playSound('cardDeal');
+    // Nouvelle donne : rafale de distribution, calée sur l'animation des cartes
+    const newDeal =
+      (view.round && prev?.round && view.round.roundIndex !== prev.round.roundIndex) ||
+      (view.round !== null && !prev?.round);
+    if (newDeal) {
+      playSound('dealStart');
+      vibrate('select');
+    }
+
+    // Fin de manche : verdict du contrat, sonore et tactile
+    if (view.phase === 'round-scoring' && prev?.phase !== 'round-scoring' && view.round) {
+      const bid = view.round.bids[view.you];
+      const tricks = view.round.tricksWon[view.you] ?? 0;
+      const success = bid !== null && bid === tricks;
+      playSound(success ? 'contractSuccess' : 'contractFail');
+      vibrate(success ? 'success' : 'failure');
+      set({ roundOutcome: success ? 'success' : 'fail', celebrate: get().celebrate + (success ? 1 : 0) });
+    }
+    if (view.phase !== 'round-scoring' && prev?.phase === 'round-scoring') {
+      set({ roundOutcome: null });
     }
 
     // C'est à moi : discret rappel sonore (uniquement au passage de tour)
@@ -69,11 +93,18 @@ export const useGame = create<GameStore>((set, get) => ({
       playSound('yourTurn');
     }
 
-    // Fin de partie
+    // Fin de partie : fanfare et confettis pour le vainqueur
     if (view.phase === 'game-over' && prev?.phase !== 'game-over') {
       const best = Math.max(...view.players.map((p) => p.totalScore));
       const iWon = view.players.find((p) => p.id === view.you)?.totalScore === best;
-      playSound(iWon ? 'victory' : 'roundEnd');
+      playSound(iWon ? 'victory' : 'defeat');
+      vibrate(iWon ? 'celebrate' : 'failure');
+      if (iWon) set({ celebrate: get().celebrate + 1 });
+    }
+
+    // Coup d'envoi
+    if (view.phase === 'bidding' && prev?.phase === 'lobby') {
+      playSound('gameStart');
     }
 
     set({ view, closedReason: null });
@@ -93,9 +124,8 @@ export const useGame = create<GameStore>((set, get) => ({
       case 'card-played':
         if (event.playerId !== view?.you) playSound('cardPlay');
         break;
-      case 'round-scored':
-        playSound('roundEnd');
-        break;
+      // Le verdict de fin de manche est déjà sonorisé dans setView
+      // (contrat tenu ou manqué) : pas de second son ici.
       case 'player-left':
         get().showToast(fr.playerLeft(event.pseudo));
         break;
@@ -114,7 +144,7 @@ export const useGame = create<GameStore>((set, get) => ({
 
   setClosed: (reason) => {
     if (freezeTimer) clearTimeout(freezeTimer);
-    set({ closedReason: reason, view: null, frozenTrick: null });
+    set({ closedReason: reason, view: null, frozenTrick: null, roundOutcome: null });
   },
 
   showToast: (message) => {
@@ -125,6 +155,6 @@ export const useGame = create<GameStore>((set, get) => ({
 
   reset: () => {
     if (freezeTimer) clearTimeout(freezeTimer);
-    set({ view: null, frozenTrick: null, closedReason: null, toast: null });
+    set({ view: null, frozenTrick: null, roundOutcome: null, closedReason: null, toast: null });
   },
 }));

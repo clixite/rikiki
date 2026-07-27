@@ -5,6 +5,7 @@ import SoundToggle from '../components/SoundToggle';
 import { fr } from '../i18n/fr';
 import { leaveRoom, rematch } from '../socket';
 import { useGame } from '../store/game';
+import PlayerAvatar from '../components/PlayerAvatar';
 
 interface Props {
   view: GameView;
@@ -72,9 +73,7 @@ export default function GameOver({ view }: Props) {
               <span className="w-6 text-center text-base" aria-hidden="true">
                 {MEDALS[i] ?? <span className="text-xs text-paper-50/40">{i + 1}</span>}
               </span>
-              <span className="text-xl leading-none" aria-hidden="true">
-                {p.avatar}
-              </span>
+              <PlayerAvatar avatar={p.avatar} size={22} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium">
                 {p.pseudo}
                 {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({fr.you})</span>}

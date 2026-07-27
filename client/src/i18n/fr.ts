@@ -71,6 +71,14 @@ export const fr = {
     `${forbidden} est interdit : le total des annonces ne peut pas égaler ${cards} (règle du crochet).`,
   bid: 'Annonce',
   tricks: 'Plis',
+
+  // Récapitulatif des annonces de la manche
+  bidsAnnounced: 'Annoncé',
+  bidsPending: (announced: number, cards: number) =>
+    `${announced} sur ${cards} — annonces en cours`,
+  bidsBalanced: (cards: number) => `Total juste : ${cards} plis annoncés`,
+  bidsOver: (n: number) => (n > 1 ? `${n} plis de trop : ça va tomber` : '1 pli de trop : ça va tomber'),
+  bidsUnder: (n: number) => (n > 1 ? `${n} plis en rab à ramasser` : '1 pli en rab à ramasser'),
   noBidYet: 'Pas encore annoncé',
   tricksOfContract: (tricks: number, bid: number) => `${tricks}/${bid} plis`,
   yourTurn: 'À toi de jouer',
@@ -81,6 +89,8 @@ export const fr = {
 
   // Récap
   roundRecap: 'Fin de la manche',
+  contractKept: 'Contrat tenu',
+  contractMissed: 'Contrat manqué',
   contract: 'Contrat',
   points: 'Points',
   nextRound: 'Manche suivante',

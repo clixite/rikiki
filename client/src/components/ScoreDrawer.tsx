@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
 import { fr } from '../i18n/fr';
+import PlayerAvatar from './PlayerAvatar';
 
 interface Props {
   view: GameView;
@@ -46,9 +47,7 @@ export default function ScoreDrawer({ view, open, onClose }: Props) {
                   <span className="w-5 text-center text-xs font-semibold tabular-nums text-paper-50/40">
                     {i + 1}
                   </span>
-                  <span className="text-xl leading-none" aria-hidden="true">
-                    {p.avatar}
-                  </span>
+                  <PlayerAvatar avatar={p.avatar} size={22} />
                   <span className="min-w-0 flex-1 truncate text-sm font-medium">
                     {p.pseudo}
                     {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({fr.you})</span>}

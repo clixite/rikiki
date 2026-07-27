@@ -7,12 +7,17 @@
 export type SoundName =
   | 'cardPlay'
   | 'cardDeal'
+  | 'dealStart'
   | 'bid'
   | 'trickWin'
   | 'trickLose'
   | 'yourTurn'
   | 'roundEnd'
+  | 'contractSuccess'
+  | 'contractFail'
   | 'victory'
+  | 'defeat'
+  | 'gameStart'
   | 'join';
 
 const MUTE_KEY = 'rikiki-muted';
@@ -116,6 +121,48 @@ const SOUNDS: Record<SoundName, () => void> = {
     for (let i = 0; i < 3; i++) {
       setTimeout(() => noiseBurst(0.06, 0.18, 2600), i * 85);
     }
+  },
+
+  // Donne : rafale rapide de cartes distribuées, calée sur l'animation.
+  // Le rythme s'accélère légèrement — c'est ce qui donne l'impression d'élan.
+  dealStart: () => {
+    for (let i = 0; i < 7; i++) {
+      const delay = i * 0.055 - i * i * 0.002;
+      setTimeout(
+        () => {
+          noiseBurst(0.05, 0.26 - i * 0.015, 2400 + i * 120);
+          tone({ freq: 150 + i * 14, duration: 0.045, type: 'triangle', gain: 0.12 });
+        },
+        Math.max(0, delay * 1000),
+      );
+    }
+  },
+
+  // Lancement de la partie : petite montée qui appelle au jeu
+  gameStart: () => {
+    [392, 523.25, 659.25].forEach((f, i) =>
+      tone({ freq: f, duration: 0.16, type: 'triangle', gain: 0.24, delay: i * 0.07 }),
+    );
+  },
+
+  // Contrat tenu : accord clair et net
+  contractSuccess: () => {
+    tone({ freq: 523.25, duration: 0.16, type: 'sine', gain: 0.3 });
+    tone({ freq: 659.25, duration: 0.2, type: 'sine', gain: 0.26, delay: 0.06 });
+    tone({ freq: 987.77, duration: 0.26, type: 'sine', gain: 0.18, delay: 0.13 });
+  },
+
+  // Contrat manqué : descente courte, jamais humiliante
+  contractFail: () => {
+    tone({ freq: 415.3, duration: 0.14, type: 'triangle', gain: 0.2 });
+    tone({ freq: 311.13, duration: 0.24, type: 'triangle', gain: 0.18, delay: 0.1 });
+  },
+
+  // Partie perdue : cadence descendante douce
+  defeat: () => {
+    [440, 392, 329.63, 261.63].forEach((f, i) =>
+      tone({ freq: f, duration: 0.3, type: 'sine', gain: 0.18, delay: i * 0.13 }),
+    );
   },
   // Annonce validée : petit blip net
   bid: () => {

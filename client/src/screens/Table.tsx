@@ -2,13 +2,16 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
 import BidPicker from '../components/BidPicker';
-import CardFace from '../components/CardFace';
+import BidsSummary from '../components/BidsSummary';
 import HandFan from '../components/HandFan';
 import OpponentsBar from '../components/OpponentsBar';
 import RoundRecap from '../components/RoundRecap';
 import ScoreDrawer from '../components/ScoreDrawer';
 import SoundToggle from '../components/SoundToggle';
 import TrickArea from '../components/TrickArea';
+import TrumpBadge from '../components/TrumpBadge';
+import PlayerAvatar from '../components/PlayerAvatar';
+import { vibrate } from '../haptics';
 import { fr } from '../i18n/fr';
 import { placeBid, playCard } from '../socket';
 import { useGame } from '../store/game';
@@ -40,13 +43,16 @@ export default function Table({ view }: Props) {
   const bidsSoFar = Object.values(round.bids).reduce<number>((sum, b) => sum + (b ?? 0), 0);
   const contractDone = myBid !== null && myTricks === myBid;
   const contractBusted = myBid !== null && myTricks > myBid;
+  const trickBusy = round.currentTrick.plays.length > 0 || frozenTrick !== null;
 
   const onPlay = async (id: string) => {
+    vibrate('tap');
     const res = await playCard(id);
     if (!res.ok) useGame.getState().showToast(res.error.message);
   };
 
   const onBid = async (bid: number) => {
+    vibrate('tap');
     const res = await placeBid(bid);
     if (!res.ok) useGame.getState().showToast(res.error.message);
   };
@@ -63,22 +69,13 @@ export default function Table({ view }: Props) {
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
-      {/* ---- En-tête : manche, atout, son, scores ---- */}
+      {/* ---- En-tête : manche, son, scores ---- */}
       <header className="flex shrink-0 items-center gap-2 px-3 pb-1 pt-2">
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-paper-50/50">
             {fr.round} {round.roundIndex + 1}/{view.roundsSequence.length}
           </p>
           <p className="truncate text-sm font-medium text-paper-50">{fr.cards(round.cardsCount)}</p>
-        </div>
-
-        <div className="flex shrink-0 items-center gap-1.5 rounded-xl bg-felt-900/45 px-2 py-1">
-          <span className="text-[10px] uppercase tracking-wide text-paper-50/50">{fr.trump}</span>
-          {round.trumpCard ? (
-            <CardFace card={round.trumpCard} size="xs" />
-          ) : (
-            <span className="text-xs text-paper-50/70">{fr.noTrump}</span>
-          )}
         </div>
 
         <SoundToggle />
@@ -99,19 +96,26 @@ export default function Table({ view }: Props) {
         <OpponentsBar view={view} />
       </div>
 
-      {/* ---- Tapis : le pli en cours ---- */}
-      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-2">
+      {/* ---- Récapitulatif des annonces : lisible en permanence ---- */}
+      <div className="shrink-0 pb-1">
+        <BidsSummary view={view} />
+      </div>
+
+      {/* ---- Tapis : atout au centre, puis le pli ---- */}
+      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-1.5">
         {/* Ancrage visuel : suggère la zone de dépose au centre de la table */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
-            background:
-              'radial-gradient(circle, rgb(255 255 255 / 0.045) 0%, transparent 68%)',
+            background: 'radial-gradient(circle, rgb(255 255 255 / 0.045) 0%, transparent 68%)',
             boxShadow: 'inset 0 0 60px -20px rgb(0 0 0 / 0.5)',
           }}
         />
+
+        <TrumpBadge trumpCard={round.trumpCard} compact={trickBusy} />
         <TrickArea view={view} frozenTrick={frozenTrick} />
+
         <motion.p
           key={statusText}
           initial={{ opacity: 0, y: 4 }}
@@ -120,6 +124,7 @@ export default function Table({ view }: Props) {
             myTurn && !frozenTrick ? 'text-brass-300' : 'text-paper-50/55'
           }`}
           data-testid="turn-status"
+          aria-live="polite"
         >
           {statusText}
         </motion.p>
@@ -140,9 +145,7 @@ export default function Table({ view }: Props) {
       {/* ---- Ma zone : contrat + main ---- */}
       <div className="shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="mb-2 flex items-center justify-center gap-2.5 px-3">
-          <span className="text-base leading-none" aria-hidden="true">
-            {me.avatar}
-          </span>
+          <PlayerAvatar avatar={me.avatar} size={20} />
           <span className="max-w-20 truncate text-sm font-medium text-paper-50">{me.pseudo}</span>
           {round.dealerSeat === me.seat && (
             <span className="rounded-full bg-brass-400 px-1.5 text-[9px] font-bold text-felt-950" title={fr.dealer}>
@@ -173,6 +176,8 @@ export default function Table({ view }: Props) {
           legalCardIds={view.phase === 'playing' && !frozenTrick ? round.legalCardIds : null}
           onPlay={onPlay}
           compact={showBidPicker}
+          trumpSuit={round.trumpCard?.suit ?? null}
+          dealKey={round.roundIndex}
         />
       </div>
 
