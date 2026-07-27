@@ -378,3 +378,70 @@ describe('joueurs automatiques', () => {
     dave.socket.close();
   });
 });
+
+describe('format de partie', () => {
+  let host: TestClient, guest: TestClient;
+  let code: string;
+
+  it('démarre en format normal et le diffuse à tout le salon', async () => {
+    host = await createUser('HoteFormat');
+    guest = await createUser('InviteFormat');
+    await Promise.all([host.connect(), guest.connect()]);
+
+    const created = await host.emit<{ ok: boolean; code: string }>('room:create');
+    code = created.code;
+    expect((await guest.emit('room:join', { code })).ok).toBe(true);
+    await Promise.all([host, guest].map((c) => c.waitView((v) => v.players.length === 2, '2 joueurs')));
+
+    expect(host.view!.format).toBe('normal');
+    expect(guest.view!.format).toBe('normal');
+  });
+
+  it('refuse un changement de format par un non-hôte', async () => {
+    const res = await guest.emit<{ ok: boolean; error?: { code: string } }>('room:setFormat', { format: 'blitz' });
+    expect(res.ok).toBe(false);
+    expect(res.error!.code).toBe('NOT_HOST');
+    expect(host.view!.format).toBe('normal');
+  });
+
+  it('refuse un format inconnu', async () => {
+    const res = await host.emit<{ ok: boolean; error?: { code: string } }>('room:setFormat', { format: 'turbo' });
+    expect(res.ok).toBe(false);
+    expect(res.error!.code).toBe('INVALID_PAYLOAD');
+    expect(host.view!.format).toBe('normal');
+  });
+
+  it('l’hôte choisit Éclair : les autres joueurs le voient avant le lancement', async () => {
+    expect((await host.emit('room:setFormat', { format: 'blitz' })).ok).toBe(true);
+    await Promise.all([host, guest].map((c) => c.waitView((v) => v.format === 'blitz', 'format éclair diffusé')));
+  });
+
+  it(
+    'joue une partie Éclair : 9 manches au lieu de 19',
+    async () => {
+      expect((await host.emit('room:addBot')).ok).toBe(true);
+      await host.waitView((v) => v.players.length === 3, 'table complète');
+
+      expect((await host.emit('game:start')).ok).toBe(true);
+      const started = await host.waitView((v) => v.phase === 'bidding', 'phase bidding');
+      expect(started.format).toBe('blitz');
+      expect(started.roundsSequence).toEqual([1, 2, 3, 4, 5, 4, 3, 2, 1]);
+
+      // Le format est verrouillé une fois la partie lancée
+      const late = await host.emit<{ ok: boolean; error?: { code: string } }>('room:setFormat', { format: 'normal' });
+      expect(late.ok).toBe(false);
+      expect(late.error!.code).toBe('BAD_PHASE');
+
+      const final = await playUntilGameOver(host);
+      expect(final.phase).toBe('game-over');
+      expect(final.roundsSequence).toHaveLength(9);
+      expect(final.round!.roundIndex).toBe(8);
+      // La dernière manche d'un Éclair redescend à 1 carte
+      expect(final.round!.cardsCount).toBe(1);
+
+      host.socket.close();
+      guest.socket.close();
+    },
+    60_000,
+  );
+});

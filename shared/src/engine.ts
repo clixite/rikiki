@@ -1,6 +1,17 @@
 import { isBotId } from './bot';
 import { cardFromId, cardId, fullDeck, hashSeed, mulberry32, shuffle, sortHand } from './cards';
-import { MAX_PLAYERS, MIN_PLAYERS, legalBids, legalCards, roundsSequence, scoreRound, trickWinner } from './rules';
+import {
+  DEFAULT_FORMAT,
+  MAX_PLAYERS,
+  MIN_PLAYERS,
+  isGameFormat,
+  legalBids,
+  legalCards,
+  roundsSequence,
+  scoreRound,
+  trickWinner,
+  type GameFormat,
+} from './rules';
 import type { CardId, GameState, Player, RoundState } from './types';
 
 export type EngineErrorCode =
@@ -12,13 +23,15 @@ export type EngineErrorCode =
   | 'NOT_YOUR_TURN'
   | 'ILLEGAL_BID'
   | 'ILLEGAL_BID_HOOK'
-  | 'ILLEGAL_CARD';
+  | 'ILLEGAL_CARD'
+  | 'ILLEGAL_FORMAT';
 
 export type GameAction =
   | { type: 'ADD_PLAYER'; player: Pick<Player, 'id' | 'pseudo' | 'avatar'> }
   | { type: 'REMOVE_PLAYER'; playerId: string }
   | { type: 'UPDATE_PROFILE'; playerId: string; pseudo: string; avatar: string }
   | { type: 'SET_CONNECTED'; playerId: string; connected: boolean }
+  | { type: 'SET_FORMAT'; playerId: string; format: GameFormat }
   | { type: 'START_GAME'; playerId: string }
   | { type: 'BID'; playerId: string; bid: number }
   | { type: 'PLAY_CARD'; playerId: string; cardId: CardId }
@@ -39,6 +52,7 @@ export function createGame(code: string, seed: string, createdAt: number, host: 
     phase: 'lobby',
     players: [{ ...host, seat: 0, connected: true, totalScore: 0 }],
     maxPlayers: MAX_PLAYERS,
+    format: DEFAULT_FORMAT,
     roundsSequence: [],
     round: null,
     createdAt,
@@ -133,11 +147,19 @@ export function applyAction(prev: GameState, action: GameAction): EngineResult {
       return { ok: true, state };
     }
 
+    case 'SET_FORMAT': {
+      if (state.phase !== 'lobby') return err('BAD_PHASE');
+      if (action.playerId !== state.hostId) return err('NOT_HOST');
+      if (!isGameFormat(action.format)) return err('ILLEGAL_FORMAT');
+      state.format = action.format;
+      return { ok: true, state };
+    }
+
     case 'START_GAME': {
       if (state.phase !== 'lobby') return err('BAD_PHASE');
       if (action.playerId !== state.hostId) return err('NOT_HOST');
       if (state.players.length < MIN_PLAYERS) return err('NOT_ENOUGH_PLAYERS');
-      state.roundsSequence = roundsSequence(state.players.length);
+      state.roundsSequence = roundsSequence(state.players.length, state.format);
       const rand = mulberry32(hashSeed(`${state.seed}:dealer`));
       const dealerSeat = Math.floor(rand() * state.players.length);
       dealRound(state, 0, dealerSeat);

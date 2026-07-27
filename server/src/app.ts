@@ -8,6 +8,7 @@ import { isBotId } from '@rikiki/shared';
 import type { Config } from './config';
 import { openDb } from './db/db';
 import { UsersRepo } from './db/users.repo';
+import { LiveRoomsRepo } from './db/rooms.repo';
 import { authRoutes } from './auth/routes';
 import { magicLinkRoutes } from './auth/magicLink';
 import { createMailer, type Mailer } from './mail/mailer';
@@ -17,6 +18,7 @@ import { registerSocketHandlers } from './sockets/handlers';
 export function createApp(config: Config, overrides: { mailer?: Mailer } = {}) {
   const db = openDb(config.DB_PATH);
   const users = new UsersRepo(db);
+  const liveRooms = new LiveRoomsRepo(db);
   const mailer = overrides.mailer ?? createMailer(config);
 
   const app = express();
@@ -59,6 +61,8 @@ export function createApp(config: Config, overrides: { mailer?: Mailer } = {}) {
       }
     },
     { botDelayMs: config.BOT_DELAY_MS },
+    // Les parties en cours sont persistées : elles survivent à un redémarrage.
+    liveRooms,
   );
   registerSocketHandlers(io, rooms, users, config);
 
@@ -75,5 +79,5 @@ export function createApp(config: Config, overrides: { mailer?: Mailer } = {}) {
     });
   }
 
-  return { app, httpServer, io, rooms, db, users };
+  return { app, httpServer, io, rooms, db, users, liveRooms };
 }

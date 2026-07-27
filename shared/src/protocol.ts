@@ -1,4 +1,5 @@
 import type { EngineErrorCode } from './engine';
+import type { GameFormat } from './rules';
 import type { CardId, GameView } from './types';
 
 export type ErrorCode =
@@ -41,6 +42,8 @@ export interface ClientToServerEvents {
   'room:addBot': (ack: (res: Ack<{ playerId: string }>) => void) => void;
   /** Retire un joueur automatique (hôte, lobby uniquement). */
   'room:removeBot': (payload: { playerId: string }, ack: (res: Ack) => void) => void;
+  /** Choisit le format de la partie (hôte, lobby uniquement) — diffusé à tout le salon. */
+  'room:setFormat': (payload: { format: GameFormat }, ack: (res: Ack) => void) => void;
   'room:rematch': (ack: (res: Ack<{ code: string }>) => void) => void;
   'game:start': (ack: (res: Ack) => void) => void;
   'game:bid': (payload: { bid: number }, ack: (res: Ack) => void) => void;

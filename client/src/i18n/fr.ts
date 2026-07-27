@@ -39,6 +39,23 @@ export const fr = {
   botsFull: 'La table est complète',
   removeBot: 'Retirer le robot',
 
+  // Format de partie (durée)
+  gameFormat: 'Format de la partie',
+  gameFormatHint: 'Choisis la durée avant de lancer',
+  formatNames: {
+    blitz: 'Éclair',
+    normal: 'Normale',
+    climb: 'Montante',
+  } as const,
+  formatDescriptions: {
+    blitz: 'Montée et descente jusqu’à 5 cartes',
+    normal: 'Montée puis descente complètes',
+    climb: 'Montée seule, sans redescente',
+  } as const,
+  formatRounds: (n: number) => (n > 1 ? `${n} manches` : '1 manche'),
+  formatDuration: (minutes: number) => `≈ ${minutes} min`,
+  formatLocked: 'Format choisi par l’hôte',
+
   // Table de jeu
   round: 'Manche',
   cards: (n: number) => (n > 1 ? `${n} cartes` : '1 carte'),
@@ -117,6 +134,42 @@ export const fr = {
   wonBadge: 'Gagné',
   lostBadge: 'Perdu',
   playersCount: (n: number) => `${n} joueurs`,
+
+  // Règles du jeu
+  rules: 'Règles du jeu',
+  rulesTitle: 'Comment jouer',
+  rulesSubtitle: 'Le Rikiki en 2 minutes',
+  rulesGoalTitle: 'Le principe',
+  rulesGoalText:
+    "Avant chaque manche, vous annoncez combien de plis vous pensez remporter. Tout l'enjeu est de tomber juste : ni plus, ni moins. Faire beaucoup de plis ne sert à rien si vous en aviez annoncé peu.",
+  rulesDealTitle: 'La donne',
+  rulesDealText:
+    "La partie se joue en plusieurs manches. La première ne distribue qu'une carte par joueur, puis deux, puis trois… avant de redescendre. À chaque manche, tout le monde reçoit le même nombre de cartes.",
+  rulesTrumpText: 'Une carte est retournée : sa couleur est l’atout de la manche.',
+  rulesBidTitle: "L'annonce",
+  rulesBidText:
+    'Chacun son tour, vous annoncez le nombre de plis visé — de 0 au nombre de cartes en main. Vous voyez votre jeu et l’atout pour décider.',
+  rulesHookTitle: 'La règle du crochet',
+  rulesHookText:
+    "Le dernier à annoncer (le donneur) ne peut pas choisir le chiffre qui ferait correspondre exactement le total des annonces au nombre de plis de la manche. Résultat : quelqu'un sera forcément déçu. Le chiffre interdit est barré automatiquement.",
+  rulesPlayTitle: 'Le jeu des plis',
+  rulesPlayText:
+    'Le joueur à gauche du donneur entame. Chacun pose une carte, et la plus forte remporte le pli. Le gagnant entame le pli suivant.',
+  rulesFollowSuit: 'Vous devez fournir la couleur demandée si vous en avez une.',
+  rulesNoSuit: "Sinon, vous jouez ce que vous voulez : couper à l'atout ou vous défausser.",
+  rulesWinTrick: "Le plus haut atout l'emporte ; sans atout, la plus haute carte de la couleur demandée.",
+  rulesScoreTitle: 'Les points',
+  rulesScoreOk: 'Contrat réussi',
+  rulesScoreOkExample: 'Annoncé 3, réalisé 3 → 16 points',
+  rulesScoreKo: 'Contrat manqué',
+  rulesScoreKoExample: 'Annoncé 3, réalisé 1 → −4 points',
+  rulesScoreZero: 'Annoncer 0 et n’en faire aucun rapporte 10 points : un contrat très rentable.',
+  rulesEndTitle: 'Fin de partie',
+  rulesEndText:
+    "Une fois toutes les manches jouées, le joueur qui totalise le plus de points l'emporte. Le tableau des scores est consultable à tout moment pendant la partie.",
+  rulesTip:
+    'Astuce : sur les petites manches, un as ou un atout élevé suffit souvent à assurer un pli. Sur les grandes, méfiez-vous des couleurs longues.',
+  rulesGotIt: "J'ai compris",
 
   loading: 'Chargement…',
   errorTitle: 'Oups',

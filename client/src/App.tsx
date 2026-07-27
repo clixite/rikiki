@@ -10,6 +10,7 @@ import History from './screens/History';
 import Home from './screens/Home';
 import Join from './screens/Join';
 import Profile from './screens/Profile';
+import Rules from './screens/Rules';
 import VerifyEmail from './screens/VerifyEmail';
 
 export default function App() {
@@ -53,6 +54,7 @@ export default function App() {
         <Route path="/j/:code" element={<Join />} />
         <Route path="/game" element={<Game />} />
         <Route path="/history" element={<History />} />
+        <Route path="/rules" element={<Rules />} />
         <Route path="/verify" element={<VerifyEmail />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

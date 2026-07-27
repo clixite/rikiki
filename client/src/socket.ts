@@ -1,5 +1,5 @@
 import { io, type Socket } from 'socket.io-client';
-import type { Ack, ClientToServerEvents, ServerToClientEvents } from '@rikiki/shared';
+import type { Ack, ClientToServerEvents, GameFormat, ServerToClientEvents } from '@rikiki/shared';
 import { useGame } from './store/game';
 import { useSession } from './store/session';
 
@@ -88,6 +88,7 @@ export async function leaveRoom(): Promise<void> {
 
 export const addBot = () => emitAck<{ playerId: string }>('room:addBot');
 export const removeBot = (playerId: string) => emitAck('room:removeBot', { playerId });
+export const setFormat = (format: GameFormat) => emitAck('room:setFormat', { format });
 export const startGame = () => emitAck('game:start');
 export const placeBid = (bid: number) => emitAck('game:bid', { bid });
 export const playCard = (cardId: string) => emitAck('game:playCard', { cardId });

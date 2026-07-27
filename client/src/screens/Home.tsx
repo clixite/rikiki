@@ -69,6 +69,16 @@ export default function Home() {
           )}
         </button>
         <div className="flex-1" />
+        <button
+          type="button"
+          data-testid="open-rules"
+          onClick={() => navigate('/rules')}
+          aria-label={fr.rules}
+          title={fr.rules}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/45 text-lg ring-1 ring-white/8 transition active:scale-90"
+        >
+          <span aria-hidden="true">📖</span>
+        </button>
         <SoundToggle />
       </div>
 

@@ -26,10 +26,19 @@ const AUTOPLAY_DELAY_MS = 800;
 /** Délai « humain » avant qu'un bot ne joue (base + jitter déterministe). */
 export const DEFAULT_BOT_DELAY_MS = 800;
 const BOT_DELAY_SPREAD_MS = 700;
+/**
+ * Les écritures en base sont groupées : une action déclenche souvent plusieurs
+ * changements d'état rapprochés (carte jouée → pli remporté → manche scorée).
+ * Un délai court garde la base quasiment à jour sans écrire à chaque micro-pas ;
+ * `flush()` force l'écriture aux moments critiques (arrêt du serveur).
+ */
+const PERSIST_DEBOUNCE_MS = 250;
 
 export interface RoomCallbacks {
   onGameOver?: (state: GameState, bestRounds: Record<string, number>) => void;
   onEmpty?: (room: Room) => void;
+  /** Écriture de l'état en base (voir `LiveRoomsRepo`). */
+  onPersist?: (room: Room) => void;
 }
 
 export interface RoomOptions {
@@ -45,6 +54,8 @@ export class Room {
   private autoplayTimer: ReturnType<typeof setTimeout> | null = null;
   /** Meilleur score de manche par joueur (pour les stats). */
   private bestRounds: Record<string, number> = {};
+  private persistTimer: ReturnType<typeof setTimeout> | null = null;
+  private dirty = false;
   lastActivity = Date.now();
 
   constructor(
@@ -57,8 +68,90 @@ export class Room {
     this.state = createGame(code, crypto.randomUUID(), Date.now(), host);
   }
 
+  /**
+   * Reconstruit une room à partir d'un état persisté (redémarrage du serveur).
+   * Renvoie `null` si l'état est inexploitable (aucun joueur).
+   */
+  static restore(
+    io: Server,
+    state: GameState,
+    callbacks: RoomCallbacks = {},
+    options: RoomOptions = {},
+    lastActivity = Date.now(),
+  ): Room | null {
+    const host = state.players.find((p) => p.id === state.hostId) ?? state.players[0];
+    if (!host) return null;
+    const room = new Room(io, state.code, host, callbacks, options);
+    room.state = state;
+    room.lastActivity = lastActivity;
+    room.resume();
+    return room;
+  }
+
   get code(): string {
     return this.state.code;
+  }
+
+  /**
+   * Reprise après un redémarrage du serveur.
+   *
+   * Les sockets et les timers vivent dans le processus : rien de tout cela n'a
+   * survécu. On repart donc d'une base saine :
+   *  - tous les joueurs humains repassent `connected: false` (aucun socket
+   *    n'est rattaché) ; ils se reconnectent normalement via `room:join`,
+   *    l'identité étant le userId du JWT ;
+   *  - une nouvelle période de grâce de `GRACE_SECONDS` est armée pour chacun
+   *    d'eux si une manche est en cours. C'est le pendant exact d'une
+   *    déconnexion ordinaire : le joueur a le temps de revenir (le client se
+   *    reconnecte tout seul), et s'il ne revient pas la partie n'est pas
+   *    bloquée pour autant — il bascule en auto-play comme d'habitude ;
+   *  - en lobby ou en `game-over` il n'y a rien à jouer : pas de timer, la
+   *    room est simplement balayée par le `sweep()` si personne ne revient ;
+   *  - les bots (toujours « connectés ») reprennent la main immédiatement si
+   *    c'est leur tour.
+   *
+   * Note : `bestRounds` n'est pas persisté (statistique annexe) ; après un
+   * redémarrage, le meilleur score de manche repart de zéro pour la partie.
+   */
+  private resume(): void {
+    this.state = {
+      ...this.state,
+      players: this.state.players.map((p) => (isBotId(p.id) ? p : { ...p, connected: false })),
+    };
+    const inRound = this.state.phase === 'bidding' || this.state.phase === 'playing' || this.state.phase === 'round-scoring';
+    if (inRound) {
+      for (const p of this.state.players) {
+        if (isBotId(p.id)) continue;
+        const t = setTimeout(() => this.onGraceExpired(p.id), GRACE_SECONDS * 1000);
+        t.unref?.();
+        this.graceTimers.set(p.id, t);
+      }
+    }
+    this.schedulePersist();
+    this.scheduleAutoplay();
+  }
+
+  /** Marque l'état comme modifié ; l'écriture réelle est groupée. */
+  private schedulePersist(): void {
+    if (!this.callbacks.onPersist) return;
+    this.dirty = true;
+    if (this.persistTimer) return;
+    this.persistTimer = setTimeout(() => {
+      this.persistTimer = null;
+      this.flush();
+    }, PERSIST_DEBOUNCE_MS);
+    this.persistTimer.unref?.();
+  }
+
+  /** Écrit sans attendre l'état en base s'il a changé depuis la dernière écriture. */
+  flush(): void {
+    if (this.persistTimer) {
+      clearTimeout(this.persistTimer);
+      this.persistTimer = null;
+    }
+    if (!this.dirty) return;
+    this.dirty = false;
+    this.callbacks.onPersist?.(this);
   }
 
   apply(action: GameAction): EngineResult {
@@ -72,6 +165,7 @@ export class Room {
           this.bestRounds[pid] = Math.max(this.bestRounds[pid] ?? 0, score);
         }
       }
+      this.schedulePersist();
       this.broadcastViews();
       if (this.state.phase === 'game-over' && prevPhase !== 'game-over') {
         this.callbacks.onGameOver?.(this.state, this.bestRounds);
@@ -116,6 +210,7 @@ export class Room {
     const res = applyAction(this.state, { type: 'SET_CONNECTED', playerId: userId, connected: true });
     if (res.ok) this.state = res.state;
     this.lastActivity = Date.now();
+    this.schedulePersist();
     this.broadcastViews();
   }
 
@@ -133,6 +228,7 @@ export class Room {
     const res = applyAction(this.state, { type: 'SET_CONNECTED', playerId: userId, connected: false });
     if (res.ok) {
       this.state = res.state;
+      this.schedulePersist();
       this.broadcastViews();
     }
     this.emitEvent({ type: 'player-disconnected', playerId: userId, graceSeconds: GRACE_SECONDS });
@@ -147,6 +243,7 @@ export class Room {
     if (!res.ok) return;
     this.state = res.state;
     this.lastActivity = Date.now();
+    this.schedulePersist();
     this.emitEvent({ type: 'player-left', playerId: userId, pseudo });
     if (this.state.hostId !== prevHost) {
       this.emitEvent({ type: 'host-changed', hostId: this.state.hostId });
@@ -185,6 +282,7 @@ export class Room {
       const connected = this.state.players.find((p) => p.connected && !isBotId(p.id));
       if (connected) {
         this.state = { ...this.state, hostId: connected.id };
+        this.schedulePersist();
         this.emitEvent({ type: 'host-changed', hostId: connected.id });
         this.broadcastViews();
       }
@@ -266,16 +364,39 @@ export class Room {
     return this.sockets.size;
   }
 
-  close(reason: string): void {
-    this.io.to(this.code).emit('room:closed', { reason });
+  private clearTimers(): void {
     for (const t of this.graceTimers.values()) clearTimeout(t);
     this.graceTimers.clear();
     if (this.autoplayTimer) clearTimeout(this.autoplayTimer);
     this.autoplayTimer = null;
+    if (this.persistTimer) clearTimeout(this.persistTimer);
+    this.persistTimer = null;
+  }
+
+  private releaseSockets(): void {
     for (const socket of this.sockets.values()) {
       socket.data.roomCode = null;
       socket.leave(this.code);
     }
     this.sockets.clear();
+  }
+
+  /** Fermeture définitive : les clients sont prévenus, l'état n'est plus utile. */
+  close(reason: string): void {
+    this.io.to(this.code).emit('room:closed', { reason });
+    // La ligne en base est supprimée par le RoomManager : inutile d'écrire.
+    this.dirty = false;
+    this.clearTimers();
+    this.releaseSockets();
+  }
+
+  /**
+   * Arrêt du serveur : on écrit l'état puis on libère les ressources, sans
+   * prévenir les clients — la partie reprendra au prochain démarrage.
+   */
+  dispose(): void {
+    this.flush();
+    this.clearTimers();
+    this.releaseSockets();
   }
 }

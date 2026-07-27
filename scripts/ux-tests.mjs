@@ -360,6 +360,31 @@ console.log('\n▸ Accessibilité et préférences système');
 }
 
 {
+  // Écran de règles : accessible et lisible d'un bout à l'autre
+  const ctx = await browser.newContext({ ...PROFILES[0], ignoreHTTPSErrors: true });
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/`);
+  await createProfile(page, 'Lea');
+  await page.waitForSelector('[data-testid="open-rules"]', { timeout: 15000 });
+  await page.click('[data-testid="open-rules"]');
+  await page.waitForSelector('[data-testid="rules-back"]', { timeout: 10000 });
+  check('règles : écran accessible depuis l’accueil', true);
+  check('règles : pas de débordement horizontal', await noHorizontalOverflow(page));
+  const rulesSmall = await smallTouchTargets(page, MIN_TOUCH);
+  check('règles : cibles tactiles ≥ 44px', rulesSmall.length === 0, rulesSmall.join(' | '));
+  // Le contenu doit être défilable jusqu'au bout, sans texte coupé
+  const scrolled = await page.evaluate(() => {
+    const el = document.querySelector('.rk-scroll');
+    if (!el) return false;
+    el.scrollTop = el.scrollHeight;
+    return el.scrollTop > 0;
+  });
+  check('règles : contenu défilable jusqu’au bout', scrolled);
+  if (SHOTS) { await settle(page); await page.screenshot({ path: `${SHOTS}/rules.png`, fullPage: false }); }
+  await ctx.close();
+}
+
+{
   // Manifest PWA et titre de page
   const ctx = await browser.newContext({ ...PROFILES[1], ignoreHTTPSErrors: true });
   const page = await ctx.newPage();

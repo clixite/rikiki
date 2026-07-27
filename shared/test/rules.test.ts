@@ -1,6 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { cardFromId } from '../src/cards';
-import { legalBids, legalCards, maxCards, roundsSequence, scoreRound, trickWinner } from '../src/rules';
+import {
+  GAME_FORMATS,
+  MAX_PLAYERS,
+  MIN_PLAYERS,
+  formatSummary,
+  isGameFormat,
+  legalBids,
+  legalCards,
+  maxCards,
+  roundsSequence,
+  scoreRound,
+  trickWinner,
+} from '../src/rules';
 import type { Trick } from '../src/types';
 
 describe('maxCards', () => {
@@ -24,6 +36,97 @@ describe('roundsSequence', () => {
     expect(roundsSequence(3)[0]).toBe(1);
     expect(roundsSequence(3)[9]).toBe(10);
     expect(roundsSequence(3)[18]).toBe(1);
+  });
+});
+
+describe('formats de partie', () => {
+  it('le format par défaut reste la partie normale', () => {
+    for (let n = MIN_PLAYERS; n <= MAX_PLAYERS; n++) {
+      expect(roundsSequence(n)).toEqual(roundsSequence(n, 'normal'));
+    }
+  });
+
+  it('Éclair : montée et descente plafonnées à 5 cartes', () => {
+    expect(roundsSequence(3, 'blitz')).toEqual([1, 2, 3, 4, 5, 4, 3, 2, 1]);
+    expect(roundsSequence(6, 'blitz')).toEqual([1, 2, 3, 4, 5, 4, 3, 2, 1]);
+    // Même à 8 joueurs (max 6 cartes), le plafond Éclair reste atteignable
+    expect(roundsSequence(8, 'blitz')).toEqual([1, 2, 3, 4, 5, 4, 3, 2, 1]);
+  });
+
+  it('Montante : montée seule, sans redescente', () => {
+    expect(roundsSequence(3, 'climb')).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(roundsSequence(6, 'climb')).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(roundsSequence(8, 'climb')).toEqual([1, 2, 3, 4, 5, 6]);
+  });
+
+  it('Normale : montée puis descente complètes', () => {
+    expect(roundsSequence(4, 'normal')).toHaveLength(19);
+    expect(roundsSequence(6, 'normal')).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1]);
+    expect(roundsSequence(8, 'normal')).toEqual([1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]);
+  });
+
+  it('toute séquence commence et finit sur une manche jouable', () => {
+    for (let n = MIN_PLAYERS; n <= MAX_PLAYERS; n++) {
+      for (const format of GAME_FORMATS) {
+        const seq = roundsSequence(n, format);
+        expect(seq.length).toBeGreaterThan(0);
+        expect(seq[0]).toBe(1);
+        expect(Math.max(...seq)).toBeLessThanOrEqual(maxCards(n));
+        // Chaque manche doit pouvoir être distribuée (52 cartes disponibles)
+        expect(n * Math.max(...seq)).toBeLessThan(52);
+      }
+    }
+  });
+
+  it('la Normale est toujours le format le plus long', () => {
+    for (let n = MIN_PLAYERS; n <= MAX_PLAYERS; n++) {
+      const blitz = formatSummary(n, 'blitz');
+      const normal = formatSummary(n, 'normal');
+      const climb = formatSummary(n, 'climb');
+      expect(blitz.tricks).toBeLessThan(normal.tricks);
+      expect(climb.tricks).toBeLessThan(normal.tricks);
+      expect(blitz.minutes).toBeLessThan(normal.minutes);
+      expect(climb.minutes).toBeLessThan(normal.minutes);
+    }
+  });
+
+  it('Éclair est le plus court jusqu’à 6 joueurs (au-delà, Montante le rattrape)', () => {
+    for (let n = MIN_PLAYERS; n <= 6; n++) {
+      expect(formatSummary(n, 'blitz').tricks).toBeLessThan(formatSummary(n, 'climb').tricks);
+    }
+    // À 8 joueurs, la montée seule s'arrête à 6 cartes : elle devient plus courte
+    expect(formatSummary(8, 'climb').tricks).toBeLessThan(formatSummary(8, 'blitz').tricks);
+  });
+
+  it('le résumé est cohérent avec la séquence', () => {
+    for (let n = MIN_PLAYERS; n <= MAX_PLAYERS; n++) {
+      for (const format of GAME_FORMATS) {
+        const seq = roundsSequence(n, format);
+        const summary = formatSummary(n, format);
+        expect(summary.format).toBe(format);
+        expect(summary.rounds).toBe(seq.length);
+        expect(summary.tricks).toBe(seq.reduce((a, b) => a + b, 0));
+        expect(summary.minutes).toBeGreaterThanOrEqual(5);
+        expect(summary.minutes % 5).toBe(0);
+      }
+    }
+  });
+
+  it('estime la durée à partir du nombre de joueurs présents', () => {
+    expect(formatSummary(3, 'blitz')).toEqual({ format: 'blitz', rounds: 9, tricks: 25, minutes: 10 });
+    expect(formatSummary(3, 'normal')).toEqual({ format: 'normal', rounds: 19, tricks: 100, minutes: 30 });
+    expect(formatSummary(3, 'climb')).toEqual({ format: 'climb', rounds: 10, tricks: 55, minutes: 15 });
+    // Un salon incomplet affiche déjà l'estimation de la partie réellement jouable
+    expect(formatSummary(1, 'normal')).toEqual(formatSummary(MIN_PLAYERS, 'normal'));
+  });
+
+  it('valide les identifiants de format', () => {
+    expect(isGameFormat('blitz')).toBe(true);
+    expect(isGameFormat('normal')).toBe(true);
+    expect(isGameFormat('climb')).toBe(true);
+    expect(isGameFormat('rapide')).toBe(false);
+    expect(isGameFormat(undefined)).toBe(false);
+    expect(isGameFormat(2)).toBe(false);
   });
 });
 

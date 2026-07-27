@@ -1,3 +1,5 @@
+import type { GameFormat } from './rules';
+
 export type Suit = 'S' | 'H' | 'D' | 'C';
 export const SUITS: readonly Suit[] = ['S', 'H', 'D', 'C'];
 
@@ -36,6 +38,54 @@ export interface UserStats {
   gamesWon: number;
   totalPoints: number;
   bestRound: number;
+}
+
+/* ------------------------------------------------------------------ */
+/* Groupes d'amis : classement cumulé sur les parties jouées ensemble   */
+/* ------------------------------------------------------------------ */
+
+/** Un groupe d'amis, tel qu'affiché dans « Mes groupes ». */
+export interface Group {
+  id: string;
+  name: string;
+  /** Code de partage à 6 lettres (distinct du code de partie à 4 lettres). */
+  code: string;
+  ownerId: string;
+  createdAt: number;
+  membersCount: number;
+  gamesCount: number;
+}
+
+export interface GroupMember {
+  userId: string;
+  pseudo: string;
+  avatar: string;
+  joinedAt: number;
+  isOwner: boolean;
+}
+
+/** Une ligne du classement cumulé du groupe. */
+export interface GroupStanding {
+  userId: string;
+  pseudo: string;
+  avatar: string;
+  totalPoints: number;
+  gamesPlayed: number;
+  gamesWon: number;
+}
+
+/** Une partie du groupe, avec le résultat de chaque participant. */
+export interface GroupGame {
+  code: string;
+  playedAt: number;
+  results: { userId: string; pseudo: string; avatar: string; score: number; rank: number; won: boolean }[];
+}
+
+export interface GroupDetail {
+  group: Group;
+  members: GroupMember[];
+  standings: GroupStanding[];
+  recentGames: GroupGame[];
 }
 
 export interface Player {
@@ -85,6 +135,8 @@ export interface GameState {
   phase: Phase;
   players: Player[];
   maxPlayers: number;
+  /** Format choisi par l'hôte dans le salon (durée de la partie). */
+  format: GameFormat;
   roundsSequence: number[];
   round: RoundState | null;
   createdAt: number;

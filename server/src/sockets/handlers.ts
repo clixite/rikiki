@@ -1,6 +1,6 @@
 import type { Server, Socket } from 'socket.io';
 import type { ErrorCode, ProtocolError, PublicUser } from '@rikiki/shared';
-import { isBotId } from '@rikiki/shared';
+import { isBotId, isGameFormat } from '@rikiki/shared';
 import type { Config } from '../config';
 import type { UsersRepo } from '../db/users.repo';
 import { verifyToken } from '../auth/tokens';
@@ -18,6 +18,7 @@ const MESSAGES: Record<ErrorCode, string> = {
   ILLEGAL_BID: 'Annonce invalide.',
   ILLEGAL_BID_HOOK: 'Annonce interdite par la règle du crochet.',
   ILLEGAL_CARD: 'Tu ne peux pas jouer cette carte.',
+  ILLEGAL_FORMAT: 'Format de partie inconnu.',
   ROOM_NOT_FOUND: 'Aucune partie avec ce code.',
   GAME_ALREADY_STARTED: 'La partie a déjà commencé.',
   ALREADY_IN_ROOM: 'Tu es déjà dans une partie.',
@@ -135,6 +136,16 @@ export function registerSocketHandlers(io: Server, rooms: RoomManager, users: Us
       if (!isBotId(targetId) || !room.isMember(targetId)) return ack(protoErr('PLAYER_NOT_FOUND'));
       room.kick(targetId);
       ack({ ok: true });
+    });
+
+    socket.on('room:setFormat', (payload: { format?: unknown } | undefined, ack: Ack) => {
+      if (typeof ack !== 'function') return;
+      const room = currentRoom();
+      if (!room) return ack(protoErr('NOT_IN_ROOM'));
+      if (!isGameFormat(payload?.format)) return ack(protoErr('INVALID_PAYLOAD'));
+      // Le moteur revérifie l'hôte et la phase ; l'application diffuse la vue à tout le salon.
+      const res = room.apply({ type: 'SET_FORMAT', playerId: user.id, format: payload.format });
+      ack(res.ok ? { ok: true } : protoErr(res.error));
     });
 
     socket.on('room:rematch', (ack: Ack) => {
