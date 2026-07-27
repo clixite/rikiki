@@ -94,9 +94,15 @@ export function useNav(): Nav {
         // Aller : la transition doit voir le DOM final tout de suite.
         flushSync(go);
       });
-      void transition.finished.finally(() => {
+      // `finished` est rejetée quand la transition est écartée — une seconde
+      // navigation lancée avant la fin de la première, un onglet passé en
+      // arrière-plan. Ce n'est pas une erreur : on nettoie dans les deux cas,
+      // et surtout on traite le rejet, sous peine de le voir remonter en
+      // « unhandled rejection ».
+      const clear = (): void => {
         delete document.documentElement.dataset.nav;
-      });
+      };
+      transition.finished.then(clear, clear);
     },
     [navigate],
   ) as Nav;
