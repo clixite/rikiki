@@ -138,7 +138,7 @@ export default function Table({ view }: Props) {
       )}
 
       {/* ---- Ma zone : contrat + main ---- */}
-      <div className="shrink-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+      <div className="shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="mb-2 flex items-center justify-center gap-2.5 px-3">
           <span className="text-base leading-none" aria-hidden="true">
             {me.avatar}

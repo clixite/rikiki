@@ -238,6 +238,23 @@ for (const profile of PROFILES) {
     );
     check('ANNONCE : pas de débordement horizontal', await noHorizontalOverflow(bidderPage));
 
+    // Marge de respiration sous la main : des cartes collées au bord de
+    // l'écran sont désagréables à saisir et paraissent rognées.
+    const bottomGap = await bidderPage.evaluate(() => {
+      const el = document.querySelector('[data-testid="hand-fan"]');
+      if (!el) return -1;
+      return Math.round(window.innerHeight - el.getBoundingClientRect().bottom);
+    });
+    check('ANNONCE : marge sous la main ≥ 8px', bottomGap >= 8, `${bottomGap}px`);
+
+    // Les cartes ne doivent recouvrir aucune information au-dessus d'elles
+    const clashContract = await overlaps(bidderPage, '[data-testid="hand-fan"]', '[data-testid="my-contract"]');
+    check(
+      'ANNONCE : la main ne recouvre pas la ligne du joueur',
+      clashContract.found && !clashContract.overlap,
+      JSON.stringify(clashContract),
+    );
+
     const bidSmall = await smallTouchTargets(bidderPage, MIN_TOUCH);
     check('ANNONCE : cibles tactiles ≥ 44px', bidSmall.length === 0, bidSmall.join(' | '));
     check(
@@ -275,6 +292,12 @@ for (const profile of PROFILES) {
     check('JEU : pas de débordement horizontal', await noHorizontalOverflow(playPage));
     check('JEU : indication du tour affichée', (await playPage.locator('[data-testid="turn-status"]').count()) > 0);
     check('JEU : contrat personnel affiché', (await playPage.locator('[data-testid="my-contract"]').count()) > 0);
+    const playClash = await overlaps(playPage, '[data-testid="hand-fan"]', '[data-testid="my-contract"]');
+    check(
+      'JEU : la main ne recouvre pas la ligne du joueur',
+      playClash.found && !playClash.overlap,
+      JSON.stringify(playClash),
+    );
     const playSmall = await smallTouchTargets(playPage, MIN_TOUCH);
     check('JEU : cibles tactiles ≥ 44px', playSmall.length === 0, playSmall.join(' | '));
     if (SHOTS) { await settle(playPage); await playPage.screenshot({ path: `${SHOTS}/${profile.name.replace(/\W+/g, '-')}-04-playing.png` }); }
