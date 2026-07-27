@@ -31,6 +31,12 @@ export default defineConfig({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/, /^\/socket\.io/],
         runtimeCaching: [],
+        // Notifications « c'est ton tour » : on greffe les écouteurs `push` et
+        // `notificationclick` sur le service worker généré, sans toucher au
+        // precache (voir client/public/push-sw.js).
+        importScripts: ['/push-sw.js'],
+        // Le script importé est chargé par `importScripts`, inutile de le précacher.
+        globIgnores: ['**/node_modules/**/*', 'push-sw.js'],
       },
     }),
   ],

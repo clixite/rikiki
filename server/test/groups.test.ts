@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { io as ioc, type Socket } from 'socket.io-client';
 import type { AddressInfo } from 'node:net';
-import type { Group, GroupDetail } from '@rikiki/shared';
+import type { GameView, Group, GroupDetail } from '@rikiki/shared';
 import { BOT_ID_PREFIX } from '@rikiki/shared';
 import { loadConfig } from '../src/config';
 import { createApp } from '../src/app';
@@ -18,6 +19,8 @@ beforeAll(async () => {
     DB_PATH: ':memory:',
     JWT_SECRET: 'secret-de-test-groupes',
     PUBLIC_URL: 'https://rikiki.test',
+    // Les bots jouent instantanément en test.
+    BOT_DELAY_MS: '0',
   } as NodeJS.ProcessEnv);
   server = createApp(config, { mailer: silentMailer });
   await new Promise<void>((resolve) => server.httpServer.listen(0, resolve));
