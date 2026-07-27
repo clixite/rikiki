@@ -14,6 +14,14 @@ const envSchema = z.object({
   NODE_ENV: z.string().default('development'),
   /** Délai minimal (ms) avant qu'un joueur automatique ne joue. 0 = instantané. */
   BOT_DELAY_MS: z.coerce.number().min(0).default(800),
+  /**
+   * Clés VAPID des notifications « c'est ton tour ». Si elles sont absentes,
+   * une paire est générée au premier démarrage puis persistée en base.
+   */
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  /** Identité du serveur pour VAPID (mailto:… ou URL) ; défaut : PUBLIC_URL. */
+  VAPID_SUBJECT: z.string().optional(),
 });
 
 export type Config = ReturnType<typeof loadConfig>;

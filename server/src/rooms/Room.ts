@@ -44,6 +44,12 @@ export interface RoomCallbacks {
 export interface RoomOptions {
   /** Délai minimal avant l'action d'un bot ; 0 = immédiat (tests). */
   botDelayMs?: number;
+  /**
+   * Appelée une seule fois par tour, dès qu'un nouveau joueur devient le
+   * joueur attendu (phase `bidding` ou `playing`). Sert aux notifications
+   * push ; le filtrage (bot, joueur encore connecté) se fait côté appelant.
+   */
+  onTurn?: (room: Room, playerId: string) => void;
 }
 
 export class Room {
@@ -101,12 +107,10 @@ export class Room {
    *    n'est rattaché) ; ils se reconnectent normalement via `room:join`,
    *    l'identité étant le userId du JWT ;
    *  - une nouvelle période de grâce de `GRACE_SECONDS` est armée pour chacun
-   *    d'eux si une manche est en cours. C'est le pendant exact d'une
-   *    déconnexion ordinaire : le joueur a le temps de revenir (le client se
-   *    reconnecte tout seul), et s'il ne revient pas la partie n'est pas
-   *    bloquée pour autant — il bascule en auto-play comme d'habitude ;
-   *  - en lobby ou en `game-over` il n'y a rien à jouer : pas de timer, la
-   *    room est simplement balayée par le `sweep()` si personne ne revient ;
+   *    d'eux. C'est le pendant exact d'une déconnexion ordinaire : le joueur a
+   *    le temps de revenir (le client se reconnecte tout seul), et s'il ne
+   *    revient pas la partie n'est pas bloquée pour autant — elle continue en
+   *    auto-play, ou le joueur est retiré s'il s'agit d'un lobby ;
    *  - les bots (toujours « connectés ») reprennent la main immédiatement si
    *    c'est leur tour.
    *
@@ -118,17 +122,27 @@ export class Room {
       ...this.state,
       players: this.state.players.map((p) => (isBotId(p.id) ? p : { ...p, connected: false })),
     };
-    const inRound = this.state.phase === 'bidding' || this.state.phase === 'playing' || this.state.phase === 'round-scoring';
-    if (inRound) {
-      for (const p of this.state.players) {
-        if (isBotId(p.id)) continue;
-        const t = setTimeout(() => this.onGraceExpired(p.id), GRACE_SECONDS * 1000);
-        t.unref?.();
-        this.graceTimers.set(p.id, t);
-      }
+    for (const p of this.state.players) {
+      if (isBotId(p.id)) continue;
+      const t = setTimeout(() => this.onRestoreGraceExpired(p.id), GRACE_SECONDS * 1000);
+      t.unref?.();
+      this.graceTimers.set(p.id, t);
     }
     this.schedulePersist();
     this.scheduleAutoplay();
+  }
+
+  /** Fin de la période de grâce accordée après un redémarrage. */
+  private onRestoreGraceExpired(userId: string): void {
+    this.graceTimers.delete(userId);
+    if (this.sockets.has(userId)) return;
+    // En lobby, une déconnexion retire le joueur (cf. `detach`) — sans quoi la
+    // partie pourrait démarrer avec des fantômes qui bloqueraient leur tour.
+    if (this.state.phase === 'lobby') {
+      this.removePlayer(userId);
+      return;
+    }
+    this.onGraceExpired(userId);
   }
 
   /** Marque l'état comme modifié ; l'écriture réelle est groupée. */

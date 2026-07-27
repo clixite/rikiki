@@ -3,6 +3,7 @@ import type { ErrorCode, ProtocolError, PublicUser } from '@rikiki/shared';
 import { isBotId, isGameFormat } from '@rikiki/shared';
 import type { Config } from '../config';
 import type { UsersRepo } from '../db/users.repo';
+import type { GroupsRepo } from '../db/groups.repo';
 import { verifyToken } from '../auth/tokens';
 import { profileSchema } from '../auth/routes';
 import type { RoomManager } from '../rooms/RoomManager';
@@ -33,7 +34,13 @@ function protoErr(code: ErrorCode): { ok: false; error: ProtocolError } {
 
 type Ack = (res: unknown) => void;
 
-export function registerSocketHandlers(io: Server, rooms: RoomManager, users: UsersRepo, config: Config): void {
+export function registerSocketHandlers(
+  io: Server,
+  rooms: RoomManager,
+  users: UsersRepo,
+  config: Config,
+  groups?: GroupsRepo,
+): void {
   io.use((socket, next) => {
     const token = socket.handshake.auth?.token as string | undefined;
     const userId = token ? verifyToken(token, config.JWT_SECRET) : null;
@@ -146,6 +153,27 @@ export function registerSocketHandlers(io: Server, rooms: RoomManager, users: Us
       // Le moteur revérifie l'hôte et la phase ; l'application diffuse la vue à tout le salon.
       const res = room.apply({ type: 'SET_FORMAT', playerId: user.id, format: payload.format });
       ack(res.ok ? { ok: true } : protoErr(res.error));
+    });
+
+    /**
+     * Rattache la partie à un groupe d'amis : à la fin, les résultats
+     * alimenteront son classement cumulé. Réservé à l'hôte, en lobby, et
+     * uniquement pour un groupe dont il est membre. `null` détache la partie.
+     */
+    socket.on('room:setGroup', (payload: { groupId?: unknown } | undefined, ack: Ack) => {
+      if (typeof ack !== 'function') return;
+      const room = currentRoom();
+      if (!room) return ack(protoErr('NOT_IN_ROOM'));
+      if (room.state.hostId !== user.id) return ack(protoErr('NOT_HOST'));
+      if (room.state.phase !== 'lobby') return ack(protoErr('BAD_PHASE'));
+
+      const raw = payload?.groupId;
+      const groupId = raw === null || raw === undefined || raw === '' ? null : String(raw);
+      if (groupId !== null && !groups?.isMember(groupId, user.id)) return ack(protoErr('INVALID_PAYLOAD'));
+
+      room.state = { ...room.state, groupId };
+      room.broadcastViews();
+      ack({ ok: true });
     });
 
     socket.on('room:rematch', (ack: Ack) => {

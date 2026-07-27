@@ -141,6 +141,12 @@ export interface GameState {
   round: RoundState | null;
   createdAt: number;
   seed: string;
+  /**
+   * Groupe d'amis auquel rattacher les résultats en fin de partie.
+   * Choisi par l'hôte dans le salon (`room:setGroup`) ; `null` ou absent =
+   * partie amicale non comptabilisée dans un classement de groupe.
+   */
+  groupId?: string | null;
 }
 
 /** Manche telle que vue par UN joueur (anti-triche : pas les mains adverses). */

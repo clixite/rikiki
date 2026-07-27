@@ -44,6 +44,11 @@ export interface ClientToServerEvents {
   'room:removeBot': (payload: { playerId: string }, ack: (res: Ack) => void) => void;
   /** Choisit le format de la partie (hôte, lobby uniquement) — diffusé à tout le salon. */
   'room:setFormat': (payload: { format: GameFormat }, ack: (res: Ack) => void) => void;
+  /**
+   * Rattache la partie à un groupe d'amis (hôte, lobby uniquement).
+   * `null` détache la partie de tout groupe. L'hôte doit être membre du groupe.
+   */
+  'room:setGroup': (payload: { groupId: string | null }, ack: (res: Ack) => void) => void;
   'room:rematch': (ack: (res: Ack<{ code: string }>) => void) => void;
   'game:start': (ack: (res: Ack) => void) => void;
   'game:bid': (payload: { bid: number }, ack: (res: Ack) => void) => void;

@@ -419,6 +419,10 @@ describe('format de partie', () => {
   it(
     'joue une partie Éclair : 9 manches au lieu de 19',
     async () => {
+      // L'invité s'éclipse : la table est complétée par des robots qui jouent seuls
+      expect((await guest.emit('room:leave')).ok).toBe(true);
+      await host.waitView((v) => v.players.length === 1, 'invité parti');
+      expect((await host.emit('room:addBot')).ok).toBe(true);
       expect((await host.emit('room:addBot')).ok).toBe(true);
       await host.waitView((v) => v.players.length === 3, 'table complète');
 
