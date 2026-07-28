@@ -104,6 +104,7 @@ function dealRound(state: GameState, roundIndex: number, dealerSeat: number): vo
     currentSeat: firstSeat,
     currentTrick: { leaderSeat: firstSeat, plays: [] },
     lastTrick: null,
+    playedCards: [],
     tricksWon: Object.fromEntries(state.players.map((p) => [p.id, 0])),
     roundScores: null,
   };
@@ -214,6 +215,8 @@ export function applyAction(prev: GameState, action: GameAction): EngineResult {
         round.trumpCard?.suit ?? null,
       );
       round.currentTrick.plays.push({ playerId: action.playerId, card });
+      // Mémoire publique de la manche : ce qui est tombé ne revient pas.
+      (round.playedCards ??= []).push(card);
 
       if (round.currentTrick.plays.length === state.players.length) {
         const winner = trickWinner(round.currentTrick, round.trumpCard?.suit ?? null);

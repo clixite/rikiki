@@ -1,6 +1,6 @@
 {
   "name": "rikiki",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "Jeu de Rikiki (Oh Hell) multijoueur : créez une partie, partagez un code à 4 lettres, jouez chacun depuis son téléphone.",
   "author": "Nicolas Simon",
@@ -21,7 +21,8 @@
     "typecheck": "tsc --noEmit -p shared && tsc --noEmit -p server && tsc --noEmit -p client",
     "test:ux": "node scripts/ux-tests.mjs",
     "store:assets": "node scripts/store-assets.mjs",
-    "store:check": "node scripts/check-store.mjs"
+    "store:check": "node scripts/check-store.mjs",
+    "bench:bots": "tsx scripts/bot-benchmark.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

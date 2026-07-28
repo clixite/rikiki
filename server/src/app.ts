@@ -71,6 +71,31 @@ export function createApp(config: Config, overrides: { mailer?: Mailer; pushSend
   app.get('/api/health', (_req, res) => {
     res.json({ ok: true });
   });
+
+  /**
+   * Erreurs remontées par le client.
+   *
+   * Journalisées, jamais stockées en base : ce sont des données de diagnostic,
+   * pas des données utilisateur. Aucune authentification exigée — un plantage
+   * survient précisément quand la session peut être cassée — mais la charge
+   * utile est tronquée et le débit limité côté client.
+   */
+  app.post('/api/client-error', (req, res) => {
+    const b = req.body as Record<string, unknown> | null;
+    const cut = (v: unknown, n: number) => (typeof v === 'string' ? v.slice(0, n) : '');
+    console.error(
+      '[client]',
+      cut(b?.kind, 40),
+      cut(b?.route, 60),
+      cut(b?.version, 40),
+      '|',
+      cut(b?.message, 300),
+      '|',
+      cut(b?.userAgent, 120),
+      cut(b?.stack, 800) ? '\n' + cut(b?.stack, 800) : '',
+    );
+    res.status(204).end();
+  });
   app.use('/api', authRoutes(users, config));
   app.use('/api', groupRoutes(groups, users, config));
   app.use('/api', magicLinkRoutes(db, users, config, mailer));

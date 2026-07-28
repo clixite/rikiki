@@ -1,6 +1,6 @@
 import { cardId } from './cards';
 import { ledSuit, legalBids, legalCards, trickWinner } from './rules';
-import type { Card, CardId, GameState, Player, Suit, Trick } from './types';
+import type { Card, CardId, CompletedTrick, GameState, Player, Suit, Trick } from './types';
 
 /* ------------------------------------------------------------------ */
 /* Identité des joueurs automatiques                                   */
@@ -132,6 +132,30 @@ export function estimateTricks(hand: readonly Card[], trump: Suit | null, nbPlay
     else p = 0.03;
     total += p * oppFactor;
   }
+
+  /*
+   * Potentiel de coupe.
+   *
+   * Une main courte dans une couleur, avec des atouts en réserve, rapporte des
+   * plis qu'aucune carte prise isolément ne laisse prévoir : on coupe. C'est
+   * précisément ce que voit un joueur humain et que l'addition carte par carte
+   * manque — d'où des annonces systématiquement trop basses avec beaucoup
+   * d'atouts et une main déséquilibrée.
+   */
+  if (trump !== null) {
+    const trumpCount = suitLengths.get(trump) ?? 0;
+    let shortness = 0;
+    for (const suit of ['S', 'H', 'D', 'C'] as const) {
+      if (suit === trump) continue;
+      const len = suitLengths.get(suit) ?? 0;
+      if (len === 0 && hand.length >= 3) shortness += 1;
+      else if (len === 1) shortness += 0.5;
+    }
+    // Chaque coupe demande un atout : on ne compte pas plus de coupes que
+    // d'atouts disponibles, et on reste prudent (0.6 pli par coupe possible).
+    total += Math.min(shortness, trumpCount) * 0.6 * oppFactor;
+  }
+
   return total;
 }
 
@@ -164,6 +188,14 @@ export function chooseBid(input: BotBidInput): number {
 /* Choix de carte                                                      */
 /* ------------------------------------------------------------------ */
 
+export interface BotOpponent {
+  playerId: string;
+  /** Plis encore nécessaires : positif = il en cherche, 0 = il n'en veut plus. */
+  needed: number;
+  /** Couleurs dont on l'a vu se défausser : il n'en a plus. */
+  voids: ReadonlySet<Suit>;
+}
+
 export interface BotCardInput {
   /** Cartes jouables (résultat de `legalCards`). */
   legal: readonly Card[];
@@ -174,39 +206,138 @@ export interface BotCardInput {
   bid: number;
   /** Plis déjà remportés par le bot dans la manche. */
   tricksWon: number;
+  /** Cartes déjà tombées dans la manche, celles du pli en cours comprises. */
+  seen?: readonly Card[];
+  /** Cartes encore en main du bot (pour juger de la longueur d'une couleur). */
+  hand?: readonly Card[];
+  /** Nombre de joueurs qui parleront après lui dans ce pli. */
+  playersAfter?: number;
+  /** Total des cartes encore en main chez les adversaires. */
+  opponentCards?: number;
+  /** État des adversaires : ce qu'ils cherchent, ce qui leur manque. */
+  opponents?: readonly BotOpponent[];
 }
 
 /**
- * Choix de carte piloté par le contrat :
- * - s'il manque des plis, le bot essaie de prendre au meilleur marché (et coupe au besoin) ;
- * - si le contrat est atteint, il cherche à perdre : défausse haute qui ne prend pas,
- *   entame basse, et surtout pas de coupe inutile.
+ * Probabilité qu'une carte ne soit dominée par aucune carte adverse.
+ *
+ * Au Rikiki, contrairement à la belote ou au bridge, **une grande partie du
+ * paquet n'est jamais distribuée** : à trois joueurs et cinq cartes, quinze
+ * cartes sur cinquante-deux sont en jeu. Une carte plus forte qui n'est pas
+ * encore tombée dort donc le plus souvent dans le talon, où elle ne prendra
+ * jamais rien. Raisonner en « maîtresse ou non » — comme le ferait un joueur
+ * de belote — conduit à ne jamais rien considérer comme sûr, et ne sert à rien.
+ *
+ * On estime donc, pour chaque carte supérieure encore inconnue, la chance
+ * qu'elle se trouve réellement dans une main adverse : le rapport entre les
+ * cartes que les adversaires détiennent encore et le total des cartes que l'on
+ * ne voit pas.
+ */
+function dominanceOdds(
+  card: Card,
+  seen: readonly Card[],
+  hand: readonly Card[],
+  opponentCards: number,
+): number {
+  const known = new Set<string>();
+  for (const c of seen) known.add(`${c.suit}${c.rank}`);
+  for (const c of hand) known.add(`${c.suit}${c.rank}`);
+
+  let higherUnknown = 0;
+  for (let rank = card.rank + 1; rank <= 14; rank++) {
+    if (!known.has(`${card.suit}${rank}`)) higherUnknown++;
+  }
+  if (higherUnknown === 0) return 1;
+
+  // 52 cartes, moins ce que l'on connaît : le reste se partage entre les mains
+  // adverses et le talon jamais distribué.
+  const unknown = Math.max(1, 52 - known.size);
+  const inOpponentHands = Math.min(1, Math.max(0, opponentCards) / unknown);
+  // Chaque carte supérieure est indépendamment « chez un adversaire » avec
+  // cette probabilité ; la carte passe si aucune n'y est.
+  return (1 - inOpponentHands) ** higherUnknown;
+}
+
+/** Seuil au-delà duquel on traite une carte comme gagnante. */
+const SURE_ENOUGH = 0.7;
+
+/** Un adversaire encore en course pour des plis peut-il couper cette couleur ? */
+function someoneCanRuff(suit: Suit, trump: Suit | null, opponents: readonly BotOpponent[]): boolean {
+  if (trump === null || suit === trump) return false;
+  return opponents.some((o) => o.needed > 0 && o.voids.has(suit));
+}
+
+/**
+ * Choix de carte, piloté par le contrat et par ce qui s'est déjà joué.
+ *
+ * Trois idées, dans cet ordre d'importance :
+ *
+ * 1. **Mémoire.** Une carte maîtresse se joue sans hésiter quand on cherche un
+ *    pli, et se garde quand on n'en veut pas.
+ * 2. **Position.** Dernier à parler, on sait exactement ce que coûte la prise :
+ *    on prend au plus juste, ou on se couche pour rien. Premier, on ne sait
+ *    rien et il faut se méfier.
+ * 3. **Contrats adverses.** Au Rikiki, tout le monde ne cherche pas à gagner :
+ *    celui qui a fini son contrat fuit les plis. Entamer une couleur qu'un
+ *    joueur en manque de plis peut couper, c'est lui offrir le pli.
  */
 export function chooseCard(input: BotCardInput): CardId {
   const { legal, trick, trump } = input;
   if (legal.length === 0) throw new Error('Aucune carte jouable');
-  const wantTrick = input.bid - input.tricksWon > 0;
+  const seen = input.seen ?? [];
+  const hand = input.hand ?? legal;
+  const opponents = input.opponents ?? [];
+  const playersAfter = input.playersAfter ?? 0;
+  const opponentCards = input.opponentCards ?? hand.length * Math.max(1, opponents.length);
+  const remaining = input.bid - input.tricksWon;
+  const wantTrick = remaining > 0;
 
-  // Entame : rien à battre, on choisit selon l'intention.
+  // ---- Entame : personne à battre, on choisit l'intention
   if (ledSuit(trick) === null) {
-    return cardId(wantTrick ? pick(legal, (c) => leadPower(c, trump)) : pick(legal, (c) => -cost(c, trump)));
+    if (wantTrick) {
+      // Une maîtresse d'abord : c'est un pli quasi acquis, sauf coupe.
+      const masters = legal.filter(
+        (c) =>
+          dominanceOdds(c, seen, hand, opponentCards) >= SURE_ENOUGH &&
+          !someoneCanRuff(c.suit, trump, opponents),
+      );
+      const pool = masters.length > 0 ? masters : legal;
+      return cardId(pick(pool, (c) => leadPower(c, trump)));
+    }
+    // On fuit les plis : petite carte, et surtout pas une couleur que quelqu'un
+    // qui cherche des plis pourrait couper — ce serait la lui offrir.
+    const safe = legal.filter((c) => !someoneCanRuff(c.suit, trump, opponents));
+    const pool = safe.length > 0 ? safe : legal;
+    return cardId(pick(pool, (c) => -cost(c, trump)));
   }
 
   const best = trickWinner(trick, trump).card;
   const winners = legal.filter((c) => beats(c, best, trump));
+  const losers = legal.filter((c) => !beats(c, best, trump));
 
   if (wantTrick) {
-    // La carte la moins chère qui prend la main ; sinon on jette la plus petite.
-    const pool = winners.length > 0 ? winners : legal;
-    return cardId(pick(pool, (c) => -cost(c, trump)));
+    if (winners.length === 0) {
+      // Impossible de prendre : on garde ses forces pour les plis suivants.
+      return cardId(pick(legal, (c) => -cost(c, trump)));
+    }
+    // Dernier à parler : la prise est certaine, on la paie au prix minimum.
+    if (playersAfter === 0) {
+      return cardId(pick(winners, (c) => -cost(c, trump)));
+    }
+    // Des joueurs passent encore : une prise trop juste se fait repasser
+    // dessus. On prend franchement quand la carte est maîtresse, sinon au
+    // meilleur marché.
+    const sure = winners.filter((c) => dominanceOdds(c, seen, hand, opponentCards) >= SURE_ENOUGH);
+    return cardId(sure.length > 0 ? pick(sure, (c) => -cost(c, trump)) : pick(winners, (c) => -cost(c, trump)));
   }
 
-  const losers = legal.filter((c) => !beats(c, best, trump));
+  // ---- Contrat atteint : on évite de prendre
   if (losers.length > 0) {
-    // On se débarrasse d'une grosse carte qui ne peut plus prendre le pli.
+    // On profite du pli perdu pour se débarrasser d'une carte encombrante :
+    // la plus haute qui ne peut plus rien prendre.
     return cardId(pick(losers, (c) => dumpValue(c, trump)));
   }
-  // Obligé de dépasser : la plus petite, pour laisser les suivants repasser devant.
+  // Obligé de dépasser : la plus petite, pour laisser les suivants repasser.
   return cardId(pick(legal, (c) => -cost(c, trump)));
 }
 
@@ -229,14 +360,71 @@ export function botBid(state: GameState, playerId: string): number {
   });
 }
 
+/**
+ * Coupes déduites de la manche.
+ *
+ * Un joueur qui ne fournit pas la couleur demandée n'en a plus : c'est la
+ * déduction la plus rentable d'un jeu de plis, et elle est gratuite. On ne
+ * peut l'établir que sur le pli en cours, seul historique détaillé conservé
+ * dans l'état — les plis précédents ne gardent que les cartes, pas qui les a
+ * jouées. C'est déjà l'information la plus utile : elle porte sur le pli où
+ * la décision se prend.
+ */
+function inferVoids(state: GameState): Map<string, Set<Suit>> {
+  const voids = new Map<string, Set<Suit>>();
+  const round = state.round;
+  if (!round) return voids;
+
+  const record = (trick: Trick | CompletedTrick | null) => {
+    if (!trick || trick.plays.length === 0) return;
+    const led = trick.plays[0].card.suit;
+    for (const play of trick.plays.slice(1)) {
+      if (play.card.suit === led) continue;
+      const set = voids.get(play.playerId) ?? new Set<Suit>();
+      set.add(led);
+      voids.set(play.playerId, set);
+    }
+  };
+  record(round.lastTrick);
+  record(round.currentTrick);
+  return voids;
+}
+
 /** Carte jouée par le bot `playerId` dans l'état courant (phase `playing`). */
 export function botCard(state: GameState, playerId: string): CardId {
   const round = state.round!;
+  const hand = round.hands[playerId] ?? [];
+  const voids = inferVoids(state);
+
+  // Combien de joueurs parlent encore après nous dans ce pli : dernier à
+  // jouer, la prise est certaine et se paie au prix minimum.
+  const playersAfter = Math.max(0, state.players.length - round.currentTrick.plays.length - 1);
+
+  const opponents: BotOpponent[] = state.players
+    .filter((p) => p.id !== playerId)
+    .map((p) => ({
+      playerId: p.id,
+      needed: (round.bids[p.id] ?? 0) - (round.tricksWon[p.id] ?? 0),
+      voids: voids.get(p.id) ?? new Set<Suit>(),
+    }));
+
+  // Cartes encore en main chez les autres : sert à estimer si une carte
+  // supérieure dort dans le talon ou menace vraiment.
+  const opponentCards = state.players
+    .filter((p) => p.id !== playerId)
+    .reduce((sum, p) => sum + (round.hands[p.id]?.length ?? 0), 0);
+
   return chooseCard({
-    legal: legalCards(round.hands[playerId] ?? [], round.currentTrick),
+    legal: legalCards(hand, round.currentTrick),
     trick: round.currentTrick,
     trump: round.trumpCard?.suit ?? null,
     bid: round.bids[playerId] ?? 0,
     tricksWon: round.tricksWon[playerId] ?? 0,
+    // L'atout retourné est visible de tous : il compte comme carte connue.
+    seen: [...(round.playedCards ?? []), ...(round.trumpCard ? [round.trumpCard] : [])],
+    hand,
+    playersAfter,
+    opponentCards,
+    opponents,
   });
 }

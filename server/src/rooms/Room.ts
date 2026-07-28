@@ -22,6 +22,15 @@ import {
 import { projectView } from '../sockets/views';
 
 export const GRACE_SECONDS = 90;
+/**
+ * Temps laissé à un joueur connecté pour jouer son tour.
+ *
+ * Jusqu'ici, seul un joueur *déconnecté* passait en jeu automatique : un ami
+ * qui laisse l'application ouverte et part discuter bloquait toute la table,
+ * indéfiniment et sans recours. Au-delà de ce délai, on joue à sa place — une
+ * seule fois, il reprend la main au tour suivant.
+ */
+export const TURN_SECONDS = 45;
 const AUTOPLAY_DELAY_MS = 800;
 /** Délai « humain » avant qu'un bot ne joue (base + jitter déterministe). */
 export const DEFAULT_BOT_DELAY_MS = 800;
@@ -44,6 +53,8 @@ export interface RoomCallbacks {
 export interface RoomOptions {
   /** Délai minimal avant l'action d'un bot ; 0 = immédiat (tests). */
   botDelayMs?: number;
+  /** Secondes laissées à un humain pour jouer ; 0 désactive le minuteur. */
+  turnSeconds?: number;
   /**
    * Appelée une seule fois par tour, dès qu'un nouveau joueur devient le
    * joueur attendu (phase `bidding` ou `playing`). Sert aux notifications
@@ -64,6 +75,9 @@ export class Room {
   private dirty = false;
   /** Signature du tour déjà signalé, pour ne notifier qu'une fois par tour. */
   private lastTurnKey: string | null = null;
+  /** Minuteur du tour en cours, et son échéance diffusée aux clients. */
+  private turnTimer: ReturnType<typeof setTimeout> | null = null;
+  turnDeadline: number | null = null;
   lastActivity = Date.now();
 
   constructor(
@@ -182,6 +196,7 @@ export class Room {
         }
       }
       this.schedulePersist();
+      this.armTurnTimer();
       this.broadcastViews();
       if (this.state.phase === 'game-over' && prevPhase !== 'game-over') {
         this.callbacks.onGameOver?.(this.state, this.bestRounds);
@@ -197,7 +212,7 @@ export class Room {
 
   broadcastViews(): void {
     for (const [userId, socket] of this.sockets) {
-      socket.emit('game:view', projectView(this.state, userId));
+      socket.emit('game:view', { ...projectView(this.state, userId), turnDeadline: this.turnDeadline });
     }
     this.signalTurnChange();
   }
@@ -218,6 +233,58 @@ export class Room {
     this.lastTurnKey = key;
     const playerId = s.players.find((p) => p.seat === r.currentSeat)?.id;
     if (playerId) onTurn(this, playerId);
+  }
+
+  /**
+   * Arme le compte à rebours du tour.
+   *
+   * Uniquement pour un humain présent : un robot a son propre délai, et un
+   * joueur déjà passé en automatique n'a pas besoin qu'on l'attende. On ne
+   * réarme qu'au vrai changement de tour, sinon chaque diffusion de vue
+   * repousserait l'échéance et le minuteur ne tomberait jamais.
+   */
+  private armTurnTimer(): void {
+    if (this.turnTimer) {
+      clearTimeout(this.turnTimer);
+      this.turnTimer = null;
+    }
+    this.turnDeadline = null;
+
+    const s = this.state;
+    if ((s.phase !== 'bidding' && s.phase !== 'playing') || !s.round) return;
+    const seconds = this.options.turnSeconds ?? TURN_SECONDS;
+    if (seconds <= 0) return;
+    const current = s.players.find((p) => p.seat === s.round!.currentSeat);
+    if (!current || isBotId(current.id) || this.autoPlaySet.has(current.id)) return;
+
+    this.turnDeadline = Date.now() + seconds * 1000;
+    const timer = setTimeout(() => this.onTurnTimeout(current.id), seconds * 1000);
+    timer.unref?.();
+    this.turnTimer = timer;
+  }
+
+  /** Le joueur n'a pas joué à temps : on joue au plus prudent à sa place. */
+  private onTurnTimeout(playerId: string): void {
+    this.turnTimer = null;
+    this.turnDeadline = null;
+    const s = this.state;
+    if ((s.phase !== 'bidding' && s.phase !== 'playing') || !s.round) return;
+    const current = s.players.find((p) => p.seat === s.round!.currentSeat);
+    // Il a joué entre-temps : le minuteur porte sur un tour révolu.
+    if (!current || current.id !== playerId) return;
+
+    const action: GameAction =
+      s.phase === 'bidding'
+        ? { type: 'BID', playerId, bid: lowestLegalBid(s, playerId) }
+        : { type: 'PLAY_CARD', playerId, cardId: lowestLegalCard(s, playerId) };
+    const res = this.apply(action);
+    if (!res.ok) return;
+    this.emitEvent(
+      action.type === 'BID'
+        ? { type: 'bid-placed', playerId, bid: action.bid }
+        : { type: 'card-played', playerId, cardId: action.cardId },
+    );
+    if (action.type === 'PLAY_CARD') this.emitPlayFollowUps();
   }
 
   isMember(userId: string): boolean {

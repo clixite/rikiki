@@ -4,6 +4,7 @@ import { useT } from '../i18n';
 import PlayerAvatar from './PlayerAvatar';
 import { EMOTE_GLYPH } from './EmoteBar';
 import { useGame } from '../store/game';
+import TurnCountdown from './TurnCountdown';
 
 interface Props {
   view: GameView;
@@ -120,6 +121,7 @@ export default function PlayerSeats({ view }: Props) {
               } ${p.connected ? '' : 'opacity-45'}`}
             >
               <PlayerAvatar playerId={p.id} avatar={p.avatar} photo={p.photo} size={44} className="rounded-full" />
+              {isCurrent && <TurnCountdown deadline={view.turnDeadline} size={56} />}
               {isDealer && (
                 <span
                   className="absolute -right-1 -top-1 rounded-full bg-brass-400 px-1.5 text-[10px] font-bold leading-tight text-felt-950"

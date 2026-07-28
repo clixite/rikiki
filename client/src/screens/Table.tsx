@@ -6,6 +6,7 @@ import BidPicker from '../components/BidPicker';
 import BidsSummary from '../components/BidsSummary';
 import LeaveGameButton from '../components/LeaveGameButton';
 import EmoteBar, { EMOTE_GLYPH } from '../components/EmoteBar';
+import { useSecondsLeft } from '../components/TurnCountdown';
 import HandFan from '../components/HandFan';
 import PlayerSeats from '../components/PlayerSeats';
 import RoundRecap from '../components/RoundRecap';
@@ -181,7 +182,11 @@ export default function Table({ view: serverView }: Props) {
       <div className="shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
         {/* « C'est à moi » doit se voir sans lire : une barre pleine largeur
             au-dessus de la main, dans la couleur d'accent du jeu. */}
-        <MyTurnBanner active={myTurn && !frozenTrick && view.phase === 'playing'} label={t.yourTurn} />
+        <MyTurnBanner
+          active={myTurn && !frozenTrick && view.phase === 'playing'}
+          label={t.yourTurn}
+          deadline={myTurn ? view.turnDeadline : null}
+        />
 
         <div className="mb-2 flex items-center justify-center gap-2 px-3">
           <PlayerAvatar avatar={me.avatar} photo={me.photo} size={30} />
@@ -270,7 +275,19 @@ function MyEmotes() {
  * cartes, tombe dans le champ de vision au bon endroit. Elle occupe sa place
  * même éteinte, sinon la main sauterait de quelques pixels à chaque tour.
  */
-function MyTurnBanner({ active, label }: { active: boolean; label: string }) {
+function MyTurnBanner({
+  active,
+  label,
+  deadline,
+}: {
+  active: boolean;
+  label: string;
+  deadline: number | null | undefined;
+}) {
+  const left = useSecondsLeft(deadline);
+  // Le décompte n'apparaît que sur la fin : afficher les secondes en
+  // permanence transforme une partie entre amis en épreuve chronométrée.
+  const showCount = active && left !== null && left <= 10;
   return (
     <div className="mb-1.5 h-9 px-3" data-testid="my-turn-banner" data-active={active ? 'true' : 'false'}>
       <motion.div
@@ -281,6 +298,7 @@ function MyTurnBanner({ active, label }: { active: boolean; label: string }) {
         aria-hidden={!active}
       >
         {label}
+        {showCount && <span className="ml-2 tabular-nums opacity-70">{left}</span>}
       </motion.div>
     </div>
   );

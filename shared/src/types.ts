@@ -132,6 +132,15 @@ export interface RoundState {
   currentSeat: number;
   currentTrick: Trick;
   lastTrick: CompletedTrick | null;
+  /**
+   * Cartes déjà tombées dans la manche, plis achevés compris.
+   *
+   * Information publique — tout le monde les a vues — mais que l'état ne
+   * conservait pas : un joueur automatique ne pouvait donc pas savoir si son
+   * Roi était devenu maître. Absente des états persistés avant la v1.2, d'où
+   * les lectures défensives.
+   */
+  playedCards: Card[];
   tricksWon: Record<string, number>;
   roundScores: Record<string, number> | null;
 }
@@ -170,4 +179,12 @@ export interface GameView extends Omit<GameState, 'round' | 'seed'> {
   /** Mon playerId dans cette partie. */
   you: string;
   round: RoundView | null;
+  /**
+   * Horodatage (ms) auquel le joueur attendu sera joué automatiquement.
+   *
+   * Calculé par le serveur à chaque changement de tour, jamais persisté : une
+   * échéance ressuscitée après un redémarrage n'aurait aucun sens. `null`
+   * quand personne n'est attendu, ou quand le tour est celui d'un robot.
+   */
+  turnDeadline?: number | null;
 }
