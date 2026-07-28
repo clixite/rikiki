@@ -324,7 +324,7 @@ export const ga: Messages = {
 
   loading: 'Á lódáil…',
   errorTitle: 'Úps',
-  copyright: '© 2026 Nicolas Simon',
+  copyright: '© 2026 Clixite SRL',
 };
 
 export default ga;

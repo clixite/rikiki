@@ -286,7 +286,7 @@ export const en: Messages = {
 
   loading: 'Loading…',
   errorTitle: 'Oops',
-  copyright: '© 2026 Nicolas Simon',
+  copyright: '© 2026 Clixite SRL',
 };
 
 export default en;

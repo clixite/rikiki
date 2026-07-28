@@ -287,7 +287,7 @@ export const es: Messages = {
 
   loading: 'Cargando…',
   errorTitle: 'Vaya',
-  copyright: '© 2026 Nicolas Simon',
+  copyright: '© 2026 Clixite SRL',
 };
 
 export default es;

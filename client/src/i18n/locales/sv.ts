@@ -287,7 +287,7 @@ export const sv: Messages = {
 
   loading: 'Laddar…',
   errorTitle: 'Hoppsan',
-  copyright: '© 2026 Nicolas Simon',
+  copyright: '© 2026 Clixite SRL',
 };
 
 export default sv;

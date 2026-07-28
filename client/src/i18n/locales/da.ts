@@ -286,7 +286,7 @@ export const da: Messages = {
 
   loading: 'Indlæser…',
   errorTitle: 'Ups',
-  copyright: '© 2026 Nicolas Simon',
+  copyright: '© 2026 Clixite SRL',
 };
 
 export default da;

@@ -84,7 +84,8 @@ Voir `.env.example` : `PORT`, `PUBLIC_URL`, `JWT_SECRET`, `DB_PATH`,
 
 ---
 
-© 2026 **Nicolas Simon** — Tous droits réservés. Voir [LICENSE](LICENSE).
+© 2026 **Clixite SRL** — Avenue Reine Astrid 53, 1300 Wavre, Belgique — BE 0871.430.776.
+Tous droits réservés. Voir [LICENSE](LICENSE).
 
 Le Rikiki (Oh Hell) est un jeu traditionnel du domaine public ; seule cette
 implémentation est protégée.

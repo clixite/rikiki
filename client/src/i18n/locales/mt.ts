@@ -325,7 +325,7 @@ export const mt: Messages = {
 
   loading: 'Qed jitgħabba…',
   errorTitle: 'Oops',
-  copyright: '© 2026 Nicolas Simon',
+  copyright: '© 2026 Clixite SRL',
 };
 
 export default mt;

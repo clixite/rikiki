@@ -127,7 +127,8 @@ npm run store:assets
 |---|---|
 | Catégorie principale | Jeux → Cartes |
 | Catégorie secondaire | Jeux → Famille |
-| Droits d'auteur | `2026 Nicolas Simon` |
+| Droits d'auteur | `2026 Clixite SRL` |
+| Nom du vendeur (affiché sur la fiche) | `Clixite SRL` |
 | **Prix** | **1,99 € — achat unique** (App Store Connect → Tarifs et disponibilité) |
 | Achats intégrés | **Aucun** — le prix est payé une fois, à l'installation |
 | Abonnement | Aucun |
@@ -140,11 +141,15 @@ Une app gratuite se soumet sans rien signer ; une app payante exige que le
 contrat « Paid Applications » soit **actif** avant même que le prix puisse être
 choisi. Dans App Store Connect → **Entreprise** (Business) :
 
-1. accepter le contrat **Paid Applications** ;
-2. renseigner les **coordonnées bancaires** (IBAN belge) ;
-3. remplir les **formulaires fiscaux** — au minimum le formulaire américain
-   (W-8BEN pour un particulier, W-8BEN-E pour une société) sans lequel Apple
-   retient 30 % des revenus américains ;
+1. accepter le contrat **Paid Applications** — au nom de **Clixite SRL**, pas
+   d'une personne physique : le compte développeur doit être de type
+   *Organization*, avec le numéro d'entreprise belge comme identifiant légal ;
+2. renseigner les **coordonnées bancaires** (IBAN au nom de la société) ;
+3. remplir les **formulaires fiscaux** — pour Clixite SRL c'est le
+   **W-8BEN-E** (formulaire des entités, pas le W-8BEN des particuliers), sans
+   lequel Apple retient 30 % des revenus américains. Prévoyez le numéro
+   d'entreprise BE 0871.430.776 et, si demandé, le GIIN ou le statut de
+   « Active NFFE » ;
 4. attendre que les trois lignes passent au vert. Cela prend souvent 24 à 48 h.
 
 Tant que ce contrat n'est pas actif, le champ « Prix » reste inaccessible et la
