@@ -159,6 +159,8 @@ export const el: Messages = {
   deleteAccountDone: 'Ο λογαριασμός διαγράφηκε.',
   cancel: 'Άκυρο',
   botTag: 'μποτ',
+  emotes: 'Αντιδράσεις',
+  close: 'Κλείσιμο',
 
   // Στατιστικά και ιστορικό
   stats: 'Στατιστικά',

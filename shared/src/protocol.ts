@@ -31,7 +31,22 @@ export type TransientEvent =
   | { type: 'player-disconnected'; playerId: string; graceSeconds: number }
   | { type: 'player-reconnected'; playerId: string }
   | { type: 'host-changed'; hostId: string }
-  | { type: 'rematch'; code: string };
+  | { type: 'rematch'; code: string }
+  | { type: 'emote'; playerId: string; emote: EmoteId };
+
+/**
+ * Réactions envoyables à la table.
+ *
+ * Une partie entre amis se joue autant en chambrant qu'en comptant les plis.
+ * Une liste courte et fermée suffit : elle se traduit toute seule, ne demande
+ * aucune modération, et ne peut pas servir de messagerie détournée.
+ */
+export const EMOTES = ['clap', 'slap', 'kiss', 'laugh', 'cry', 'fire', 'think', 'wow'] as const;
+export type EmoteId = (typeof EMOTES)[number];
+
+export function isEmoteId(value: unknown): value is EmoteId {
+  return typeof value === 'string' && (EMOTES as readonly string[]).includes(value);
+}
 
 export interface ClientToServerEvents {
   'room:create': (ack: (res: Ack<{ code: string }>) => void) => void;
@@ -55,6 +70,8 @@ export interface ClientToServerEvents {
   'game:playCard': (payload: { cardId: CardId }, ack: (res: Ack) => void) => void;
   'game:nextRound': (ack: (res: Ack) => void) => void;
   'profile:update': (payload: { pseudo: string; avatar: string }, ack: (res: Ack) => void) => void;
+  /** Réaction envoyée à la table (limitée côté serveur). */
+  'game:emote': (payload: { emote: EmoteId }, ack: (res: Ack) => void) => void;
 }
 
 export interface ServerToClientEvents {

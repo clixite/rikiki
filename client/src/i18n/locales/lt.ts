@@ -170,6 +170,8 @@ export const lt: Messages = {
   deleteAccountDone: 'Paskyra ištrinta.',
   cancel: 'Atšaukti',
   botTag: 'botas',
+  emotes: 'Reakcijos',
+  close: 'Uždaryti',
 
   // Statistika ir istorija
   stats: 'Statistika',

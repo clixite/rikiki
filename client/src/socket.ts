@@ -1,5 +1,5 @@
 import { io, type Socket } from 'socket.io-client';
-import type { Ack, ClientToServerEvents, GameFormat, ServerToClientEvents } from '@rikiki/shared';
+import type { EmoteId, Ack, ClientToServerEvents, GameFormat, ServerToClientEvents } from '@rikiki/shared';
 import { useGame } from './store/game';
 import { useSession } from './store/session';
 import { API_BASE } from './config';
@@ -79,6 +79,11 @@ export async function joinRoom(code: string): Promise<Ack<{ code: string }>> {
   const res = await emitAck<{ code: string }>('room:join', { code });
   if (res.ok) useSession.getState().setRoomCode(res.code);
   return res;
+}
+
+/** Envoie une réaction à la table. Le serveur bride le débit, on ignore l'échec. */
+export function sendEmote(emote: EmoteId): void {
+  socket?.emit('game:emote', { emote }, () => undefined);
 }
 
 export async function leaveRoom(): Promise<void> {

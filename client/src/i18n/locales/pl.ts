@@ -180,6 +180,8 @@ export const pl: Messages = {
   deleteAccountDone: 'Konto usunięte.',
   cancel: 'Anuluj',
   botTag: 'bot',
+  emotes: 'Reakcje',
+  close: 'Zamknij',
 
   // Statystyki i historia
   stats: 'Statystyki',

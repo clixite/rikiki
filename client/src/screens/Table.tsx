@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
 import { cardId } from '@rikiki/shared';
 import BidPicker from '../components/BidPicker';
 import BidsSummary from '../components/BidsSummary';
+import EmoteBar, { EMOTE_GLYPH } from '../components/EmoteBar';
 import HandFan from '../components/HandFan';
-import OpponentsBar from '../components/OpponentsBar';
+import PlayerSeats from '../components/PlayerSeats';
 import RoundRecap from '../components/RoundRecap';
 import ScoreDrawer from '../components/ScoreDrawer';
 import SoundToggle from '../components/SoundToggle';
@@ -109,37 +110,46 @@ export default function Table({ view: serverView }: Props) {
         </button>
       </header>
 
-      {/* ---- Adversaires ---- */}
-      <div className="shrink-0 pb-1 pt-1">
-        <OpponentsBar view={view} />
-      </div>
-
       {/* ---- Récapitulatif des annonces : lisible en permanence ---- */}
       <div className="shrink-0 pb-1">
         <BidsSummary view={view} />
       </div>
 
-      {/* ---- Tapis : atout au centre, puis le pli ---- */}
-      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-1.5">
+      {/*
+        ---- Tapis ----
+        Les joueurs sont posés en couche absolue autour du feutre, le pli
+        occupe le centre, l'atout tient le coin gauche : le regard n'a plus à
+        chercher qui joue ni quelle est la couleur maîtresse.
+      */}
+      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center">
         {/* Ancrage visuel : suggère la zone de dépose au centre de la table */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full"
+          className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgb(255 255 255 / 0.045) 0%, transparent 68%)',
-            boxShadow: 'inset 0 0 60px -20px rgb(0 0 0 / 0.5)',
+            background: 'radial-gradient(circle, rgb(255 255 255 / 0.05) 0%, transparent 68%)',
+            boxShadow: 'inset 0 0 70px -20px rgb(0 0 0 / 0.5)',
           }}
         />
 
-        <TrumpBadge trumpCard={round.trumpCard} compact={trickBusy} />
+        <PlayerSeats view={view} />
+
+        {/* L'atout se consulte du coin de l'œil : il quitte le centre, que le
+            pli réclame, et reste ancré au même endroit toute la manche. */}
+        <div className="absolute left-2 top-1/2 -translate-y-1/2">
+          <TrumpBadge trumpCard={round.trumpCard} compact={false} />
+        </div>
+
         <TrickArea view={view} frozenTrick={frozenTrick} />
+
+        <MyEmotes />
 
         <motion.p
           key={statusText}
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`relative h-5 px-4 text-center text-sm font-medium ${
-            myTurn && !frozenTrick ? 'text-brass-300' : 'text-paper-50/55'
+          className={`relative mt-2 h-6 px-4 text-center text-base font-semibold ${
+            myTurn && !frozenTrick ? 'text-brass-300' : 'text-paper-50/60'
           }`}
           data-testid="turn-status"
           aria-live="polite"
@@ -162,17 +172,21 @@ export default function Table({ view: serverView }: Props) {
 
       {/* ---- Ma zone : contrat + main ---- */}
       <div className="shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        <div className="mb-2 flex items-center justify-center gap-2.5 px-3">
-          <PlayerAvatar avatar={me.avatar} size={20} />
-          <span className="max-w-20 truncate text-sm font-medium text-paper-50">{me.pseudo}</span>
+        {/* « C'est à moi » doit se voir sans lire : une barre pleine largeur
+            au-dessus de la main, dans la couleur d'accent du jeu. */}
+        <MyTurnBanner active={myTurn && !frozenTrick && view.phase === 'playing'} label={t.yourTurn} />
+
+        <div className="mb-2 flex items-center justify-center gap-2 px-3">
+          <PlayerAvatar avatar={me.avatar} size={30} />
+          <span className="max-w-24 truncate text-[15px] font-semibold text-paper-50">{me.pseudo}</span>
           {round.dealerSeat === me.seat && (
-            <span className="rounded-full bg-brass-400 px-1.5 text-[9px] font-bold text-felt-950" title={t.dealer}>
+            <span className="rounded-full bg-brass-400 px-1.5 text-[10px] font-bold text-felt-950" title={t.dealer}>
               D
             </span>
           )}
           <span
             data-testid="my-contract"
-            className={`rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums ${
+            className={`rounded-full px-2.5 py-1 text-[14px] font-bold tabular-nums ${
               myBid === null
                 ? 'bg-white/8 text-paper-50/55'
                 : contractBusted
@@ -184,7 +198,7 @@ export default function Table({ view: serverView }: Props) {
           >
             {myBid === null ? t.noBidYet : t.tricksOfContract(myTricks, myBid)}
           </span>
-          <span className="text-[11px] tabular-nums text-paper-50/45">
+          <span className="text-[13px] tabular-nums text-paper-50/45">
             {t.total} {me.totalScore}
           </span>
         </div>
@@ -199,8 +213,70 @@ export default function Table({ view: serverView }: Props) {
         />
       </div>
 
+      <EmoteBar />
+
       {showRecap && <RoundRecap view={view} />}
       <ScoreDrawer view={view} open={scoresOpen} onClose={() => setScoresOpen(false)} />
+    </div>
+  );
+}
+
+/**
+ * Mes propres réactions, au centre du tapis.
+ *
+ * Celles des autres s'affichent au-dessus de leur siège ; moi je n'ai pas de
+ * siège, ma place est en bas de l'écran. Les faire apparaître au centre évite
+ * de recouvrir la main tout en confirmant l'envoi.
+ */
+function MyEmotes() {
+  // Le sélecteur doit renvoyer une référence stable : filtrer à l'intérieur
+  // fabriquerait un tableau neuf à chaque lecture, et zustand rerendrait sans
+  // fin. On prend les valeurs telles quelles, on filtre au rendu.
+  const emotes = useGame((s) => s.emotes);
+  const you = useGame((s) => s.view?.you);
+  const mine = you ? emotes.filter((e) => e.playerId === you) : [];
+
+  return (
+    <div className="pointer-events-none absolute inset-x-0 top-1/2 flex justify-center gap-1">
+      <AnimatePresence>
+        {mine.map((e) => (
+          <motion.span
+            key={e.id}
+            initial={{ opacity: 0, scale: 0.4, y: 30 }}
+            animate={{ opacity: 1, scale: 1.2, y: -10 }}
+            exit={{ opacity: 0, scale: 0.8, y: -50 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 20 }}
+            className="text-4xl drop-shadow-lg"
+            aria-hidden="true"
+          >
+            {EMOTE_GLYPH[e.emote]}
+          </motion.span>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/**
+ * Bandeau « à toi de jouer ».
+ *
+ * Le texte d'état au centre du tapis ne suffisait pas : on regarde ses cartes,
+ * pas la table. Une barre pleine largeur collée à la main, juste au-dessus des
+ * cartes, tombe dans le champ de vision au bon endroit. Elle occupe sa place
+ * même éteinte, sinon la main sauterait de quelques pixels à chaque tour.
+ */
+function MyTurnBanner({ active, label }: { active: boolean; label: string }) {
+  return (
+    <div className="mb-1.5 h-9 px-3" data-testid="my-turn-banner" data-active={active ? 'true' : 'false'}>
+      <motion.div
+        animate={{ opacity: active ? 1 : 0, y: active ? 0 : 6 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+        className="flex h-9 items-center justify-center rounded-xl bg-linear-to-b from-brass-300 to-brass-500 text-[15px] font-bold uppercase tracking-wide text-felt-950"
+        style={{ boxShadow: active ? '0 4px 18px -6px rgb(217 178 92 / 0.7)' : 'none' }}
+        aria-hidden={!active}
+      >
+        {label}
+      </motion.div>
     </div>
   );
 }

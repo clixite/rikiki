@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Card, CompletedTrick, GameView, TransientEvent } from '@rikiki/shared';
+import type { Card, CompletedTrick, EmoteId, GameView, TransientEvent } from '@rikiki/shared';
 import { playSound } from '../audio';
 import { vibrate } from '../haptics';
 import { t as tr } from '../i18n';
@@ -21,6 +21,8 @@ interface GameStore {
   toast: string | null;
   /** Coup joué localement, en attente de confirmation du serveur. */
   optimistic: OptimisticState;
+  /** Réactions reçues, affichées quelques secondes près de leur auteur. */
+  emotes: { id: number; playerId: string; emote: EmoteId }[];
   setView: (view: GameView) => void;
   /** Applique un coup immédiatement à l'écran (sans attendre le serveur). */
   playOptimistic: (card: Card) => void;
@@ -30,12 +32,17 @@ interface GameStore {
   /** Vue à afficher : serveur + coup local éventuel. */
   displayView: () => GameView | null;
   onEvent: (event: TransientEvent) => void;
+  /** Retire une réaction dont l'affichage est terminé. */
+  dismissEmote: (id: number) => void;
   setSocketConnected: (connected: boolean) => void;
   setClosed: (reason: string | null) => void;
   showToast: (message: string) => void;
   reset: () => void;
 }
 
+/** Durée d'affichage d'une réaction au-dessus de son auteur. */
+const EMOTE_VISIBLE_MS = 2600;
+let emoteSeq = 0;
 let freezeTimer: ReturnType<typeof setTimeout> | null = null;
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -55,6 +62,7 @@ function isMyTurn(view: GameView | null | undefined): boolean {
 export const useGame = create<GameStore>((set, get) => ({
   view: null,
   socketConnected: false,
+  emotes: [],
   frozenTrick: null,
   roundOutcome: null,
   celebrate: 0,
@@ -163,16 +171,27 @@ export const useGame = create<GameStore>((set, get) => ({
       case 'player-reconnected':
         get().showToast(tr().playerReconnected(pseudoOf(event.playerId)));
         break;
+      case 'emote': {
+        // Chaque réaction porte un identifiant propre : deux envois identiques
+        // coup sur coup doivent s'afficher comme deux bulles distinctes.
+        const id = ++emoteSeq;
+        set((state) => ({ emotes: [...state.emotes, { id, playerId: event.playerId, emote: event.emote }] }));
+        playSound('bid');
+        setTimeout(() => get().dismissEmote(id), EMOTE_VISIBLE_MS);
+        break;
+      }
       default:
         break;
     }
   },
 
+  dismissEmote: (id) => set((state) => ({ emotes: state.emotes.filter((e) => e.id !== id) })),
+
   setSocketConnected: (socketConnected) => set({ socketConnected }),
 
   setClosed: (reason) => {
     if (freezeTimer) clearTimeout(freezeTimer);
-    set({ closedReason: reason, view: null, frozenTrick: null, roundOutcome: null, optimistic: EMPTY_OPTIMISTIC });
+    set({ closedReason: reason, view: null, frozenTrick: null, roundOutcome: null, optimistic: EMPTY_OPTIMISTIC, emotes: [] });
   },
 
   showToast: (message) => {
@@ -183,6 +202,6 @@ export const useGame = create<GameStore>((set, get) => ({
 
   reset: () => {
     if (freezeTimer) clearTimeout(freezeTimer);
-    set({ view: null, frozenTrick: null, roundOutcome: null, closedReason: null, toast: null, optimistic: EMPTY_OPTIMISTIC });
+    set({ view: null, frozenTrick: null, roundOutcome: null, closedReason: null, toast: null, optimistic: EMPTY_OPTIMISTIC, emotes: [] });
   },
 }));

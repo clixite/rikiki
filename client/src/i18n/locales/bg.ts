@@ -160,6 +160,8 @@ export const bg: Messages = {
   deleteAccountDone: 'Профилът е изтрит.',
   cancel: 'Отказ',
   botTag: 'бот',
+  emotes: 'Реакции',
+  close: 'Затвори',
 
   // Статистика и история
   stats: 'Статистика',

@@ -158,6 +158,8 @@ export const fi: Messages = {
   deleteAccountDone: 'Tili poistettu.',
   cancel: 'Peruuta',
   botTag: 'botti',
+  emotes: 'Reaktiot',
+  close: 'Sulje',
 
   // Tilastot ja historia
   stats: 'Tilastot',

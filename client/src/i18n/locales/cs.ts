@@ -179,6 +179,8 @@ export const cs: Messages = {
   deleteAccountDone: 'Účet byl smazán.',
   cancel: 'Zrušit',
   botTag: 'robot',
+  emotes: 'Reakce',
+  close: 'Zavřít',
 
   // Statistiky a historie
   stats: 'Statistiky',

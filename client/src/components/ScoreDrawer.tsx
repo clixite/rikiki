@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import type { GameView } from '@rikiki/shared';
+import type { GameHistoryEntry, GameView } from '@rikiki/shared';
+import { fetchHistory, readCachedHistory } from '../api';
 import { useT } from '../i18n';
+import { useSession } from '../store/session';
 
 import PlayerAvatar from './PlayerAvatar';
 
@@ -10,10 +13,34 @@ interface Props {
   onClose: () => void;
 }
 
+/**
+ * Scores de la partie en cours et historique personnel, dans le même tiroir.
+ *
+ * Les joueurs veulent revoir leurs résultats précédents sans quitter la table :
+ * sortir de la partie pour aller les consulter ferait perdre le fil, et
+ * personne ne le fait. Le cache local permet d'afficher l'historique
+ * instantanément, la requête ne fait que le rafraîchir.
+ */
 export default function ScoreDrawer({ view, open, onClose }: Props) {
   const t = useT();
+  const userId = useSession((s) => s.user?.id);
+  const [tab, setTab] = useState<'scores' | 'history'>('scores');
+  const [history, setHistory] = useState<GameHistoryEntry[] | null>(null);
   const sorted = [...view.players].sort((a, b) => b.totalScore - a.totalScore);
   const round = view.round;
+
+  useEffect(() => {
+    if (!open || tab !== 'history' || !userId) return;
+    setHistory((current) => current ?? readCachedHistory(userId));
+    fetchHistory(userId)
+      .then(setHistory)
+      .catch(() => undefined);
+  }, [open, tab, userId]);
+
+  // Le tiroir rouvre toujours sur les scores : c'est ce qu'on vient voir
+  useEffect(() => {
+    if (!open) setTab('scores');
+  }, [open]);
 
   return (
     <AnimatePresence>
@@ -35,9 +62,28 @@ export default function ScoreDrawer({ view, open, onClose }: Props) {
             style={{ boxShadow: 'var(--shadow-panel)' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/15" />
-            <h2 className="mb-4 text-center text-lg font-bold">{t.scoreboard}</h2>
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/15" />
 
+            <div className="mb-4 flex gap-1 rounded-xl bg-felt-950/40 p-1">
+              {(['scores', 'history'] as const).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  data-testid={`drawer-tab-${key}`}
+                  onClick={() => setTab(key)}
+                  aria-pressed={tab === key}
+                  className={`min-h-11 flex-1 rounded-lg text-sm font-semibold transition ${
+                    tab === key ? 'bg-felt-700 text-paper-50' : 'text-paper-50/55 active:scale-95'
+                  }`}
+                >
+                  {key === 'scores' ? t.scoreboard : t.myGames}
+                </button>
+              ))}
+            </div>
+
+            {tab === 'history' ? (
+              <HistoryList entries={history} t={t} />
+            ) : (
             <ul className="space-y-1.5">
               {sorted.map((p, i) => (
                 <li
@@ -65,17 +111,58 @@ export default function ScoreDrawer({ view, open, onClose }: Props) {
                 </li>
               ))}
             </ul>
+            )}
 
             <button
               type="button"
               onClick={onClose}
-              className="mt-4 w-full rounded-xl bg-white/8 py-3 text-sm font-medium transition active:scale-[0.98]"
+              className="mt-4 min-h-11 w-full rounded-xl bg-white/8 py-3 text-sm font-medium transition active:scale-[0.98]"
             >
-              Fermer
+              {t.close}
             </button>
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+/** Dernières parties du joueur, en lecture seule. */
+function HistoryList({
+  entries,
+  t,
+}: {
+  entries: GameHistoryEntry[] | null;
+  t: ReturnType<typeof useT>;
+}) {
+  if (entries === null) {
+    return <p className="py-6 text-center text-sm text-paper-50/45">{t.verifying}</p>;
+  }
+  if (entries.length === 0) {
+    return <p className="py-6 text-center text-sm text-paper-50/45">{t.noHistory}</p>;
+  }
+  return (
+    <ul className="space-y-1.5" data-testid="drawer-history">
+      {entries.map((game, i) => (
+        <li
+          key={`${game.code}-${game.playedAt}-${i}`}
+          className="flex items-center gap-2.5 rounded-xl bg-felt-900/40 px-3 py-2.5"
+        >
+          <span
+            className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${
+              game.won ? 'bg-success/20 text-success' : 'bg-white/8 text-paper-50/50'
+            }`}
+          >
+            {game.won ? t.wonBadge : t.lostBadge}
+          </span>
+          <span className="min-w-0 flex-1 truncate text-sm text-paper-50/70">
+            {t.playersCount(game.playersCount)}
+          </span>
+          <span className="w-12 shrink-0 text-right text-base font-bold tabular-nums text-brass-300">
+            {game.myScore}
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }

@@ -149,6 +149,8 @@ export const sv: Messages = {
   deleteAccountDone: 'Kontot raderat.',
   cancel: 'Avbryt',
   botTag: 'bot',
+  emotes: 'Reaktioner',
+  close: 'Stäng',
 
   // Statistik och historik
   stats: 'Statistik',

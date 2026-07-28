@@ -156,6 +156,8 @@ export const et: Messages = {
   deleteAccountDone: 'Konto on kustutatud.',
   cancel: 'Loobu',
   botTag: 'robot',
+  emotes: 'Reaktsioonid',
+  close: 'Sulge',
 
   // Statistika ja ajalugu
   stats: 'Statistika',

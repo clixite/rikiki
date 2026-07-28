@@ -148,6 +148,8 @@ export const da: Messages = {
   deleteAccountDone: 'Kontoen er slettet.',
   cancel: 'Annuller',
   botTag: 'bot',
+  emotes: 'Reaktioner',
+  close: 'Luk',
 
   // Statistik og historik
   stats: 'Statistik',

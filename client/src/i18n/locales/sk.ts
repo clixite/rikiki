@@ -178,6 +178,8 @@ export const sk: Messages = {
   deleteAccountDone: 'Účet bol zmazaný.',
   cancel: 'Zrušiť',
   botTag: 'robot',
+  emotes: 'Reakcie',
+  close: 'Zavrieť',
 
   // Štatistiky a história
   stats: 'Štatistiky',

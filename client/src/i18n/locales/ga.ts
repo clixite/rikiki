@@ -184,6 +184,8 @@ export const ga: Messages = {
   deleteAccountDone: 'Cuntas scriosta.',
   cancel: 'Cealaigh',
   botTag: 'róbat',
+  emotes: 'Frithghníomhartha',
+  close: 'Dún',
 
   // Staitisticí agus stair
   stats: 'Staitisticí',

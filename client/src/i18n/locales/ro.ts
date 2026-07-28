@@ -178,6 +178,8 @@ export const ro: Messages = {
   deleteAccountDone: 'Cont șters.',
   cancel: 'Anulează',
   botTag: 'robot',
+  emotes: 'Reacții',
+  close: 'Închide',
 
   // Statistici și istoric
   stats: 'Statistici',

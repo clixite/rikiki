@@ -200,7 +200,13 @@ export function applyAction(prev: GameState, action: GameAction): EngineResult {
       const legal = legalCards(hand, round.currentTrick).map(cardId);
       if (!legal.includes(action.cardId)) return err('ILLEGAL_CARD');
 
-      round.hands[action.playerId] = hand.filter((c) => cardId(c) !== action.cardId);
+      // Retrait de la carte, puis nouveau tri : quand une couleur disparaît de
+      // la main, l'alternance rouge/noir doit se refaire, sinon deux couleurs
+      // de même teinte se retrouvent côte à côte et la lecture se brouille.
+      round.hands[action.playerId] = sortHand(
+        hand.filter((c) => cardId(c) !== action.cardId),
+        round.trumpCard?.suit ?? null,
+      );
       round.currentTrick.plays.push({ playerId: action.playerId, card });
 
       if (round.currentTrick.plays.length === state.players.length) {

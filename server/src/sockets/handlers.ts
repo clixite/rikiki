@@ -1,6 +1,6 @@
 import type { Server, Socket } from 'socket.io';
 import type { ErrorCode, ProtocolError, PublicUser } from '@rikiki/shared';
-import { isBotId, isGameFormat } from '@rikiki/shared';
+import { isBotId, isEmoteId, isGameFormat } from '@rikiki/shared';
 import type { Config } from '../config';
 import type { UsersRepo } from '../db/users.repo';
 import type { GroupsRepo } from '../db/groups.repo';
@@ -8,6 +8,10 @@ import { verifyToken } from '../auth/tokens';
 import { profileSchema } from '../auth/routes';
 import type { RoomManager } from '../rooms/RoomManager';
 import { isValidCodeFormat, normalizeCode } from '../rooms/roomCodes';
+
+/** Anti-spam des réactions : au plus 3 par tranche de 5 secondes et par joueur. */
+const EMOTE_BURST = 3;
+const EMOTE_WINDOW_MS = 5000;
 
 const MESSAGES: Record<ErrorCode, string> = {
   BAD_PHASE: 'Action impossible dans cette phase de jeu.',
@@ -62,6 +66,16 @@ export function registerSocketHandlers(
     const leaveCurrent = () => {
       const room = currentRoom();
       if (room) room.detach(user.id, socket);
+    };
+
+    /** Fenêtre glissante de limitation des réactions, propre à ce joueur. */
+    const emoteTimes: number[] = [];
+    const allowEmote = () => {
+      const now = Date.now();
+      while (emoteTimes.length > 0 && now - emoteTimes[0] > EMOTE_WINDOW_MS) emoteTimes.shift();
+      if (emoteTimes.length >= EMOTE_BURST) return false;
+      emoteTimes.push(now);
+      return true;
     };
 
     /** Quitte la room courante seulement si ce n'est pas celle visée. */
@@ -240,6 +254,25 @@ export function registerSocketHandlers(
       if (room) {
         room.apply({ type: 'UPDATE_PROFILE', playerId: user.id, pseudo: parsed.data.pseudo, avatar: parsed.data.avatar });
       }
+      ack({ ok: true });
+    });
+
+    /**
+     * Réactions à la table.
+     *
+     * Le débit est bridé par joueur : sans cela, un doigt appuyé en boucle
+     * transforme la table en mitraillette d'émojis et gâche la partie pour
+     * tout le monde. Trois par fenêtre de cinq secondes suffisent largement
+     * pour chambrer.
+     */
+    socket.on('game:emote', (payload: unknown, ack: Ack) => {
+      if (typeof ack !== 'function') return;
+      const emote = (payload as { emote?: unknown } | null)?.emote;
+      if (!isEmoteId(emote)) return ack(protoErr('INVALID_PAYLOAD'));
+      const room = currentRoom();
+      if (!room) return ack(protoErr('PLAYER_NOT_FOUND'));
+      if (!allowEmote()) return ack({ ok: true });
+      room.emitEvent({ type: 'emote', playerId: user.id, emote });
       ack({ ok: true });
     });
 

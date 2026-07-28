@@ -186,6 +186,8 @@ export const sl: Messages = {
   deleteAccountDone: 'Račun je izbrisan.',
   cancel: 'Prekliči',
   botTag: 'bot',
+  emotes: 'Odzivi',
+  close: 'Zapri',
 
   // Statistika in zgodovina
   stats: 'Statistika',

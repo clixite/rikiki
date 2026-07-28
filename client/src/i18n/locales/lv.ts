@@ -168,6 +168,8 @@ export const lv: Messages = {
   deleteAccountDone: 'Konts ir dzēsts.',
   cancel: 'Atcelt',
   botTag: 'bots',
+  emotes: 'Reakcijas',
+  close: 'Aizvērt',
 
   // Statistika un vēsture
   stats: 'Statistika',

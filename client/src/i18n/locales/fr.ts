@@ -149,6 +149,8 @@ export const fr = {
   deleteAccountDone: 'Compte supprimé.',
   cancel: 'Annuler',
   botTag: 'robot',
+  emotes: 'Réactions',
+  close: 'Fermer',
 
   // Statistiques et historique
   stats: 'Statistiques',

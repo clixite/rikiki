@@ -21,14 +21,14 @@ export default function TrickArea({ view, frozenTrick }: Props) {
 
   return (
     <div
-      className="flex min-h-[7.5rem] w-full items-center justify-center px-3"
+      className="flex min-h-[9.5rem] w-full items-center justify-center px-3"
       data-testid="trick-area"
       // Nombre de cartes posées : lisible par les scripts de capture et de test
       data-trick-cards={trick.plays.length}
     >
       {empty ? (
-        <div className="flex h-24 w-16 items-center justify-center rounded-lg border border-dashed border-white/12">
-          <span className="text-xl text-white/12">♠</span>
+        <div className="flex h-28 w-[4.75rem] items-center justify-center rounded-lg border border-dashed border-white/12">
+          <span className="text-2xl text-white/12">♠</span>
         </div>
       ) : (
         <div className="flex flex-wrap items-end justify-center gap-x-2 gap-y-1">
@@ -52,7 +52,7 @@ export default function TrickArea({ view, frozenTrick }: Props) {
                   className="flex flex-col items-center gap-1"
                 >
                   <div className="relative">
-                    <CardFace card={card} size="md" layoutId={`card-${cardId(card)}`} />
+                    <CardFace card={card} size="lg" layoutId={`card-${cardId(card)}`} />
                     {isWinner && (
                       <motion.div
                         initial={{ opacity: 0 }}
@@ -62,7 +62,7 @@ export default function TrickArea({ view, frozenTrick }: Props) {
                     )}
                   </div>
                   <span
-                    className={`max-w-[4.5rem] truncate text-[10px] leading-tight ${
+                    className={`max-w-[5rem] truncate text-[12px] font-medium leading-tight ${
                       isWinner ? 'font-semibold text-brass-200' : 'text-paper-50/60'
                     }`}
                   >

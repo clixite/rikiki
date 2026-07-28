@@ -149,6 +149,8 @@ export const es: Messages = {
   deleteAccountDone: 'Cuenta eliminada.',
   cancel: 'Cancelar',
   botTag: 'bot',
+  emotes: 'Reacciones',
+  close: 'Cerrar',
 
   // Estadísticas e historial
   stats: 'Estadísticas',

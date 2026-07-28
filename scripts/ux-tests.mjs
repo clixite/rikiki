@@ -321,8 +321,48 @@ for (const profile of PROFILES) {
     check('JEU : tiroir des scores s’ouvre', true);
     check('JEU : tiroir sans débordement', await noHorizontalOverflow(playPage));
     if (SHOTS) { await settle(playPage); await playPage.screenshot({ path: `${SHOTS}/${profile.name.replace(/\W+/g, '-')}-05-scores.png` }); }
+
+    // L'historique doit rester consultable sans quitter la partie : sortir de
+    // la table pour aller voir ses résultats, personne ne le fait.
+    await playPage.click('[data-testid="drawer-tab-history"]');
+    await playPage.waitForTimeout(700);
+    check(
+      'JEU : historique consultable depuis le tiroir',
+      (await playPage.locator('[data-testid="score-drawer"]').count()) > 0,
+    );
+    check('JEU : tiroir historique sans débordement', await noHorizontalOverflow(playPage));
+
     await playPage.keyboard.press('Escape').catch(() => null);
     await playPage.locator('[data-testid="score-drawer"]').click({ position: { x: 5, y: 5 } }).catch(() => null);
+    await playPage.waitForTimeout(400);
+
+    // Les joueurs sont disposés autour du tapis, pas alignés en haut de l'écran
+    const seatCount = await playPage.locator('[data-testid="player-seats"] [data-testid^="opponent-"]').count();
+    check('JEU : adversaires placés autour de la table', seatCount === 2, String(seatCount));
+
+    // Savoir que c'est à soi ne doit demander aucun effort de lecture
+    check(
+      'JEU : bandeau « à toi de jouer » présent',
+      (await playPage.locator('[data-testid="my-turn-banner"]').count()) > 0,
+    );
+
+    // Réactions : palette accessible, cibles confortables, envoi sans casse
+    await playPage.click('[data-testid="open-emotes"]');
+    await playPage.waitForSelector('[data-testid="emote-palette"]', { timeout: 5000 });
+    // La palette entre en ressort : mesurer trop tôt lirait une taille réduite
+    await playPage.waitForTimeout(500);
+    check('JEU : palette de réactions accessible', true);
+    const emoteBox = await playPage.locator('[data-testid="emote-clap"]').boundingBox();
+    check(
+      'JEU : réactions à cible confortable',
+      (emoteBox?.height ?? 0) >= MIN_TOUCH - 0.5 && (emoteBox?.width ?? 0) >= MIN_TOUCH - 0.5,
+      JSON.stringify(emoteBox),
+    );
+    await playPage.click('[data-testid="emote-clap"]');
+    await playPage.waitForTimeout(600);
+    check('JEU : réaction envoyée sans débordement', await noHorizontalOverflow(playPage));
+    await playPage.click('[data-testid="open-emotes"]');
+    await playPage.waitForTimeout(300);
   } else {
     check('JEU : phase de jeu atteinte', false, 'aucune carte jouable détectée');
   }

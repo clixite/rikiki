@@ -149,6 +149,8 @@ export const nl: Messages = {
   deleteAccountDone: 'Account verwijderd.',
   cancel: 'Annuleren',
   botTag: 'bot',
+  emotes: 'Reacties',
+  close: 'Sluiten',
 
   // Statistieken en geschiedenis
   stats: 'Statistieken',

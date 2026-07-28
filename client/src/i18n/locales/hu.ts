@@ -152,6 +152,8 @@ export const hu: Messages = {
   deleteAccountDone: 'A fiók törölve.',
   cancel: 'Mégse',
   botTag: 'bot',
+  emotes: 'Reakciók',
+  close: 'Bezárás',
 
   // Statisztika és előzmények
   stats: 'Statisztika',

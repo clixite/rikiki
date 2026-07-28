@@ -185,6 +185,8 @@ export const mt: Messages = {
   deleteAccountDone: 'Il-kont tħassar.',
   cancel: 'Ikkanċella',
   botTag: 'bot',
+  emotes: 'Reazzjonijiet',
+  close: 'Agħlaq',
 
   // Statistika u storja
   stats: 'Statistika',
