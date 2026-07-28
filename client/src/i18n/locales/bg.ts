@@ -70,6 +70,21 @@ export const bg: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} мин`,
   formatLocked: 'Форматът е избран от домакина',
 
+  // Barème de score
+  scoringVariant: 'Точкуване',
+  scoringHint: 'Как се броят точките',
+  scoringNames: {
+    classic: 'Класическо',
+    gentle: 'Меко',
+    always: 'Взятките се броят',
+  },
+  scoringDescriptions: {
+    classic: 'Точна заявка: 10 + 2 на взятка. Сгрешена: −2 за всяка разлика.',
+    gentle: 'Точна заявка: 10 + 1 на взятка. Сгрешена: 0, без наказание.',
+    always: 'Взятките винаги носят точки, +10 при точна заявка.',
+  },
+  scoringLocked: 'Точкуването се избира от домакина',
+
   // Маса за игра
   round: 'Рунд',
   cards: (n: number) => karti(n),
@@ -256,6 +271,7 @@ export const bg: Messages = {
   rulesScoreKoExample: 'Заявени 3, взети 1 → −4 точки',
   rulesScoreZero:
     'Заявиш ли 0 и не вземеш нито една, печелиш 10 точки: много изгоден контракт.',
+  rulesScoreVariants: 'Домакинът може да избере друго точкуване в стаята:',
   rulesEndTitle: 'Край на играта',
   rulesEndText:
     'След последния рунд печели играчът с най-много точки. Таблицата с точките е достъпна по всяко време по време на играта.',

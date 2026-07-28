@@ -196,6 +196,42 @@ for (const profile of PROFILES) {
   const startDisabledAt2 = await host.page.locator('[data-testid="start-game"]').isDisabled();
   check('salon : démarrage bloqué à 2 joueurs', startDisabledAt2);
 
+  // ---- Barème de score : l'hôte choisit, la table entière doit le voir
+  const scoringVisible = (await host.page.locator('[data-testid="scoring-picker"]').count()) > 0;
+  check('salon : choix du barème de score', scoringVisible);
+  if (scoringVisible) {
+    const defaultScoring = await host.page.getAttribute('[data-testid="scoring-picker"]', 'data-scoring');
+    check('salon : barème classique par défaut', defaultScoring === 'classic', String(defaultScoring));
+
+    const scoringBox = await host.page.locator('[data-testid="scoring-classic"]').boundingBox();
+    check(
+      'salon : cible du barème ≥ 44px',
+      (scoringBox?.height ?? 0) >= MIN_TOUCH - 0.5,
+      JSON.stringify(scoringBox),
+    );
+
+    // Un invité ne choisit pas le barème, mais il doit pouvoir le lire
+    check(
+      'salon : l’invité ne modifie pas le barème',
+      (await p2.page.locator('[data-testid="scoring-gentle"]').count()) === 0,
+    );
+
+    await host.page.click('[data-testid="scoring-gentle"]');
+    await p2.page.waitForSelector('[data-testid="scoring-picker"][data-scoring="gentle"]', { timeout: 10000 })
+      .then(() => check('salon : barème diffusé à toute la table', true))
+      .catch(async () => {
+        const seen = await p2.page.getAttribute('[data-testid="scoring-picker"]', 'data-scoring');
+        check('salon : barème diffusé à toute la table', false, String(seen));
+      });
+
+    const rule = (await p2.page.textContent('[data-testid="scoring-description"]')) ?? '';
+    check('salon : la règle du barème est écrite en toutes lettres', rule.trim().length > 20, rule.trim());
+
+    // On revient au barème classique pour la suite du parcours
+    await host.page.click('[data-testid="scoring-classic"]');
+    await host.page.waitForSelector('[data-testid="scoring-picker"][data-scoring="classic"]', { timeout: 10000 });
+  }
+
   // On complète avec un robot → 3 joueurs
   if (addBotVisible) {
     await host.page.click('[data-testid="add-bot"]');

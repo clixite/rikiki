@@ -58,6 +58,21 @@ export const sv: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Formatet är valt av värden',
 
+  // Barème de score
+  scoringVariant: 'Poängräkning',
+  scoringHint: 'Så räknas poängen',
+  scoringNames: {
+    classic: 'Klassisk',
+    gentle: 'Mild',
+    always: 'Stick räknas alltid',
+  },
+  scoringDescriptions: {
+    classic: 'Budet höll: 10 + 2 per stick. Missat: −2 per sticks skillnad.',
+    gentle: 'Budet höll: 10 + 1 per stick. Missat: 0, inget straff.',
+    always: 'Dina stick ger alltid poäng, +10 om budet håller.',
+  },
+  scoringLocked: 'Poängräkning vald av värden',
+
   // Spelbordet
   round: 'Runda',
   cards: (n: number) => `${n} kort`,
@@ -244,6 +259,7 @@ export const sv: Messages = {
   rulesScoreKo: 'Kontrakt missat',
   rulesScoreKoExample: 'Bjöd 3, tog 1 → −4 poäng',
   rulesScoreZero: 'Att bjuda 0 och inte ta ett enda stick ger 10 poäng: ett riktigt lönsamt kontrakt.',
+  rulesScoreVariants: 'Värden kan välja en annan poängräkning i lobbyn:',
   rulesEndTitle: 'Slutet på partiet',
   rulesEndText:
     'När alla rundor är spelade vinner den som har flest poäng. Ställningen går att se när som helst under partiet.',

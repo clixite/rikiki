@@ -1,5 +1,12 @@
 import { io, type Socket } from 'socket.io-client';
-import type { EmoteId, Ack, ClientToServerEvents, GameFormat, ServerToClientEvents } from '@rikiki/shared';
+import type {
+  EmoteId,
+  Ack,
+  ClientToServerEvents,
+  GameFormat,
+  ScoringVariant,
+  ServerToClientEvents,
+} from '@rikiki/shared';
 import { useGame } from './store/game';
 import { useSession } from './store/session';
 import { API_BASE } from './config';
@@ -95,6 +102,7 @@ export async function leaveRoom(): Promise<void> {
 export const addBot = () => emitAck<{ playerId: string }>('room:addBot');
 export const removeBot = (playerId: string) => emitAck('room:removeBot', { playerId });
 export const setFormat = (format: GameFormat) => emitAck('room:setFormat', { format });
+export const setScoring = (scoring: ScoringVariant) => emitAck('room:setScoring', { scoring });
 /** Rattache la partie en cours à un groupe (hôte, lobby) ; `null` la détache. */
 export const setRoomGroup = (groupId: string | null) => emitAck('room:setGroup', { groupId });
 export const startGame = () => emitAck('game:start');

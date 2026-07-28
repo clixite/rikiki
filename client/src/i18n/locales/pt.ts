@@ -58,6 +58,21 @@ export const pt: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Formato escolhido pelo anfitrião',
 
+  // Barème de score
+  scoringVariant: 'Pontuação',
+  scoringHint: 'Como se contam os pontos',
+  scoringNames: {
+    classic: 'Clássica',
+    gentle: 'Branda',
+    always: 'As vazas contam sempre',
+  },
+  scoringDescriptions: {
+    classic: 'Contrato cumprido: 10 + 2 por vaza. Falhado: −2 por vaza de diferença.',
+    gentle: 'Contrato cumprido: 10 + 1 por vaza. Falhado: 0, sem penalização.',
+    always: 'As tuas vazas pontuam sempre, +10 se cumprires o contrato.',
+  },
+  scoringLocked: 'Pontuação escolhida pelo anfitrião',
+
   // Mesa de jogo
   round: 'Ronda',
   cards: (n: number) => (n === 1 ? '1 carta' : `${n} cartas`),
@@ -244,6 +259,7 @@ export const pt: Messages = {
   rulesScoreKo: 'Contrato falhado',
   rulesScoreKoExample: 'Apostadas 3, feitas 1 → −4 pontos',
   rulesScoreZero: 'Apostar 0 e não fazer nenhuma vale 10 pontos: um contrato muito rentável.',
+  rulesScoreVariants: 'O anfitrião pode escolher outra pontuação na sala:',
   rulesEndTitle: 'Fim do jogo',
   rulesEndText:
     'Jogadas todas as rondas, ganha quem somar mais pontos. Podes consultar a tabela de pontuações a qualquer momento durante o jogo.',

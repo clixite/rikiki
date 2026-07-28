@@ -1,6 +1,6 @@
 import type { Server, Socket } from 'socket.io';
 import type { ErrorCode, ProtocolError, PublicUser } from '@rikiki/shared';
-import { isBotId, isEmoteId, isGameFormat } from '@rikiki/shared';
+import { isBotId, isEmoteId, isGameFormat, isScoringVariant } from '@rikiki/shared';
 import type { Config } from '../config';
 import type { UsersRepo } from '../db/users.repo';
 import type { GroupsRepo } from '../db/groups.repo';
@@ -172,6 +172,16 @@ export function registerSocketHandlers(
       if (!isGameFormat(payload?.format)) return ack(protoErr('INVALID_PAYLOAD'));
       // Le moteur revérifie l'hôte et la phase ; l'application diffuse la vue à tout le salon.
       const res = room.apply({ type: 'SET_FORMAT', playerId: user.id, format: payload.format });
+      ack(res.ok ? { ok: true } : protoErr(res.error));
+    });
+
+    socket.on('room:setScoring', (payload: { scoring?: unknown } | undefined, ack: Ack) => {
+      if (typeof ack !== 'function') return;
+      const room = currentRoom();
+      if (!room) return ack(protoErr('NOT_IN_ROOM'));
+      if (!isScoringVariant(payload?.scoring)) return ack(protoErr('INVALID_PAYLOAD'));
+      // Le moteur revérifie l'hôte et la phase ; l'application diffuse la vue.
+      const res = room.apply({ type: 'SET_SCORING', playerId: user.id, scoring: payload.scoring });
       ack(res.ok ? { ok: true } : protoErr(res.error));
     });
 

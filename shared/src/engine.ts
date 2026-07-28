@@ -2,15 +2,18 @@ import { isBotId } from './bot';
 import { cardFromId, cardId, fullDeck, hashSeed, mulberry32, shuffle, sortHand } from './cards';
 import {
   DEFAULT_FORMAT,
+  DEFAULT_SCORING,
   MAX_PLAYERS,
   MIN_PLAYERS,
   isGameFormat,
+  isScoringVariant,
   legalBids,
   legalCards,
   roundsSequence,
   scoreRound,
   trickWinner,
   type GameFormat,
+  type ScoringVariant,
 } from './rules';
 import type { CardId, GameState, Player, RoundState } from './types';
 
@@ -32,6 +35,7 @@ export type GameAction =
   | { type: 'UPDATE_PROFILE'; playerId: string; pseudo: string; avatar: string; photo?: string | null }
   | { type: 'SET_CONNECTED'; playerId: string; connected: boolean }
   | { type: 'SET_FORMAT'; playerId: string; format: GameFormat }
+  | { type: 'SET_SCORING'; playerId: string; scoring: ScoringVariant }
   | { type: 'START_GAME'; playerId: string }
   | { type: 'BID'; playerId: string; bid: number }
   | { type: 'PLAY_CARD'; playerId: string; cardId: CardId }
@@ -58,6 +62,7 @@ export function createGame(
     players: [{ ...host, seat: 0, connected: true, totalScore: 0 }],
     maxPlayers: MAX_PLAYERS,
     format: DEFAULT_FORMAT,
+    scoring: DEFAULT_SCORING,
     roundsSequence: [],
     round: null,
     createdAt,
@@ -162,6 +167,14 @@ export function applyAction(prev: GameState, action: GameAction): EngineResult {
       return { ok: true, state };
     }
 
+    case 'SET_SCORING': {
+      if (state.phase !== 'lobby') return err('BAD_PHASE');
+      if (action.playerId !== state.hostId) return err('NOT_HOST');
+      if (!isScoringVariant(action.scoring)) return err('ILLEGAL_FORMAT');
+      state.scoring = action.scoring;
+      return { ok: true, state };
+    }
+
     case 'START_GAME': {
       if (state.phase !== 'lobby') return err('BAD_PHASE');
       if (action.playerId !== state.hostId) return err('NOT_HOST');
@@ -228,7 +241,7 @@ export function applyAction(prev: GameState, action: GameAction): EngineResult {
         if (handsEmpty) {
           round.roundScores = {};
           for (const p of state.players) {
-            const score = scoreRound(round.bids[p.id] ?? 0, round.tricksWon[p.id]);
+            const score = scoreRound(round.bids[p.id] ?? 0, round.tricksWon[p.id], state.scoring ?? DEFAULT_SCORING);
             round.roundScores[p.id] = score;
             p.totalScore += score;
           }

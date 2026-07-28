@@ -65,6 +65,21 @@ export const fi: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Isäntä valitsi muodon',
 
+  // Barème de score
+  scoringVariant: 'Pisteytys',
+  scoringHint: 'Miten pisteet lasketaan',
+  scoringNames: {
+    classic: 'Klassinen',
+    gentle: 'Lempeä',
+    always: 'Tikit lasketaan',
+  },
+  scoringDescriptions: {
+    classic: 'Tilaus täyttyi: 10 + 2 per tikki. Meni pieleen: −2 per tikin ero.',
+    gentle: 'Tilaus täyttyi: 10 + 1 per tikki. Meni pieleen: 0, ei rangaistusta.',
+    always: 'Tikkisi tuovat aina pisteitä, +10 jos tilaus täyttyy.',
+  },
+  scoringLocked: 'Isäntä valitsee pisteytyksen',
+
   // Pelipöytä
   round: 'Kierros',
   cards: (n: number) => fiN(n, 'kortti', 'korttia'),
@@ -254,6 +269,7 @@ export const fi: Messages = {
   rulesScoreKoExample: 'Tarjous 3, tulos 1 → −4 pistettä',
   rulesScoreZero:
     'Nollan tarjoaminen ja tikittä jääminen tuo 10 pistettä: erittäin kannattava sopimus.',
+  rulesScoreVariants: 'Isäntä voi valita aulassa toisen pisteytyksen:',
   rulesEndTitle: 'Pelin loppu',
   rulesEndText:
     'Kun kaikki kierrokset on pelattu, eniten pisteitä kerännyt voittaa. Pistetaulukon voi avata milloin tahansa kesken pelin.',

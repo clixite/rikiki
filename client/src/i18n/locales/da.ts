@@ -58,6 +58,21 @@ export const da: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Formatet er valgt af værten',
 
+  // Barème de score
+  scoringVariant: 'Pointsystem',
+  scoringHint: 'Sådan tælles pointene',
+  scoringNames: {
+    classic: 'Klassisk',
+    gentle: 'Mildt',
+    always: 'Stik tæller',
+  },
+  scoringDescriptions: {
+    classic: 'Bud holdt: 10 + 2 pr. stik. Forfejlet: −2 pr. stik i forskel.',
+    gentle: 'Bud holdt: 10 + 1 pr. stik. Forfejlet: 0, ingen straf.',
+    always: 'Dine stik giver altid point, +10 hvis buddet holder.',
+  },
+  scoringLocked: 'Pointsystem valgt af værten',
+
   // Spillebordet
   round: 'Runde',
   cards: (n: number) => `${n} kort`,
@@ -243,6 +258,7 @@ export const da: Messages = {
   rulesScoreKo: 'Kontrakt misset',
   rulesScoreKoExample: 'Meldt 3, taget 1 → −4 point',
   rulesScoreZero: 'At melde 0 og ikke tage et eneste stik giver 10 point: en rigtig god forretning.',
+  rulesScoreVariants: 'Værten kan vælge et andet pointsystem i lobbyen:',
   rulesEndTitle: 'Spillets afslutning',
   rulesEndText:
     'Når alle runder er spillet, vinder den med flest point. Stillingen kan ses når som helst undervejs.',

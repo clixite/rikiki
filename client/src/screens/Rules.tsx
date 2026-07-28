@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { useNav } from '../nav';
-import { cardFromId } from '@rikiki/shared';
+import { SCORING_VARIANTS, cardFromId } from '@rikiki/shared';
 import CardFace from '../components/CardFace';
 import SoundToggle from '../components/SoundToggle';
 import { useT } from '../i18n';
@@ -112,6 +112,20 @@ export default function Rules() {
             </div>
           </div>
           <p className="pt-1 text-xs text-paper-50/55">{t.rulesScoreZero}</p>
+
+          {/* Chaque famille compte à sa façon : autant dire tout de suite que
+              le barème d'origine n'est pas le seul disponible. */}
+          <div className="rounded-xl bg-felt-900/45 p-2.5 ring-1 ring-white/6">
+            <p className="text-xs text-paper-50/55">{t.rulesScoreVariants}</p>
+            <ul className="mt-1.5 space-y-1">
+              {SCORING_VARIANTS.map((s) => (
+                <li key={s} className="text-[11px] leading-snug text-paper-50/55">
+                  <span className="font-semibold text-brass-300">{t.scoringNames[s]}</span> —{' '}
+                  {t.scoringDescriptions[s]}
+                </li>
+              ))}
+            </ul>
+          </div>
         </Section>
 
         <Section step="6" title={t.rulesEndTitle}>

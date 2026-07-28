@@ -75,6 +75,21 @@ export const lv: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Formātu izvēlējās saimnieks',
 
+  // Barème de score
+  scoringVariant: 'Punktu skaitīšana',
+  scoringHint: 'Kā tiek skaitīti punkti',
+  scoringNames: {
+    classic: 'Klasiskā',
+    gentle: 'Saudzīgā',
+    always: 'Stiķi vienmēr skaitās',
+  },
+  scoringDescriptions: {
+    classic: 'Solījums izpildīts: 10 + 2 par stiķi. Neizpildīts: −2 par katru stiķa starpību.',
+    gentle: 'Solījums izpildīts: 10 + 1 par stiķi. Neizpildīts: 0, bez soda.',
+    always: 'Tavi stiķi vienmēr dod punktus, +10 par izpildītu solījumu.',
+  },
+  scoringLocked: 'Skaitīšanu izvēlas rīkotājs',
+
   // Spēles galds
   round: 'Kārta',
   cards: (n: number) => lvN(n, 'kārts', 'kārtis', 'kāršu'),
@@ -265,6 +280,7 @@ export const lv: Messages = {
   rulesScoreKoExample: 'Pieteikts 3, paņemts 1 → −4 punkti',
   rulesScoreZero:
     'Pieteikt 0 un nepaņemt nevienu stiķi dod 10 punktus: ļoti izdevīgs līgums.',
+  rulesScoreVariants: 'Rīkotājs telpā var izvēlēties citu punktu skaitīšanu:',
   rulesEndTitle: 'Spēles beigas',
   rulesEndText:
     'Kad visas kārtas nospēlētas, uzvar spēlētājs ar vislielāko punktu skaitu. Rezultātu tabulu var apskatīt jebkurā spēles brīdī.',

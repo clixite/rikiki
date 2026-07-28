@@ -1,5 +1,5 @@
 import type { EngineErrorCode } from './engine';
-import type { GameFormat } from './rules';
+import type { GameFormat, ScoringVariant } from './rules';
 import type { CardId, GameView } from './types';
 
 export type ErrorCode =
@@ -59,6 +59,8 @@ export interface ClientToServerEvents {
   'room:removeBot': (payload: { playerId: string }, ack: (res: Ack) => void) => void;
   /** Choisit le format de la partie (hôte, lobby uniquement) — diffusé à tout le salon. */
   'room:setFormat': (payload: { format: GameFormat }, ack: (res: Ack) => void) => void;
+  /** Choisit le barème de score (hôte, lobby uniquement). */
+  'room:setScoring': (payload: { scoring: ScoringVariant }, ack: (res: Ack) => void) => void;
   /**
    * Rattache la partie à un groupe d'amis (hôte, lobby uniquement).
    * `null` détache la partie de tout groupe. L'hôte doit être membre du groupe.

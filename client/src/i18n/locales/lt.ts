@@ -76,6 +76,21 @@ export const lt: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Formatą pasirinko šeimininkas',
 
+  // Barème de score
+  scoringVariant: 'Taškų skaičiavimas',
+  scoringHint: 'Kaip skaičiuojami taškai',
+  scoringNames: {
+    classic: 'Klasikinis',
+    gentle: 'Švelnus',
+    always: 'Kirčiai visada skaičiuojami',
+  },
+  scoringDescriptions: {
+    classic: 'Pasižadėjimas įvykdytas: 10 + 2 už kirtį. Nepavyko: −2 už kiekvieną kirčio skirtumą.',
+    gentle: 'Pasižadėjimas įvykdytas: 10 + 1 už kirtį. Nepavyko: 0, jokios baudos.',
+    always: 'Tavo kirčiai visada duoda taškų, +10 už įvykdytą pasižadėjimą.',
+  },
+  scoringLocked: 'Skaičiavimą pasirenka šeimininkas',
+
   // Žaidimo stalas
   round: 'Ratas',
   cards: (n: number) => ltN(n, 'korta', 'kortos', 'kortų'),
@@ -267,6 +282,7 @@ export const lt: Messages = {
   rulesScoreKoExample: 'Užsakyta 3, paimta 1 → −4 taškai',
   rulesScoreZero:
     'Užsakyti 0 ir nepaimti nė vieno kirčio duoda 10 taškų: labai pelninga sutartis.',
+  rulesScoreVariants: 'Šeimininkas kambaryje gali pasirinkti kitą skaičiavimą:',
   rulesEndTitle: 'Partijos pabaiga',
   rulesEndText:
     'Kai sužaidžiami visi ratai, laimi daugiausia taškų surinkęs žaidėjas. Rezultatų lentelę galima atsiversti bet kada partijos metu.',

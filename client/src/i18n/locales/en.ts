@@ -58,6 +58,21 @@ export const en: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Format set by the host',
 
+  // Barème de score
+  scoringVariant: 'Scoring',
+  scoringHint: 'How the points are counted',
+  scoringNames: {
+    classic: 'Classic',
+    gentle: 'Gentle',
+    always: 'Tricks count',
+  },
+  scoringDescriptions: {
+    classic: 'Contract met: 10 + 2 per trick. Missed: −2 per trick off.',
+    gentle: 'Contract met: 10 + 1 per trick. Missed: 0, no penalty.',
+    always: 'Your tricks always score, +10 if the contract is met.',
+  },
+  scoringLocked: 'Scoring set by the host',
+
   // Table
   round: 'Round',
   cards: (n: number) => (n === 1 ? '1 card' : `${n} cards`),
@@ -244,6 +259,7 @@ export const en: Messages = {
   rulesScoreKo: 'Contract missed',
   rulesScoreKoExample: 'Bid 3, won 1 → −4 points',
   rulesScoreZero: 'Bidding 0 and taking none is worth 10 points: a very profitable contract.',
+  rulesScoreVariants: 'The host can pick a different scoring in the lobby:',
   rulesEndTitle: 'End of the game',
   rulesEndText:
     'Once every round has been played, whoever has the most points wins. The scoreboard can be checked at any time during the game.',

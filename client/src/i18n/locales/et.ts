@@ -67,6 +67,21 @@ export const et: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Formaadi valis peremees',
 
+  // Barème de score
+  scoringVariant: 'Punktiarvestus',
+  scoringHint: 'Kuidas punkte loetakse',
+  scoringNames: {
+    classic: 'Klassikaline',
+    gentle: 'Leebe',
+    always: 'Tihid loevad',
+  },
+  scoringDescriptions: {
+    classic: 'Lubadus täidetud: 10 + 2 tihi kohta. Ebaõnnestus: −2 iga tihi vahe eest.',
+    gentle: 'Lubadus täidetud: 10 + 1 tihi kohta. Ebaõnnestus: 0, karistust pole.',
+    always: 'Sinu tihid annavad alati punkte, +10 täidetud lubaduse eest.',
+  },
+  scoringLocked: 'Punktiarvestuse valib võõrustaja',
+
   // Mängulaud
   round: 'Voor',
   cards: (n: number) => etN(n, 'kaart', 'kaarti'),
@@ -252,6 +267,7 @@ export const et: Messages = {
   rulesScoreKoExample: 'Lubatud 3, saadud 1 → −4 punkti',
   rulesScoreZero:
     'Nulli lubamine ja ühegi tihi võtmata jätmine annab 10 punkti: väga tulus lubadus.',
+  rulesScoreVariants: 'Võõrustaja saab ruumis valida teise punktiarvestuse:',
   rulesEndTitle: 'Mängu lõpp',
   rulesEndText:
     'Kui kõik voorud on mängitud, võidab kõige rohkem punkte kogunud mängija. Punktitabelit saab mängu ajal igal hetkel vaadata.',

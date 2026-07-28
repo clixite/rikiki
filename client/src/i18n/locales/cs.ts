@@ -79,6 +79,21 @@ export const cs: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Formát určuje hostitel',
 
+  // Barème de score
+  scoringVariant: 'Bodování',
+  scoringHint: 'Jak se počítají body',
+  scoringNames: {
+    classic: 'Klasické',
+    gentle: 'Mírné',
+    always: 'Zdvihy se počítají',
+  },
+  scoringDescriptions: {
+    classic: 'Splněný závazek: 10 + 2 za zdvih. Nesplněný: −2 za každý zdvih rozdílu.',
+    gentle: 'Splněný závazek: 10 + 1 za zdvih. Nesplněný: 0, žádný postih.',
+    always: 'Zdvihy vždy bodují, +10 při splněném závazku.',
+  },
+  scoringLocked: 'Bodování určuje hostitel',
+
   // Stůl
   round: 'Kolo',
   cards: (n: number) => plural(n, '1 karta', `${n} karty`, `${n} karet`),
@@ -276,6 +291,7 @@ export const cs: Messages = {
   rulesScoreKoExample: 'Hláška 3, uděláno 1 → −4 body',
   rulesScoreZero:
     'Nahlásit 0 a žádný zdvih neudělat dá 10 bodů: hodně výnosný závazek.',
+  rulesScoreVariants: 'Hostitel může v místnosti zvolit jiné bodování:',
   rulesEndTitle: 'Konec hry',
   rulesEndText:
     'Až se odehrají všechna kola, vyhrává hráč s nejvyšším součtem bodů. Tabulku skóre si můžeš během hry kdykoli otevřít.',

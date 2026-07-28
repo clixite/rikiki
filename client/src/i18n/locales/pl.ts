@@ -79,6 +79,21 @@ export const pl: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Format wybiera gospodarz',
 
+  // Barème de score
+  scoringVariant: 'Punktacja',
+  scoringHint: 'Jak liczone są punkty',
+  scoringNames: {
+    classic: 'Klasyczna',
+    gentle: 'Łagodna',
+    always: 'Lewy zawsze się liczą',
+  },
+  scoringDescriptions: {
+    classic: 'Deklaracja trafiona: 10 + 2 za lewę. Nietrafiona: −2 za każdą lewę różnicy.',
+    gentle: 'Deklaracja trafiona: 10 + 1 za lewę. Nietrafiona: 0, bez kary.',
+    always: 'Twoje lewy zawsze punktują, +10 za trafioną deklarację.',
+  },
+  scoringLocked: 'Punktację wybiera gospodarz',
+
   // Stół
   round: 'Runda',
   cards: (n: number) => plural(n, '1 karta', `${n} karty`, `${n} kart`),
@@ -278,6 +293,7 @@ export const pl: Messages = {
   rulesScoreKoExample: 'Deklaracja 3, wzięta 1 → −4 punkty',
   rulesScoreZero:
     'Deklaracja 0 i ani jednej wziętej lewy daje 10 punktów: bardzo opłacalny kontrakt.',
+  rulesScoreVariants: 'Gospodarz może wybrać w poczekalni inną punktację:',
   rulesEndTitle: 'Koniec partii',
   rulesEndText:
     'Po rozegraniu wszystkich rund wygrywa gracz z największą liczbą punktów. Tabelę wyników możesz sprawdzić w każdej chwili podczas partii.',

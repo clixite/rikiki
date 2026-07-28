@@ -80,6 +80,21 @@ export const hr: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Format bira domaćin',
 
+  // Barème de score
+  scoringVariant: 'Bodovanje',
+  scoringHint: 'Kako se broje bodovi',
+  scoringNames: {
+    classic: 'Klasično',
+    gentle: 'Blago',
+    always: 'Štihovi se broje',
+  },
+  scoringDescriptions: {
+    classic: 'Najava pogođena: 10 + 2 po štihu. Promašena: −2 po štihu razlike.',
+    gentle: 'Najava pogođena: 10 + 1 po štihu. Promašena: 0, bez kazne.',
+    always: 'Tvoji štihovi uvijek nose bodove, +10 ako je najava pogođena.',
+  },
+  scoringLocked: 'Bodovanje bira domaćin',
+
   // Stol
   round: 'Runda',
   cards: (n: number) => plural(n, `${n} karta`, `${n} karte`, `${n} karata`),
@@ -280,6 +295,7 @@ export const hr: Messages = {
   rulesScoreKoExample: 'Najava 3, odneseno 1 → −4 boda',
   rulesScoreZero:
     'Najaviti 0 i ne odnijeti nijedan štih donosi 10 bodova: vrlo isplativa obveza.',
+  rulesScoreVariants: 'Domaćin u sobi može odabrati drugo bodovanje:',
   rulesEndTitle: 'Kraj igre',
   rulesEndText:
     'Kad se odigraju sve runde, pobjeđuje igrač s najviše bodova. Tablicu rezultata možeš pogledati bilo kada tijekom igre.',

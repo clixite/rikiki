@@ -91,6 +91,21 @@ export const ga: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} nóim.`,
   formatLocked: 'Formáid roghnaithe ag an óstach',
 
+  // Barème de score
+  scoringVariant: 'Scóráil',
+  scoringHint: 'An chaoi a gcomhairtear na pointí',
+  scoringNames: {
+    classic: 'Clasaiceach',
+    gentle: 'Séimh',
+    always: 'Cleasanna i gcónaí',
+  },
+  scoringDescriptions: {
+    classic: 'Conradh comhlíonta: 10 + 2 in aghaidh an chleasa. Teipthe: −2 in aghaidh gach cleasa difríochta.',
+    gentle: 'Conradh comhlíonta: 10 + 1 in aghaidh an chleasa. Teipthe: 0, gan phionós.',
+    always: 'Faigheann do chleasanna pointí i gcónaí, +10 má chomhlíontar an conradh.',
+  },
+  scoringLocked: 'Roghnaíonn an t-óstach an scóráil',
+
   // An bord
   round: 'Babhta',
   cards: (n: number) => cartai(n),
@@ -280,6 +295,7 @@ export const ga: Messages = {
   rulesScoreKoExample: 'Tairgthe 3, bainte amach 1 → −4 phointe',
   rulesScoreZero:
     'Má thairgeann tú 0 agus mura mbuann tú ceann ar bith, gnóthaíonn tú 10 bpointe: conradh an-bhrabúsach.',
+  rulesScoreVariants: 'Is féidir leis an óstach scóráil eile a roghnú sa halla:',
   rulesEndTitle: 'Deireadh an chluiche',
   rulesEndText:
     'Nuair a bhíonn na babhtaí ar fad imrithe, buann an t-imreoir leis an líon is mó pointí. Tá clár na scór le feiceáil am ar bith le linn an chluiche.',

@@ -88,6 +88,21 @@ export const ro: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Format ales de gazdă',
 
+  // Barème de score
+  scoringVariant: 'Punctaj',
+  scoringHint: 'Cum se numără punctele',
+  scoringNames: {
+    classic: 'Clasic',
+    gentle: 'Blând',
+    always: 'Levatele contează mereu',
+  },
+  scoringDescriptions: {
+    classic: 'Contract îndeplinit: 10 + 2 pe levată. Ratat: −2 pentru fiecare levată diferență.',
+    gentle: 'Contract îndeplinit: 10 + 1 pe levată. Ratat: 0, fără penalizare.',
+    always: 'Levatele tale punctează mereu, +10 dacă îndeplinești contractul.',
+  },
+  scoringLocked: 'Punctajul este ales de gazdă',
+
   // Masa de joc
   round: 'Runda',
   cards: (n: number) => carti(n),
@@ -274,6 +289,7 @@ export const ro: Messages = {
   rulesScoreKoExample: 'Pariat 3, făcut 1 → −4 puncte',
   rulesScoreZero:
     'Pariezi 0 și nu iei nicio levată: 10 puncte, un contract foarte rentabil.',
+  rulesScoreVariants: 'Gazda poate alege alt punctaj în sală:',
   rulesEndTitle: 'Finalul partidei',
   rulesEndText:
     'După ce s-au jucat toate rundele, câștigă jucătorul cu cele mai multe puncte. Tabelul de scoruri poate fi consultat oricând în timpul partidei.',

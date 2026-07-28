@@ -1,4 +1,4 @@
-import type { GameFormat } from '@rikiki/shared';
+import type { GameFormat, ScoringVariant } from '@rikiki/shared';
 
 export const fr = {
   appName: 'Rikiki',
@@ -57,6 +57,21 @@ export const fr = {
   formatRounds: (n: number) => (n > 1 ? `${n} manches` : '1 manche'),
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Format choisi par l’hôte',
+
+  // Barème de score
+  scoringVariant: 'Barème de score',
+  scoringHint: 'Comment on compte les points',
+  scoringNames: {
+    classic: 'Classique',
+    gentle: 'Bienveillant',
+    always: 'Plis toujours comptés',
+  } as Record<ScoringVariant, string>,
+  scoringDescriptions: {
+    classic: 'Contrat tenu : 10 + 2 par pli. Raté : −2 par pli d’écart.',
+    gentle: 'Contrat tenu : 10 + 1 par pli. Raté : 0, aucune pénalité.',
+    always: 'Tes plis comptent toujours, +10 si le contrat est tenu.',
+  } as Record<ScoringVariant, string>,
+  scoringLocked: 'Barème choisi par l’hôte',
 
   // Table de jeu
   round: 'Manche',
@@ -244,6 +259,7 @@ export const fr = {
   rulesScoreKo: 'Contrat manqué',
   rulesScoreKoExample: 'Annoncé 3, réalisé 1 → −4 points',
   rulesScoreZero: 'Annoncer 0 et n’en faire aucun rapporte 10 points : un contrat très rentable.',
+  rulesScoreVariants: 'L’hôte peut choisir un autre barème dans le salon :',
   rulesEndTitle: 'Fin de partie',
   rulesEndText:
     "Une fois toutes les manches jouées, le joueur qui totalise le plus de points l'emporte. Le tableau des scores est consultable à tout moment pendant la partie.",

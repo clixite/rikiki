@@ -83,6 +83,21 @@ export const sl: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Format izbere gostitelj',
 
+  // Barème de score
+  scoringVariant: 'Točkovanje',
+  scoringHint: 'Kako se štejejo točke',
+  scoringNames: {
+    classic: 'Klasično',
+    gentle: 'Prizanesljivo',
+    always: 'Štihi vedno štejejo',
+  },
+  scoringDescriptions: {
+    classic: 'Napoved dosežena: 10 + 2 na štih. Zgrešena: −2 za vsak štih razlike.',
+    gentle: 'Napoved dosežena: 10 + 1 na štih. Zgrešena: 0, brez kazni.',
+    always: 'Tvoji štihi vedno prinesejo točke, +10 ob doseženi napovedi.',
+  },
+  scoringLocked: 'Točkovanje izbere gostitelj',
+
   // Miza
   round: 'Krog',
   cards: (n: number) => plural(n, '1 karta', `${n} karti`, `${n} karte`, `${n} kart`),
@@ -287,6 +302,7 @@ export const sl: Messages = {
   rulesScoreKoExample: 'Napoved 3, dosežen 1 → −4 točke',
   rulesScoreZero:
     'Napovedati 0 in ne pobrati nobenega štiha prinese 10 točk: zelo donosna obveza.',
+  rulesScoreVariants: 'Gostitelj lahko v sobi izbere drugo točkovanje:',
   rulesEndTitle: 'Konec igre',
   rulesEndText:
     'Ko so odigrani vsi krogi, zmaga igralec z največ točkami. Tabelo rezultatov si lahko med igro ogledaš kadar koli.',

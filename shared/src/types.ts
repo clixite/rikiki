@@ -1,4 +1,4 @@
-import type { GameFormat } from './rules';
+import type { GameFormat, ScoringVariant } from './rules';
 
 export type Suit = 'S' | 'H' | 'D' | 'C';
 export const SUITS: readonly Suit[] = ['S', 'H', 'D', 'C'];
@@ -153,6 +153,11 @@ export interface GameState {
   maxPlayers: number;
   /** Format choisi par l'hôte dans le salon (durée de la partie). */
   format: GameFormat;
+  /**
+   * Barème de score choisi par l'hôte. Absent des parties créées avant la
+   * v1.3 : toute lecture retombe sur le barème classique.
+   */
+  scoring?: ScoringVariant;
   roundsSequence: number[];
   round: RoundState | null;
   createdAt: number;

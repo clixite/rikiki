@@ -58,6 +58,21 @@ export const it: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Formato scelto dall’host',
 
+  // Barème de score
+  scoringVariant: 'Punteggio',
+  scoringHint: 'Come si contano i punti',
+  scoringNames: {
+    classic: 'Classico',
+    gentle: 'Indulgente',
+    always: 'Le prese contano',
+  },
+  scoringDescriptions: {
+    classic: 'Contratto rispettato: 10 + 2 per presa. Mancato: −2 per presa di scarto.',
+    gentle: 'Contratto rispettato: 10 + 1 per presa. Mancato: 0, nessuna penalità.',
+    always: 'Le tue prese contano sempre, +10 se il contratto è rispettato.',
+  },
+  scoringLocked: 'Punteggio scelto dall’ospite',
+
   // Tavolo da gioco
   round: 'Mano',
   cards: (n: number) => (n === 1 ? '1 carta' : `${n} carte`),
@@ -244,6 +259,7 @@ export const it: Messages = {
   rulesScoreKo: 'Contratto mancato',
   rulesScoreKoExample: 'Dichiarate 3, fatte 1 → −4 punti',
   rulesScoreZero: 'Dichiarare 0 e non farne nessuna vale 10 punti: un contratto molto redditizio.',
+  rulesScoreVariants: 'L’ospite può scegliere un altro punteggio nella sala:',
   rulesEndTitle: 'Fine della partita',
   rulesEndText:
     'Giocate tutte le mani, vince chi ha totalizzato più punti. La tabella dei punteggi si può consultare in qualsiasi momento durante la partita.',

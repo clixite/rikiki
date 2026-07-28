@@ -63,6 +63,21 @@ export const hu: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} perc`,
   formatLocked: 'A hosszt a házigazda választja',
 
+  // Barème de score
+  scoringVariant: 'Pontozás',
+  scoringHint: 'Hogyan számoljuk a pontokat',
+  scoringNames: {
+    classic: 'Klasszikus',
+    gentle: 'Engedékeny',
+    always: 'Az ütések mindig számítanak',
+  },
+  scoringDescriptions: {
+    classic: 'Bemondás teljesítve: 10 + 2 ütésenként. Elhibázva: −2 minden ütésnyi eltérésért.',
+    gentle: 'Bemondás teljesítve: 10 + 1 ütésenként. Elhibázva: 0, nincs büntetés.',
+    always: 'Az ütéseid mindig pontot érnek, +10 ha a bemondás sikerül.',
+  },
+  scoringLocked: 'A pontozást a házigazda választja',
+
   // Asztal
   round: 'Kör',
   cards: (n: number) => `${n} lap`,
@@ -248,6 +263,7 @@ export const hu: Messages = {
   rulesScoreKoExample: 'Bemondás 3, ütés 1 → −4 pont',
   rulesScoreZero:
     'A 0 bemondása és egyetlen ütés nélküli kör 10 pontot ér: nagyon kifizetődő bemondás.',
+  rulesScoreVariants: 'A házigazda a váróban más pontozást is választhat:',
   rulesEndTitle: 'A parti vége',
   rulesEndText:
     'Ha minden kört lejátszottatok, a legtöbb pontot gyűjtő játékos nyer. A pontozótáblát a parti alatt bármikor megnézheted.',

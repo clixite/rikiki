@@ -4,8 +4,10 @@ import {
   GAME_FORMATS,
   MAX_PLAYERS,
   MIN_PLAYERS,
+  SCORING_VARIANTS,
   formatSummary,
   isGameFormat,
+  isScoringVariant,
   legalBids,
   legalCards,
   maxCards,
@@ -191,5 +193,40 @@ describe('scoreRound', () => {
   it('contrat raté', () => {
     expect(scoreRound(2, 0)).toBe(-4);
     expect(scoreRound(0, 3)).toBe(-6);
+  });
+
+  it('barème classique : identique au comportement par défaut', () => {
+    expect(scoreRound(3, 3, 'classic')).toBe(scoreRound(3, 3));
+    expect(scoreRound(2, 0, 'classic')).toBe(scoreRound(2, 0));
+  });
+
+  it('barème bienveillant : jamais de score négatif', () => {
+    expect(scoreRound(0, 0, 'gentle')).toBe(10);
+    expect(scoreRound(3, 3, 'gentle')).toBe(13);
+    expect(scoreRound(2, 0, 'gentle')).toBe(0);
+    expect(scoreRound(0, 5, 'gentle')).toBe(0);
+  });
+
+  it('barème « plis toujours comptés » : rater reste rentable', () => {
+    expect(scoreRound(0, 0, 'always')).toBe(10);
+    expect(scoreRound(3, 3, 'always')).toBe(13);
+    expect(scoreRound(2, 0, 'always')).toBe(0);
+    // Trois plis pris sans les avoir annoncés valent mieux que zéro pli.
+    expect(scoreRound(0, 3, 'always')).toBe(3);
+  });
+
+  it('aucun barème ne pénalise un contrat tenu', () => {
+    for (const variant of SCORING_VARIANTS) {
+      for (let bid = 0; bid <= 10; bid++) {
+        expect(scoreRound(bid, bid, variant)).toBeGreaterThanOrEqual(10);
+      }
+    }
+  });
+
+  it('isScoringVariant filtre les valeurs venues du réseau', () => {
+    for (const variant of SCORING_VARIANTS) expect(isScoringVariant(variant)).toBe(true);
+    expect(isScoringVariant('classique')).toBe(false);
+    expect(isScoringVariant(null)).toBe(false);
+    expect(isScoringVariant(0)).toBe(false);
   });
 });

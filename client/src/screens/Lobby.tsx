@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { useNav } from '../nav';
-import type { GameFormat, GameView } from '@rikiki/shared';
-import { GAME_FORMATS, MIN_PLAYERS, formatSummary, isBotId } from '@rikiki/shared';
+import type { GameFormat, GameView, ScoringVariant } from '@rikiki/shared';
+import { DEFAULT_SCORING, GAME_FORMATS, MIN_PLAYERS, SCORING_VARIANTS, formatSummary, isBotId } from '@rikiki/shared';
 import InviteButtons from '../components/InviteButtons';
 import SoundToggle from '../components/SoundToggle';
 import { useT } from '../i18n';
 
-import { addBot, kickPlayer, leaveRoom, removeBot, setFormat, startGame } from '../socket';
+import { addBot, kickPlayer, leaveRoom, removeBot, setFormat, setScoring, startGame } from '../socket';
 import { useGame } from '../store/game';
 import PlayerAvatar from '../components/PlayerAvatar';
 
@@ -21,8 +21,11 @@ export default function Lobby({ view }: Props) {
   const [busy, setBusy] = useState(false);
   // Format affiché en attendant l'aller-retour serveur (retour tactile immédiat).
   const [pendingFormat, setPendingFormat] = useState<GameFormat | null>(null);
+  const [pendingScoring, setPendingScoring] = useState<ScoringVariant | null>(null);
   const isHost = view.hostId === view.you;
   const selectedFormat = pendingFormat ?? view.format;
+  // Les parties créées avant l'arrivée des barèmes n'en portent aucun.
+  const selectedScoring = pendingScoring ?? view.scoring ?? DEFAULT_SCORING;
   const missing = Math.max(0, MIN_PLAYERS - view.players.length);
   const canStart = missing === 0;
   const isFull = view.players.length >= view.maxPlayers;
@@ -37,6 +40,14 @@ export default function Lobby({ view }: Props) {
     setPendingFormat(format);
     const res = await setFormat(format);
     setPendingFormat(null);
+    if (!res.ok) useGame.getState().showToast(res.error.message);
+  };
+
+  const onPickScoring = async (scoring: ScoringVariant) => {
+    if (scoring === selectedScoring) return;
+    setPendingScoring(scoring);
+    const res = await setScoring(scoring);
+    setPendingScoring(null);
     if (!res.ok) useGame.getState().showToast(res.error.message);
   };
 
@@ -208,6 +219,56 @@ export default function Lobby({ view }: Props) {
             </span>
           </div>
         )}
+      </div>
+
+      {/* Barème de score : chaque famille compte à sa façon, il faut pouvoir
+          retrouver la sienne — sinon le jeu paraît « faux ». */}
+      <div className="pt-3" data-testid="scoring-picker" data-scoring={selectedScoring}>
+        <div className="mb-2 flex items-baseline justify-between gap-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-paper-50/50">{t.scoringVariant}</p>
+          <p className="text-[11px] text-paper-50/40">{isHost ? t.scoringHint : t.scoringLocked}</p>
+        </div>
+
+        {isHost ? (
+          <div className="grid grid-cols-3 gap-1.5">
+            {SCORING_VARIANTS.map((s) => {
+              const selected = s === selectedScoring;
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  data-testid={`scoring-${s}`}
+                  aria-pressed={selected}
+                  title={t.scoringDescriptions[s]}
+                  onClick={() => onPickScoring(s)}
+                  className={`relative flex min-h-[44px] items-center justify-center rounded-xl px-1.5 py-2 text-center transition active:scale-95 ${
+                    selected ? 'text-felt-950' : 'bg-felt-900/45 text-paper-50 ring-1 ring-white/6'
+                  }`}
+                >
+                  {selected && (
+                    <motion.span
+                      layoutId="scoring-active"
+                      aria-hidden="true"
+                      transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                      className="absolute inset-0 rounded-xl bg-linear-to-b from-brass-300 to-brass-500 ring-1 ring-brass-200/50"
+                      style={{ boxShadow: '0 2px 8px -2px rgb(0 0 0 / 0.5)' }}
+                    />
+                  )}
+                  <span className="relative text-[13px] font-bold leading-tight">{t.scoringNames[s]}</span>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="rounded-xl bg-felt-900/45 px-3 py-2.5 text-[15px] font-medium text-paper-50 ring-1 ring-white/6">
+            {t.scoringNames[selectedScoring]}
+          </p>
+        )}
+
+        {/* La règle en toutes lettres : c'est elle qu'on vient vérifier */}
+        <p className="mt-1.5 text-[11px] leading-snug text-paper-50/50" data-testid="scoring-description">
+          {t.scoringDescriptions[selectedScoring]}
+        </p>
       </div>
 
       {/* Actions */}

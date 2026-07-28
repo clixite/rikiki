@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { cardId } from '../src/cards';
 import { applyAction, createGame, lowestLegalBid, lowestLegalCard } from '../src/engine';
-import { roundsSequence, type GameFormat } from '../src/rules';
+import { SCORING_VARIANTS, roundsSequence, scoreRound, type GameFormat, type ScoringVariant } from '../src/rules';
 import type { GameState } from '../src/types';
 
 function newLobby(nbPlayers: number): GameState {
@@ -87,10 +87,16 @@ describe('démarrage et enchères', () => {
  * Joue une partie complète en choisissant toujours la plus petite option légale.
  * Renvoie l'état final et le nombre d'actions jouées (mesure de la longueur réelle).
  */
-function runGame(nbPlayers: number, seed = 'seed-42', format?: GameFormat): { state: GameState; actions: number } {
+function runGame(
+  nbPlayers: number,
+  seed = 'seed-42',
+  format?: GameFormat,
+  scoring?: ScoringVariant,
+): { state: GameState; actions: number } {
   let state = newLobby(nbPlayers);
   state = { ...state, seed };
   if (format) state = mustApply(state, { type: 'SET_FORMAT', playerId: 'p0', format });
+  if (scoring) state = mustApply(state, { type: 'SET_SCORING', playerId: 'p0', scoring });
   state = mustApply(state, { type: 'START_GAME', playerId: 'p0' });
   let actions = 0;
   let guard = 10000;
@@ -192,6 +198,65 @@ describe('format de partie', () => {
     // Dernière manche jouée = le sommet de la montée
     expect(climb.state.round!.cardsCount).toBe(8);
     expect(climb.actions).toBeLessThan(runGame(6, 'seed-format').actions);
+  });
+});
+
+describe('barème de score', () => {
+  it('démarre en barème classique par défaut', () => {
+    expect(newLobby(3).scoring).toBe('classic');
+  });
+
+  it('refuse un barème venu d’un non-hôte, d’une valeur inconnue ou hors lobby', () => {
+    const lobby = newLobby(3);
+    expect(applyAction(lobby, { type: 'SET_SCORING', playerId: 'p1', scoring: 'gentle' })).toEqual({
+      ok: false,
+      error: 'NOT_HOST',
+    });
+    expect(
+      applyAction(lobby, { type: 'SET_SCORING', playerId: 'p0', scoring: 'doux' as ScoringVariant }),
+    ).toEqual({ ok: false, error: 'ILLEGAL_FORMAT' });
+
+    const started = mustApply(lobby, { type: 'START_GAME', playerId: 'p0' });
+    expect(applyAction(started, { type: 'SET_SCORING', playerId: 'p0', scoring: 'always' })).toEqual({
+      ok: false,
+      error: 'BAD_PHASE',
+    });
+  });
+
+  it('applique le barème choisi aux scores de manche', () => {
+    for (const scoring of SCORING_VARIANTS) {
+      const state = runGame(4, 'seed-bareme', 'blitz', scoring).state;
+      const round = state.round!;
+      for (const p of state.players) {
+        expect(round.roundScores![p.id]).toBe(scoreRound(round.bids[p.id]!, round.tricksWon[p.id], scoring));
+      }
+    }
+  });
+
+  it('les barèmes sans pénalité ne produisent jamais de total négatif', () => {
+    for (const scoring of ['gentle', 'always'] as const) {
+      const state = runGame(4, 'seed-bareme', 'blitz', scoring).state;
+      for (const p of state.players) expect(p.totalScore).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('une partie déjà en cours conserve son barème absent (parties d’avant la v1.3)', () => {
+    // Les états persistés avant l'arrivée des barèmes n'ont pas le champ :
+    // la lecture doit retomber sur le classique plutôt que de planter.
+    let state = newLobby(3);
+    state = { ...state, scoring: undefined };
+    state = mustApply(state, { type: 'START_GAME', playerId: 'p0' });
+    while (state.phase !== 'round-scoring') {
+      const current = state.players.find((p) => p.seat === state.round!.currentSeat)!;
+      state =
+        state.phase === 'bidding'
+          ? mustApply(state, { type: 'BID', playerId: current.id, bid: lowestLegalBid(state, current.id) })
+          : mustApply(state, { type: 'PLAY_CARD', playerId: current.id, cardId: lowestLegalCard(state, current.id) });
+    }
+    const round = state.round!;
+    for (const p of state.players) {
+      expect(round.roundScores![p.id]).toBe(scoreRound(round.bids[p.id]!, round.tricksWon[p.id], 'classic'));
+    }
   });
 });
 

@@ -58,6 +58,21 @@ export const nl: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Formaat gekozen door de host',
 
+  // Barème de score
+  scoringVariant: 'Puntentelling',
+  scoringHint: 'Hoe de punten geteld worden',
+  scoringNames: {
+    classic: 'Klassiek',
+    gentle: 'Mild',
+    always: 'Slagen tellen altijd',
+  },
+  scoringDescriptions: {
+    classic: 'Bod gehaald: 10 + 2 per slag. Gemist: −2 per slag verschil.',
+    gentle: 'Bod gehaald: 10 + 1 per slag. Gemist: 0, geen straf.',
+    always: 'Je slagen tellen altijd, +10 als het bod klopt.',
+  },
+  scoringLocked: 'Telling gekozen door de host',
+
   // Speeltafel
   round: 'Ronde',
   cards: (n: number) => (n === 1 ? '1 kaart' : `${n} kaarten`),
@@ -244,6 +259,7 @@ export const nl: Messages = {
   rulesScoreKo: 'Contract gemist',
   rulesScoreKoExample: 'Geboden 3, gehaald 1 → −4 punten',
   rulesScoreZero: '0 bieden en er geen halen levert 10 punten op: een heel lucratief contract.',
+  rulesScoreVariants: 'De host kan in de lobby een andere telling kiezen:',
   rulesEndTitle: 'Einde van het spel',
   rulesEndText:
     'Als alle rondes gespeeld zijn, wint wie de meeste punten heeft. Het scorebord kun je tijdens het spel altijd bekijken.',

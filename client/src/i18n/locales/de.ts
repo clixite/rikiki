@@ -58,6 +58,21 @@ export const de: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} Min.`,
   formatLocked: 'Format vom Host gewählt',
 
+  // Barème de score
+  scoringVariant: 'Wertung',
+  scoringHint: 'Wie die Punkte gezählt werden',
+  scoringNames: {
+    classic: 'Klassisch',
+    gentle: 'Mild',
+    always: 'Stiche zählen',
+  },
+  scoringDescriptions: {
+    classic: 'Ansage erfüllt: 10 + 2 pro Stich. Verfehlt: −2 je Stich Abweichung.',
+    gentle: 'Ansage erfüllt: 10 + 1 pro Stich. Verfehlt: 0, keine Strafe.',
+    always: 'Deine Stiche zählen immer, +10 bei erfüllter Ansage.',
+  },
+  scoringLocked: 'Wertung vom Gastgeber gewählt',
+
   // Spieltisch
   round: 'Runde',
   cards: (n: number) => (n === 1 ? '1 Karte' : `${n} Karten`),
@@ -244,6 +259,7 @@ export const de: Messages = {
   rulesScoreKo: 'Kontrakt verfehlt',
   rulesScoreKoExample: 'Angesagt 3, gemacht 1 → −4 Punkte',
   rulesScoreZero: '0 ansagen und keinen Stich machen bringt 10 Punkte: ein sehr lohnender Kontrakt.',
+  rulesScoreVariants: 'Der Gastgeber kann im Raum eine andere Wertung wählen:',
   rulesEndTitle: 'Spielende',
   rulesEndText:
     'Sind alle Runden gespielt, gewinnt, wer die meisten Punkte hat. Den Punktestand kannst du während des Spiels jederzeit ansehen.',

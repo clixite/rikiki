@@ -58,6 +58,21 @@ export const es: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Formato elegido por el anfitrión',
 
+  // Barème de score
+  scoringVariant: 'Puntuación',
+  scoringHint: 'Cómo se cuentan los puntos',
+  scoringNames: {
+    classic: 'Clásica',
+    gentle: 'Indulgente',
+    always: 'Las bazas cuentan',
+  },
+  scoringDescriptions: {
+    classic: 'Contrato cumplido: 10 + 2 por baza. Fallado: −2 por baza de diferencia.',
+    gentle: 'Contrato cumplido: 10 + 1 por baza. Fallado: 0, sin penalización.',
+    always: 'Tus bazas puntúan siempre, +10 si cumples el contrato.',
+  },
+  scoringLocked: 'Puntuación elegida por el anfitrión',
+
   // Mesa de juego
   round: 'Ronda',
   cards: (n: number) => (n === 1 ? '1 carta' : `${n} cartas`),
@@ -244,6 +259,7 @@ export const es: Messages = {
   rulesScoreKo: 'Contrato fallado',
   rulesScoreKoExample: 'Apostadas 3, hechas 1 → −4 puntos',
   rulesScoreZero: 'Apostar 0 y no hacer ninguna da 10 puntos: un contrato muy rentable.',
+  rulesScoreVariants: 'El anfitrión puede elegir otra puntuación en la sala:',
   rulesEndTitle: 'Fin de la partida',
   rulesEndText:
     'Cuando se han jugado todas las rondas, gana quien suma más puntos. Puedes consultar la tabla de puntuación en cualquier momento de la partida.',

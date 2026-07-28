@@ -133,7 +133,40 @@ export function trickWinner(trick: Trick, trump: Suit | null): TrickPlay {
   return best;
 }
 
-/** Score de manche : contrat exact → 10 + 2×plis ; raté → −2 par pli d'écart. */
-export function scoreRound(bid: number, tricks: number): number {
-  return bid === tricks ? 10 + 2 * tricks : -2 * Math.abs(tricks - bid);
+/**
+ * Barèmes de score.
+ *
+ * Chaque famille a le sien, et c'est une vraie source d'abandon : quelqu'un
+ * qui compte autrement chez lui trouve le jeu « faux ». Trois barèmes couvrent
+ * l'essentiel de ce qui se joue réellement.
+ */
+export const SCORING_VARIANTS = ['classic', 'gentle', 'always'] as const;
+export type ScoringVariant = (typeof SCORING_VARIANTS)[number];
+export const DEFAULT_SCORING: ScoringVariant = 'classic';
+
+export function isScoringVariant(value: unknown): value is ScoringVariant {
+  return typeof value === 'string' && (SCORING_VARIANTS as readonly string[]).includes(value);
+}
+
+/**
+ * Score d'une manche.
+ *
+ * - `classic` : contrat exact → 10 + 2×plis ; raté → −2 par pli d'écart.
+ *   Le barème d'origine : il récompense les gros contrats tenus et punit
+ *   sèchement, donc les scores s'écartent vite.
+ * - `gentle` : contrat exact → 10 + plis ; raté → 0. Aucune pénalité, personne
+ *   ne décroche — la version qu'on sort en famille avec des débutants.
+ * - `always` : on marque toujours ses plis, plus 10 si le contrat est exact.
+ *   Rater reste rentable, ce qui pousse à jouer les plis plutôt qu'à les fuir.
+ */
+export function scoreRound(bid: number, tricks: number, variant: ScoringVariant = DEFAULT_SCORING): number {
+  const exact = bid === tricks;
+  switch (variant) {
+    case 'gentle':
+      return exact ? 10 + tricks : 0;
+    case 'always':
+      return tricks + (exact ? 10 : 0);
+    default:
+      return exact ? 10 + 2 * tricks : -2 * Math.abs(tricks - bid);
+  }
 }

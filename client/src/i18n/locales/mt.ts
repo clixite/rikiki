@@ -92,6 +92,21 @@ export const mt: Messages = {
   formatDuration: (minutes: number) => `≈ ${minutes} min`,
   formatLocked: 'Format magħżul mill-ospitu',
 
+  // Barème de score
+  scoringVariant: 'Punteġġ',
+  scoringHint: 'Kif jingħaddu l-punti',
+  scoringNames: {
+    classic: 'Klassiku',
+    gentle: 'Ħanin',
+    always: 'Id-daqqiet dejjem jgħoddu',
+  },
+  scoringDescriptions: {
+    classic: 'Kuntratt milħuq: 10 + 2 għal kull daqqa. Falluta: −2 għal kull daqqa ta’ differenza.',
+    gentle: 'Kuntratt milħuq: 10 + 1 għal kull daqqa. Falluta: 0, bla penali.',
+    always: 'Id-daqqiet tiegħek dejjem jagħtu punti, +10 jekk il-kuntratt jintlaħaq.',
+  },
+  scoringLocked: 'Il-punteġġ jagħżlu l-ospitu',
+
   // Il-mejda
   round: 'Rawnd',
   cards: (n: number) => karti(n),
@@ -281,6 +296,7 @@ export const mt: Messages = {
   rulesScoreKoExample: 'Ħabbart 3, għamilt 1 → −4 punti',
   rulesScoreZero:
     'Tħabbar 0 u ma tagħmel l-ebda daqqa jġib 10 punti: kuntratt profittabbli ħafna.',
+  rulesScoreVariants: 'L-ospitu jista’ jagħżel punteġġ ieħor fil-lobby:',
   rulesEndTitle: 'Tmiem il-logħba',
   rulesEndText:
     'Meta jintlagħbu r-rawnds kollha, jirbaħ il-plejer bl-aktar punti. It-tabella tal-punteġġi tista’ tarraha meta trid matul il-logħba.',
