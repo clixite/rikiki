@@ -119,7 +119,7 @@ export default function PlayerSeats({ view }: Props) {
                 isCurrent ? 'rk-turn bg-brass-400/20' : 'bg-felt-900/50 ring-1 ring-white/8'
               } ${p.connected ? '' : 'opacity-45'}`}
             >
-              <PlayerAvatar avatar={p.avatar} size={44} className="rounded-full" />
+              <PlayerAvatar playerId={p.id} avatar={p.avatar} photo={p.photo} size={44} className="rounded-full" />
               {isDealer && (
                 <span
                   className="absolute -right-1 -top-1 rounded-full bg-brass-400 px-1.5 text-[10px] font-bold leading-tight text-felt-950"

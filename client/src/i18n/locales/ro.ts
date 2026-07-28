@@ -180,6 +180,15 @@ export const ro: Messages = {
   botTag: 'robot',
   emotes: 'Reacții',
   close: 'Închide',
+  leaveGame: 'Părăsește partida',
+  leaveGameWarning:
+    'Partida continuă fără tine, iar punctele tale din această partidă se pierd.',
+  leaveGameAction: 'Da, părăsesc',
+  takePhoto: 'Fă o poză',
+  removePhoto: 'Elimină poza',
+  photoError: 'Poza este prea mare sau ilizibilă.',
+  reportPlayer: 'Raportează',
+  reportDone: 'Poza a fost ascunsă și raportată.',
 
   // Statistici și istoric
   stats: 'Statistici',

@@ -98,9 +98,40 @@ CREATE TABLE IF NOT EXISTS group_results (
   won INTEGER NOT NULL
 );
 
+/*
+ * Signalements de contenu.
+ *
+ * L'App Store impose un moyen de signaler un contenu choquant dès lors que des
+ * joueurs peuvent en publier — ici, une photo de profil. Les signalements sont
+ * conservés pour être relus, et le joueur qui signale masque immédiatement le
+ * contenu sur son appareil sans attendre de modération.
+ */
+CREATE TABLE IF NOT EXISTS content_reports (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  reporter_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  reported_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  reason TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_content_reports_target
+  ON content_reports(reported_id, created_at DESC);
+
 CREATE INDEX IF NOT EXISTS idx_group_results_group
   ON group_results(group_id, played_at DESC);
 `;
+
+/**
+ * Ajoute une colonne à une table existante, sans échouer si elle est déjà là.
+ *
+ * `CREATE TABLE IF NOT EXISTS` ne modifie pas une table déjà créée : les bases
+ * en production ne verraient jamais les colonnes ajoutées après coup.
+ */
+function addColumnIfMissing(db: Database.Database, table: string, column: string, type: string): void {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
+  if (columns.some((c) => c.name === column)) return;
+  db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
+}
 
 export function openDb(dbPath: string): Database.Database {
   if (dbPath !== ':memory:') {
@@ -110,5 +141,6 @@ export function openDb(dbPath: string): Database.Database {
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   db.exec(MIGRATIONS);
+  addColumnIfMissing(db, 'users', 'photo', 'TEXT');
   return db;
 }

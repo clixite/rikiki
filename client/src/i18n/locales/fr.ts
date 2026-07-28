@@ -151,6 +151,15 @@ export const fr = {
   botTag: 'robot',
   emotes: 'Réactions',
   close: 'Fermer',
+  leaveGame: 'Quitter la partie',
+  leaveGameWarning:
+    'La partie continue sans toi et tes points de cette partie sont perdus.',
+  leaveGameAction: 'Oui, quitter',
+  takePhoto: 'Prendre une photo',
+  removePhoto: 'Retirer la photo',
+  photoError: 'Photo trop lourde ou illisible.',
+  reportPlayer: 'Signaler',
+  reportDone: 'Photo masquée et signalée.',
 
   // Statistiques et historique
   stats: 'Statistiques',

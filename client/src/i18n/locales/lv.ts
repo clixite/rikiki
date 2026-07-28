@@ -170,6 +170,15 @@ export const lv: Messages = {
   botTag: 'bots',
   emotes: 'Reakcijas',
   close: 'Aizvērt',
+  leaveGame: 'Pamest spēli',
+  leaveGameWarning:
+    'Spēle turpinās bez tevis, un tavi šīs spēles punkti tiek zaudēti.',
+  leaveGameAction: 'Jā, pamest',
+  takePhoto: 'Uzņemt fotoattēlu',
+  removePhoto: 'Noņemt fotoattēlu',
+  photoError: 'Fotoattēls ir pārāk liels vai nesalasāms.',
+  reportPlayer: 'Ziņot',
+  reportDone: 'Fotoattēls paslēpts un ziņots.',
 
   // Statistika un vēsture
   stats: 'Statistika',

@@ -151,6 +151,15 @@ export const nl: Messages = {
   botTag: 'bot',
   emotes: 'Reacties',
   close: 'Sluiten',
+  leaveGame: 'Partij verlaten',
+  leaveGameWarning:
+    'De partij gaat door zonder jou en je punten van deze partij gaan verloren.',
+  leaveGameAction: 'Ja, verlaten',
+  takePhoto: 'Foto maken',
+  removePhoto: 'Foto verwijderen',
+  photoError: 'Foto te groot of onleesbaar.',
+  reportPlayer: 'Melden',
+  reportDone: 'Foto verborgen en gemeld.',
 
   // Statistieken en geschiedenis
   stats: 'Statistieken',

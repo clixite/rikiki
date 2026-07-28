@@ -183,6 +183,15 @@ export const hr: Messages = {
   botTag: 'bot',
   emotes: 'Reakcije',
   close: 'Zatvori',
+  leaveGame: 'Napusti partiju',
+  leaveGameWarning:
+    'Partija se nastavlja bez tebe, a tvoji bodovi iz ove partije su izgubljeni.',
+  leaveGameAction: 'Da, napusti',
+  takePhoto: 'Snimi fotografiju',
+  removePhoto: 'Ukloni fotografiju',
+  photoError: 'Fotografija je prevelika ili nečitljiva.',
+  reportPlayer: 'Prijavi',
+  reportDone: 'Fotografija skrivena i prijavljena.',
 
   // Statistika i povijest
   stats: 'Statistika',

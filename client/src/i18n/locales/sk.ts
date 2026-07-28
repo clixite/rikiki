@@ -180,6 +180,15 @@ export const sk: Messages = {
   botTag: 'robot',
   emotes: 'Reakcie',
   close: 'Zavrieť',
+  leaveGame: 'Opustiť hru',
+  leaveGameWarning:
+    'Hra pokračuje bez teba a tvoje body z tejto hry prepadnú.',
+  leaveGameAction: 'Áno, opustiť',
+  takePhoto: 'Odfotiť sa',
+  removePhoto: 'Odstrániť fotku',
+  photoError: 'Fotka je príliš veľká alebo nečitateľná.',
+  reportPlayer: 'Nahlásiť',
+  reportDone: 'Fotka skrytá a nahlásená.',
 
   // Štatistiky a história
   stats: 'Štatistiky',

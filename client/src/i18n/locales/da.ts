@@ -150,6 +150,15 @@ export const da: Messages = {
   botTag: 'bot',
   emotes: 'Reaktioner',
   close: 'Luk',
+  leaveGame: 'Forlad spillet',
+  leaveGameWarning:
+    'Spillet fortsætter uden dig, og dine point i dette spil går tabt.',
+  leaveGameAction: 'Ja, forlad',
+  takePhoto: 'Tag et billede',
+  removePhoto: 'Fjern billede',
+  photoError: 'Billedet er for stort eller ulæseligt.',
+  reportPlayer: 'Anmeld',
+  reportDone: 'Billedet er skjult og anmeldt.',
 
   // Statistik og historik
   stats: 'Statistik',

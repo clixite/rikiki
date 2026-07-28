@@ -1,1 +1,8 @@
-Prima versione.
+Tavolo ridisegnato: i giocatori sono disposti attorno al panno, la briscola è grande di lato e una fascia indica chiaramente quando tocca a te.
+
+• Abbandonare una partita in corso senza bloccare il tavolo
+• Foto profilo: scattati un selfie
+• Reazioni da inviare al tavolo
+• Cronologia consultabile durante la partita
+• La mano si riordina quando un seme finisce
+• Corretto l'audio dopo il passaggio in background

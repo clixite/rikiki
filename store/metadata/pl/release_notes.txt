@@ -1,1 +1,8 @@
-Pierwsza wersja.
+Przeprojektowany stół: gracze siedzą wokół sukna, atut jest duży z boku, a pasek wyraźnie pokazuje, kiedy jest twoja kolej.
+
+• Opuszczenie trwającej rozgrywki bez blokowania stołu
+• Zdjęcie profilowe: zrób sobie selfie
+• Reakcje wysyłane do stołu
+• Historia dostępna w trakcie rozgrywki
+• Ręka porządkuje się, gdy kończy się kolor
+• Poprawiony dźwięk po powrocie z tła

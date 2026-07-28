@@ -191,7 +191,7 @@ Répondre **Aucun / Non** à toutes les questions. Points d'attention :
 |---|---|---|
 | Jeux d'argent et de hasard simulés | **Non** | Aucune mise, aucune monnaie virtuelle, aucun gain — un jeu de plis n'est pas un jeu de casino |
 | Concours | Non | |
-| Contenu généré par les utilisateurs | **Non** | Seul le pseudo est saisi, visible uniquement des joueurs de la partie ou du groupe ; il n'existe ni chat ni publication. La règle 1.2 (contenu généré) ne s'applique pas, et l'hôte peut de toute façon retirer un joueur |
+| Contenu généré par les utilisateurs | **Oui — rare/léger** | Depuis la version 1.1, un joueur peut mettre une photo de profil, visible des seuls joueurs de sa partie ou de ses groupes. Ni chat, ni fil public, ni texte libre au-delà du pseudo. Les contrôles exigés par la règle 1.2 sont en place : signalement (drapeau dans le tableau des scores), masquage immédiat sur l'appareil, retrait du joueur par l'hôte, et contact publié sur la page d'assistance |
 | Accès web illimité | Non | |
 | Violence, contenu sexuel, langage grossier | Non | |
 
@@ -212,6 +212,7 @@ raison — c'est l'erreur classique sur un jeu de cartes.
 | Identifiant utilisateur (compte) | Oui | Oui | **Non** | Fonctionnalité de l'app |
 | Contenu de jeu (historique, scores) | Oui | Oui | **Non** | Fonctionnalité de l'app |
 | Nom d'utilisateur (pseudo) | Oui | Oui | **Non** | Fonctionnalité de l'app |
+| Photos (photo de profil, facultative) | Oui | Oui | **Non** | Fonctionnalité de l'app |
 | Diagnostics, publicité, localisation, contacts, achats | **Non** | — | — | — |
 
 Répondre **Non** à « Utilisez-vous les données pour le suivi ? ». Aucun SDK
@@ -254,10 +255,14 @@ Ajouter dans `Info.plist` (déjà prévu dans la configuration Capacitor) :
 > mon compte ». La suppression est immédiate et efface toutes les données
 > associées.
 >
-> Il n'y a ni messagerie, ni fil public, ni contenu publié : la seule saisie
-> libre est le pseudo, visible uniquement des joueurs invités dans la partie ou
-> d'un groupe d'amis. L'hôte peut retirer n'importe quel joueur de la table à
-> tout moment.
+> Contenu généré : un joueur peut choisir une photo de profil, visible
+> uniquement des joueurs invités dans sa partie ou de ses groupes d'amis. Il
+> n'existe ni messagerie, ni fil public, ni texte libre en dehors du pseudo.
+> Les contrôles prévus par la règle 1.2 sont accessibles en jeu : le tableau
+> des scores (icône coupe) propose un drapeau de signalement sur tout joueur
+> ayant une photo — le contenu est masqué immédiatement sur l'appareil et le
+> signalement est enregistré. L'hôte peut par ailleurs retirer n'importe quel
+> joueur de la table.
 >
 > L'application est vendue à l'unité : elle ne contient ni publicité, ni achat
 > intégré, ni abonnement, ni monnaie virtuelle, ni mise d'argent. Les données
@@ -289,6 +294,7 @@ d'un canal alpha. À relancer après chaque retouche.
 - [ ] La page d'assistance est en ligne : `/support.html` → 200
 - [ ] La politique de confidentialité est en ligne : `/privacy.html` → 200
 - [ ] La suppression de compte fonctionne sur la production, pas seulement en local
+- [ ] Le signalement d'un joueur masque bien sa photo et répond 200 (`POST /api/report`)
 - [ ] La version déployée correspond au binaire soumis (la date de build est affichée en bas de l'accueil)
 - [ ] L'icône ne comporte ni coins arrondis, ni transparence, ni texte illisible en petit
 - [ ] Les captures correspondent bien à la version soumise

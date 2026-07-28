@@ -64,7 +64,7 @@ export default function Home() {
           onClick={() => navigate('/profile')}
           className="flex h-11 min-w-0 items-center gap-2 rounded-full bg-felt-900/45 pl-2.5 pr-3.5 ring-1 ring-white/8 transition active:scale-95"
         >
-          <PlayerAvatar avatar={user.avatar} size={26} />
+          <PlayerAvatar avatar={user.avatar} photo={user.photo} size={26} />
           <span className="max-w-32 truncate text-sm font-medium">{user.pseudo}</span>
           {!user.isGuest && (
             <span className="text-xs text-success" title={t.accountSaved} aria-label={t.accountSaved}>

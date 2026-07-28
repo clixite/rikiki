@@ -187,6 +187,15 @@ export const mt: Messages = {
   botTag: 'bot',
   emotes: 'Reazzjonijiet',
   close: 'Agħlaq',
+  leaveGame: 'Oħroġ mil-logħba',
+  leaveGameWarning:
+    'Il-logħba tkompli mingħajrek u l-punti tiegħek ta\' din il-logħba jintilfu.',
+  leaveGameAction: 'Iva, oħroġ',
+  takePhoto: 'Ħu ritratt',
+  removePhoto: 'Neħħi r-ritratt',
+  photoError: 'Ir-ritratt huwa kbir wisq jew ma jinqarax.',
+  reportPlayer: 'Irrapporta',
+  reportDone: 'Ir-ritratt inħeba u ġie rrappurtat.',
 
   // Statistika u storja
   stats: 'Statistika',

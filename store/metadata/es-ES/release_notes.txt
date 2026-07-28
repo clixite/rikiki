@@ -1,1 +1,8 @@
-Primera versión.
+Mesa rediseñada: los jugadores se sitúan alrededor del tapete, el triunfo aparece en grande a un lado y una banda indica claramente cuándo te toca.
+
+• Salir de una partida en curso sin bloquear la mesa
+• Foto de perfil: hazte un selfie
+• Reacciones para enviar a la mesa
+• Historial consultable durante la partida
+• La mano se reordena cuando desaparece un palo
+• Corregido el sonido tras pasar a segundo plano

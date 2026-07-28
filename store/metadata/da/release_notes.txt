@@ -1,1 +1,8 @@
-Første version.
+Bordet er redesignet: spillerne sidder nu rundt om filten, trumfen vises stort i siden, og et banner viser tydeligt, hvornår det er din tur.
+
+• Forlad et igangværende spil uden at blokere bordet
+• Profilbillede: tag en selfie
+• Reaktioner, du kan sende til bordet
+• Historik tilgængelig under spillet
+• Hånden sorteres igen, når en farve slipper op
+• Lyden rettet efter appen har været i baggrunden

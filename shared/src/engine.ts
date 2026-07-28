@@ -27,9 +27,9 @@ export type EngineErrorCode =
   | 'ILLEGAL_FORMAT';
 
 export type GameAction =
-  | { type: 'ADD_PLAYER'; player: Pick<Player, 'id' | 'pseudo' | 'avatar'> }
+  | { type: 'ADD_PLAYER'; player: Pick<Player, 'id' | 'pseudo' | 'avatar'> & { photo?: string | null } }
   | { type: 'REMOVE_PLAYER'; playerId: string }
-  | { type: 'UPDATE_PROFILE'; playerId: string; pseudo: string; avatar: string }
+  | { type: 'UPDATE_PROFILE'; playerId: string; pseudo: string; avatar: string; photo?: string | null }
   | { type: 'SET_CONNECTED'; playerId: string; connected: boolean }
   | { type: 'SET_FORMAT'; playerId: string; format: GameFormat }
   | { type: 'START_GAME'; playerId: string }
@@ -45,7 +45,12 @@ function err(error: EngineErrorCode): EngineResult {
   return { ok: false, error };
 }
 
-export function createGame(code: string, seed: string, createdAt: number, host: Pick<Player, 'id' | 'pseudo' | 'avatar'>): GameState {
+export function createGame(
+  code: string,
+  seed: string,
+  createdAt: number,
+  host: Pick<Player, 'id' | 'pseudo' | 'avatar'> & { photo?: string | null },
+): GameState {
   return {
     code,
     hostId: host.id,
@@ -137,6 +142,7 @@ export function applyAction(prev: GameState, action: GameAction): EngineResult {
       if (!p) return err('PLAYER_NOT_FOUND');
       p.pseudo = action.pseudo;
       p.avatar = action.avatar;
+      if (action.photo !== undefined) p.photo = action.photo;
       return { ok: true, state };
     }
 

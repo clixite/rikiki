@@ -88,7 +88,7 @@ export function registerSocketHandlers(
       if (typeof ack !== 'function') return;
       leaveCurrent();
       const fresh = users.getById(user.id) ?? user;
-      const room = rooms.create({ id: fresh.id, pseudo: fresh.pseudo, avatar: fresh.avatar });
+      const room = rooms.create({ id: fresh.id, pseudo: fresh.pseudo, avatar: fresh.avatar, photo: fresh.photo });
       room.attach(user.id, socket);
       ack({ ok: true, code: room.code });
     });
@@ -112,7 +112,10 @@ export function registerSocketHandlers(
       if (room.state.phase !== 'lobby') return ack(protoErr('GAME_ALREADY_STARTED'));
       leaveIfOther(code);
       const fresh = users.getById(user.id) ?? user;
-      const res = room.apply({ type: 'ADD_PLAYER', player: { id: fresh.id, pseudo: fresh.pseudo, avatar: fresh.avatar } });
+      const res = room.apply({
+        type: 'ADD_PLAYER',
+        player: { id: fresh.id, pseudo: fresh.pseudo, avatar: fresh.avatar, photo: fresh.photo },
+      });
       if (!res.ok) return ack(protoErr(res.error));
       room.attach(user.id, socket);
       room.emitEvent({ type: 'player-joined', playerId: fresh.id, pseudo: fresh.pseudo });
@@ -121,7 +124,10 @@ export function registerSocketHandlers(
 
     socket.on('room:leave', (ack: Ack) => {
       if (typeof ack !== 'function') return;
-      leaveCurrent();
+      const room = currentRoom();
+      // En partie, un départ volontaire passe la main au jeu automatique tout
+      // de suite : la table ne doit pas attendre la fin du délai de grâce.
+      if (room) room.leave(user.id, socket);
       ack({ ok: true });
     });
 
@@ -197,7 +203,7 @@ export function registerSocketHandlers(
       if (room.state.hostId !== user.id) return ack(protoErr('NOT_HOST'));
       if (room.state.phase !== 'game-over') return ack(protoErr('BAD_PHASE'));
       const fresh = users.getById(user.id) ?? user;
-      const next = rooms.create({ id: fresh.id, pseudo: fresh.pseudo, avatar: fresh.avatar });
+      const next = rooms.create({ id: fresh.id, pseudo: fresh.pseudo, avatar: fresh.avatar, photo: fresh.photo });
       room.emitEvent({ type: 'rematch', code: next.code });
       ack({ ok: true, code: next.code });
     });
@@ -252,7 +258,14 @@ export function registerSocketHandlers(
       users.updateProfile(user.id, parsed.data.pseudo, parsed.data.avatar);
       const room = currentRoom();
       if (room) {
-        room.apply({ type: 'UPDATE_PROFILE', playerId: user.id, pseudo: parsed.data.pseudo, avatar: parsed.data.avatar });
+        const fresh = users.getById(user.id);
+        room.apply({
+          type: 'UPDATE_PROFILE',
+          playerId: user.id,
+          pseudo: parsed.data.pseudo,
+          avatar: parsed.data.avatar,
+          photo: fresh?.photo ?? null,
+        });
       }
       ack({ ok: true });
     });

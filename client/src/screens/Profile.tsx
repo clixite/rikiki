@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { useNav } from '../nav';
-import { createGuestAccount, deleteAccount, requestMagicLink, updateProfile } from '../api';
+import { createGuestAccount, deleteAccount, requestMagicLink, updatePhoto, updateProfile } from '../api';
 import Avatar, { AVATAR_IDS, DEFAULT_AVATAR_ID } from '../components/Avatar';
+import PlayerAvatar from '../components/PlayerAvatar';
+import { toAvatarPhoto } from '../photo';
 import AccessibilitySection from '../components/AccessibilitySection';
 import LocalePicker from '../components/LocalePicker';
 import SoundToggle from '../components/SoundToggle';
@@ -21,6 +23,7 @@ export default function Profile() {
   // Un compte existant peut encore porter un ancien avatar emoji : on le garde
   // tel quel tant que le joueur n'en choisit pas un nouveau (cf. <Avatar />).
   const [avatar, setAvatar] = useState(user?.avatar ?? DEFAULT_AVATAR_ID);
+  const [photo, setPhoto] = useState<string | null>(user?.photo ?? null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -91,8 +94,10 @@ export default function Profile() {
           className="mx-auto my-5 h-20 w-20"
           aria-hidden="true"
         >
-          <Avatar id={avatar} size={80} />
+          <PlayerAvatar avatar={avatar} photo={photo} size={80} />
         </motion.div>
+
+        <PhotoPicker photo={photo} onChange={setPhoto} disabled={!user} />
 
         <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-paper-50/55" htmlFor="pseudo">
           {t.yourPseudo}
@@ -404,6 +409,104 @@ function DangerZone() {
         </div>
       )}
       <p className="mt-1 text-xs leading-snug text-paper-50/35">{t.deleteAccountHint}</p>
+    </div>
+  );
+}
+
+/**
+ * Photo de profil.
+ *
+ * Une photo prise sur le moment rend la table beaucoup plus vivante qu'une
+ * vignette dessinée : on reconnaît ses amis d'un coup d'œil. Elle est réduite
+ * sur l'appareil avant l'envoi (192 px, quelques kilo-octets) — inutile de
+ * faire transiter une image de plusieurs mégaoctets pour un rond de 44 pixels.
+ *
+ * `capture="user"` ouvre directement la caméra frontale sur téléphone, tout en
+ * laissant la galerie accessible sur ordinateur.
+ */
+function PhotoPicker({
+  photo,
+  onChange,
+  disabled,
+}: {
+  photo: string | null;
+  onChange: (photo: string | null) => void;
+  disabled: boolean;
+}) {
+  const t = useT();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const pick = async (file: File | undefined) => {
+    if (!file) return;
+    setBusy(true);
+    setError('');
+    try {
+      const dataUrl = await toAvatarPhoto(file);
+      const { user: updated } = await updatePhoto(dataUrl);
+      useSession.getState().setUser(updated);
+      onChange(dataUrl);
+      await updateProfileOnSocket(updated.pseudo, updated.avatar);
+    } catch {
+      setError(t.photoError);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const remove = async () => {
+    setBusy(true);
+    try {
+      const { user: updated } = await updatePhoto(null);
+      useSession.getState().setUser(updated);
+      onChange(null);
+      await updateProfileOnSocket(updated.pseudo, updated.avatar);
+    } catch {
+      setError(t.photoError);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (disabled) return null;
+
+  return (
+    <div className="mb-4 flex flex-col items-center gap-1">
+      <div className="flex gap-2">
+        <label
+          data-testid="take-photo"
+          className={`flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full bg-white/8 px-4 text-sm font-semibold ring-1 ring-white/10 transition active:scale-95 ${
+            busy ? 'opacity-40' : ''
+          }`}
+        >
+          <span aria-hidden="true">📷</span>
+          {t.takePhoto}
+          <input
+            type="file"
+            accept="image/*"
+            capture="user"
+            className="sr-only"
+            disabled={busy}
+            onChange={(e) => {
+              void pick(e.target.files?.[0]);
+              e.target.value = '';
+            }}
+          />
+        </label>
+
+        {photo && (
+          <button
+            type="button"
+            data-testid="remove-photo"
+            onClick={remove}
+            disabled={busy}
+            className="min-h-11 rounded-full bg-white/8 px-4 text-sm font-semibold text-paper-50/70 ring-1 ring-white/10 transition active:scale-95 disabled:opacity-40"
+          >
+            {t.removePhoto}
+          </button>
+        )}
+      </div>
+      {error && <p className="text-xs text-danger">{error}</p>}
     </div>
   );
 }

@@ -151,6 +151,15 @@ export const it: Messages = {
   botTag: 'bot',
   emotes: 'Reazioni',
   close: 'Chiudi',
+  leaveGame: 'Abbandona la partita',
+  leaveGameWarning:
+    'La partita continua senza di te e i punti di questa partita sono persi.',
+  leaveGameAction: 'Sì, abbandona',
+  takePhoto: 'Scatta una foto',
+  removePhoto: 'Rimuovi la foto',
+  photoError: 'Foto troppo pesante o illeggibile.',
+  reportPlayer: 'Segnala',
+  reportDone: 'Foto nascosta e segnalata.',
 
   // Statistiche e cronologia
   stats: 'Statistiche',

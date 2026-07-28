@@ -69,7 +69,7 @@ export class Room {
   constructor(
     private io: Server,
     code: string,
-    host: Pick<Player, 'id' | 'pseudo' | 'avatar'>,
+    host: Pick<Player, 'id' | 'pseudo' | 'avatar'> & { photo?: string | null },
     private callbacks: RoomCallbacks = {},
     private options: RoomOptions = {},
   ) {
@@ -269,6 +269,24 @@ export class Room {
     this.emitEvent({ type: 'player-disconnected', playerId: userId, graceSeconds: GRACE_SECONDS });
     const t = setTimeout(() => this.onGraceExpired(userId), GRACE_SECONDS * 1000);
     this.graceTimers.set(userId, t);
+  }
+
+  /**
+   * Départ volontaire d'un joueur.
+   *
+   * Une déconnexion subie ouvre une période de grâce : le joueur a peut-être
+   * traversé un tunnel, la table l'attend. Un départ volontaire, lui, est
+   * définitif — laisser la table patienter trente secondes pour quelqu'un qui
+   * a explicitement claqué la porte gâche la partie des autres. On bascule
+   * donc immédiatement son siège en jeu automatique.
+   */
+  leave(userId: string, socket: Socket): void {
+    const inGame = this.state.phase !== 'lobby' && this.isMember(userId);
+    this.detach(userId, socket);
+    if (!inGame) return;
+    const timer = this.graceTimers.get(userId);
+    if (timer) clearTimeout(timer);
+    this.onGraceExpired(userId);
   }
 
   removePlayer(userId: string): void {

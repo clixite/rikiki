@@ -1,1 +1,8 @@
-Prva različica.
+Prenovljena miza: igralci sedijo okoli sukna, adut je velik ob strani, pas pa jasno pove, kdaj si na vrsti.
+
+• Zapustitev igre v teku brez blokiranja mize
+• Profilna fotografija: posnemi selfi
+• Odzivi za pošiljanje k mizi
+• Zgodovina dostopna med igro
+• Roka se preuredi, ko zmanjka barve
+• Popravljen zvok po vrnitvi iz ozadja

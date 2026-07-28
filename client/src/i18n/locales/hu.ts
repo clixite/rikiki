@@ -154,6 +154,15 @@ export const hu: Messages = {
   botTag: 'bot',
   emotes: 'Reakciók',
   close: 'Bezárás',
+  leaveGame: 'Kilépés a játszmából',
+  leaveGameWarning:
+    'A játszma nélküled folytatódik, és a játszmában szerzett pontjaid elvesznek.',
+  leaveGameAction: 'Igen, kilépek',
+  takePhoto: 'Fénykép készítése',
+  removePhoto: 'Fénykép eltávolítása',
+  photoError: 'A fénykép túl nagy vagy olvashatatlan.',
+  reportPlayer: 'Jelentés',
+  reportDone: 'A fénykép elrejtve és jelentve.',
 
   // Statisztika és előzmények
   stats: 'Statisztika',

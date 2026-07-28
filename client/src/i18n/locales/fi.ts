@@ -160,6 +160,15 @@ export const fi: Messages = {
   botTag: 'botti',
   emotes: 'Reaktiot',
   close: 'Sulje',
+  leaveGame: 'Poistu pelistä',
+  leaveGameWarning:
+    'Peli jatkuu ilman sinua ja tämän pelin pisteesi menetetään.',
+  leaveGameAction: 'Kyllä, poistu',
+  takePhoto: 'Ota kuva',
+  removePhoto: 'Poista kuva',
+  photoError: 'Kuva on liian suuri tai lukukelvoton.',
+  reportPlayer: 'Ilmoita',
+  reportDone: 'Kuva piilotettu ja ilmoitettu.',
 
   // Tilastot ja historia
   stats: 'Tilastot',

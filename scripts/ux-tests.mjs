@@ -346,6 +346,26 @@ for (const profile of PROFILES) {
       (await playPage.locator('[data-testid="my-turn-banner"]').count()) > 0,
     );
 
+    // Quitter en cours de partie : indispensable, et jamais sans confirmation
+    check('JEU : bouton pour quitter la partie', (await playPage.locator('[data-testid="leave-game"]').count()) > 0);
+    await playPage.click('[data-testid="leave-game"]');
+    await playPage.waitForSelector('[data-testid="leave-game-confirm"]', { timeout: 5000 });
+    check('JEU : sortie confirmée avant d’agir', true);
+    await playPage.click('[data-testid="leave-confirm"]', { position: { x: 5, y: 5 } });
+    // L'animation de sortie garde l'élément quelques instants : on attend son
+    // retrait réel plutôt qu'un délai fixe, qui varie avec la charge machine.
+    const leaveClosed = await playPage
+      .waitForSelector('[data-testid="leave-game-confirm"]', { state: 'detached', timeout: 8000 })
+      .then(() => true)
+      .catch(() => false);
+    check('JEU : sortie annulable', leaveClosed);
+
+    // L'atout doit se lire d'un coup d'œil : enseigne annoncée, pas devinée
+    const trumpSuit = await playPage.locator('[data-testid="trump-badge"]').getAttribute('data-trump');
+    check('JEU : enseigne d’atout annoncée', ['S', 'H', 'D', 'C', 'none'].includes(trumpSuit ?? ''), String(trumpSuit));
+    const trumpBox = await playPage.locator('[data-testid="trump-badge"]').boundingBox();
+    check('JEU : atout suffisamment grand', (trumpBox?.height ?? 0) >= 80, JSON.stringify(trumpBox));
+
     // Réactions : palette accessible, cibles confortables, envoi sans casse
     await playPage.click('[data-testid="open-emotes"]');
     await playPage.waitForSelector('[data-testid="emote-palette"]', { timeout: 5000 });
@@ -427,6 +447,11 @@ console.log('\n▸ Accessibilité et préférences système');
 
   const delBox = await page.locator('[data-testid="delete-account"]').boundingBox();
   check('compte : cible de suppression ≥ 44px', (delBox?.height ?? 0) >= MIN_TOUCH - 0.5, JSON.stringify(delBox));
+
+  // Photo de profil : proposée, et masquable pour qui n'en veut pas
+  check('compte : prise de photo proposée', (await page.locator('[data-testid="take-photo"]').count()) > 0);
+  const photoBox = await page.locator('[data-testid="take-photo"]').boundingBox();
+  check('compte : cible photo ≥ 44px', (photoBox?.height ?? 0) >= MIN_TOUCH - 0.5, JSON.stringify(photoBox));
 
   const privacyHref = await page.locator('a[href="/privacy.html"]').first().getAttribute('href');
   check('compte : lien vers la politique de confidentialité', privacyHref === '/privacy.html');

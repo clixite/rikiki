@@ -4,6 +4,9 @@ import type { GameHistoryEntry, GameView } from '@rikiki/shared';
 import { fetchHistory, readCachedHistory } from '../api';
 import { useT } from '../i18n';
 import { useSession } from '../store/session';
+import { reportPlayer } from '../api';
+import { hidePlayer, isHidden } from '../moderation';
+import { isPhotoDataUrl } from '../photo';
 
 import PlayerAvatar from './PlayerAvatar';
 
@@ -95,7 +98,7 @@ export default function ScoreDrawer({ view, open, onClose }: Props) {
                   <span className="w-5 text-center text-xs font-semibold tabular-nums text-paper-50/40">
                     {i + 1}
                   </span>
-                  <PlayerAvatar avatar={p.avatar} size={22} />
+                  <PlayerAvatar playerId={p.id} avatar={p.avatar} photo={p.photo} size={22} />
                   <span className="min-w-0 flex-1 truncate text-sm font-medium">
                     {p.pseudo}
                     {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({t.you})</span>}
@@ -108,6 +111,21 @@ export default function ScoreDrawer({ view, open, onClose }: Props) {
                   <span className="w-12 shrink-0 text-right text-base font-bold tabular-nums text-brass-300">
                     {p.totalScore}
                   </span>
+                  {p.id !== view.you && isPhotoDataUrl(p.photo) && !isHidden(p.id) && (
+                    <button
+                      type="button"
+                      data-testid={`report-${p.id}`}
+                      onClick={() => {
+                        hidePlayer(p.id);
+                        reportPlayer(p.id, 'photo').catch(() => undefined);
+                      }}
+                      aria-label={t.reportPlayer}
+                      title={t.reportPlayer}
+                      className="ml-1 flex h-11 w-8 shrink-0 items-center justify-center text-paper-50/35 transition active:scale-90"
+                    >
+                      <span aria-hidden="true">⚑</span>
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

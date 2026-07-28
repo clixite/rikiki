@@ -158,6 +158,15 @@ export const et: Messages = {
   botTag: 'robot',
   emotes: 'Reaktsioonid',
   close: 'Sulge',
+  leaveGame: 'Lahku mängust',
+  leaveGameWarning:
+    'Mäng jätkub ilma sinuta ja selle mängu punktid lähevad kaotsi.',
+  leaveGameAction: 'Jah, lahku',
+  takePhoto: 'Tee foto',
+  removePhoto: 'Eemalda foto',
+  photoError: 'Foto on liiga suur või loetamatu.',
+  reportPlayer: 'Teata',
+  reportDone: 'Foto peideti ja teatati.',
 
   // Statistika ja ajalugu
   stats: 'Statistika',

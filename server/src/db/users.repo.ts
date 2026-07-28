@@ -6,6 +6,7 @@ interface UserRow {
   id: string;
   pseudo: string;
   avatar: string;
+  photo: string | null;
   email: string | null;
   is_guest: number;
   created_at: number;
@@ -16,6 +17,7 @@ function toPublic(row: UserRow): PublicUser {
     id: row.id,
     pseudo: row.pseudo,
     avatar: row.avatar,
+    photo: row.photo ?? null,
     email: row.email,
     isGuest: row.is_guest === 1,
   };
@@ -46,6 +48,11 @@ export class UsersRepo {
 
   updateProfile(id: string, pseudo: string, avatar: string): void {
     this.db.prepare('UPDATE users SET pseudo = ?, avatar = ? WHERE id = ?').run(pseudo, avatar, id);
+  }
+
+  /** Photo de profil : `null` revient à l'avatar dessiné. */
+  updatePhoto(id: string, photo: string | null): void {
+    this.db.prepare('UPDATE users SET photo = ? WHERE id = ?').run(photo, id);
   }
 
   /** Promotion d'un invité en compte e-mail (conserve id, pseudo, stats). */
@@ -82,6 +89,14 @@ export class UsersRepo {
       this.db.prepare('DELETE FROM users WHERE id = ?').run(id);
     });
     run();
+  }
+
+  /** Enregistre un signalement ; un joueur inconnu est simplement ignoré. */
+  addReport(reporterId: string, reportedId: string, reason: string): void {
+    if (!this.getById(reportedId)) return;
+    this.db
+      .prepare('INSERT INTO content_reports (reporter_id, reported_id, reason, created_at) VALUES (?, ?, ?, ?)')
+      .run(reporterId, reportedId, reason, Date.now());
   }
 
   getStats(userId: string): UserStats {

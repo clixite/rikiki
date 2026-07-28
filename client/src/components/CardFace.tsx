@@ -23,7 +23,7 @@ export function isRedSuit(suit: Suit): boolean {
  * teinte (paquet dit à quatre couleurs) : indispensable pour distinguer ♥ de
  * ♠ quand on ne perçoit pas le rouge.
  */
-function suitInkClass(suit: Suit): string {
+export function suitInkClass(suit: Suit): string {
   switch (suit) {
     case 'H':
       return 'text-suit-red';

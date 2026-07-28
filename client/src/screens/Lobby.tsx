@@ -92,7 +92,7 @@ export default function Lobby({ view }: Props) {
                 data-testid={`lobby-player-${p.id}`}
                 className="flex items-center gap-3 rounded-xl bg-felt-900/45 px-3 py-2.5 ring-1 ring-white/6"
               >
-                <PlayerAvatar avatar={p.avatar} size={30} />
+                <PlayerAvatar playerId={p.id} avatar={p.avatar} photo={p.photo} size={30} />
                 <span className="min-w-0 flex-1 truncate text-[15px] font-medium">
                   {p.pseudo}
                   {p.id === view.you && <span className="ml-1.5 text-xs text-paper-50/45">({t.you})</span>}

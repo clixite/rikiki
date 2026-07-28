@@ -1,1 +1,8 @@
-Erste Version.
+Der Tisch wurde neu gestaltet: Die Spieler sitzen jetzt rund um den Filz, die Trumpffarbe steht groß an der Seite, und ein Banner zeigt deutlich, wann du am Zug bist.
+
+• Laufende Partie verlassen, ohne den Tisch zu blockieren
+• Profilfoto: mach ein Selfie
+• Reaktionen an den Tisch senden
+• Verlauf während der Partie einsehbar
+• Die Hand sortiert sich neu, wenn eine Farbe ausgeht
+• Ton nach dem Wechsel in den Hintergrund korrigiert

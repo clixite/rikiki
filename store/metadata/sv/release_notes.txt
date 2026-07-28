@@ -1,1 +1,8 @@
-Första versionen.
+Bordet är omgjort: spelarna sitter nu runt duken, trumfen visas stort på sidan och en banderoll visar tydligt när det är din tur.
+
+• Lämna ett pågående parti utan att blockera bordet
+• Profilbild: ta en selfie
+• Reaktioner att skicka till bordet
+• Historiken går att se under partiet
+• Handen sorteras om när en färg tar slut
+• Ljudet fixat efter att appen varit i bakgrunden

@@ -1,1 +1,8 @@
-Ensimmäinen versio.
+Pöytä on uudistettu: pelaajat istuvat nyt pöydän ympärillä, valtti näkyy suurena sivussa ja palkki kertoo selvästi, milloin on sinun vuorosi.
+
+• Poistu käynnissä olevasta pelistä jumittamatta pöytää
+• Profiilikuva: ota selfie
+• Reaktiot lähetettäväksi pöytään
+• Historia luettavissa pelin aikana
+• Käsi järjestyy uudelleen, kun maa loppuu
+• Korjattu ääni taustalta palattaessa

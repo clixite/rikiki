@@ -162,6 +162,15 @@ export const bg: Messages = {
   botTag: 'бот',
   emotes: 'Реакции',
   close: 'Затвори',
+  leaveGame: 'Напускане на играта',
+  leaveGameWarning:
+    'Играта продължава без теб, а точките ти от нея се губят.',
+  leaveGameAction: 'Да, напусни',
+  takePhoto: 'Направи снимка',
+  removePhoto: 'Премахни снимката',
+  photoError: 'Снимката е твърде голяма или нечетима.',
+  reportPlayer: 'Сигнал',
+  reportDone: 'Снимката е скрита и подадена за преглед.',
 
   // Статистика и история
   stats: 'Статистика',

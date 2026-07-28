@@ -1,1 +1,8 @@
-Prima versiune.
+Masă regândită: jucătorii stau acum în jurul pânzei, atuul apare mare pe margine, iar o bandă arată clar când e rândul tău.
+
+• Părăsirea unei partide în curs fără a bloca masa
+• Poză de profil: fă-ți un selfie
+• Reacții de trimis la masă
+• Istoric consultabil în timpul partidei
+• Mâna se reorganizează când se termină o culoare
+• Sunet corectat după trecerea în fundal

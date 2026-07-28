@@ -172,6 +172,15 @@ export const lt: Messages = {
   botTag: 'botas',
   emotes: 'Reakcijos',
   close: 'Uždaryti',
+  leaveGame: 'Palikti partiją',
+  leaveGameWarning:
+    'Partija tęsiasi be tavęs, o šios partijos taškai prarandami.',
+  leaveGameAction: 'Taip, palikti',
+  takePhoto: 'Nufotografuoti',
+  removePhoto: 'Pašalinti nuotrauką',
+  photoError: 'Nuotrauka per didelė arba neįskaitoma.',
+  reportPlayer: 'Pranešti',
+  reportDone: 'Nuotrauka paslėpta ir pranešta.',
 
   // Statistika ir istorija
   stats: 'Statistika',

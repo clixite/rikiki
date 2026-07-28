@@ -181,6 +181,15 @@ export const cs: Messages = {
   botTag: 'robot',
   emotes: 'Reakce',
   close: 'Zavřít',
+  leaveGame: 'Opustit hru',
+  leaveGameWarning:
+    'Hra pokračuje bez tebe a tvoje body z této hry propadnou.',
+  leaveGameAction: 'Ano, opustit',
+  takePhoto: 'Vyfotit se',
+  removePhoto: 'Odebrat fotku',
+  photoError: 'Fotka je příliš velká nebo nečitelná.',
+  reportPlayer: 'Nahlásit',
+  reportDone: 'Fotka skryta a nahlášena.',
 
   // Statistiky a historie
   stats: 'Statistiky',

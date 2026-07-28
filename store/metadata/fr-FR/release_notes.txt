@@ -1,1 +1,8 @@
-Première version.
+Table entièrement revue : les joueurs sont maintenant disposés autour du tapis, l'atout s'affiche en grand sur le côté, et un bandeau indique clairement quand c'est à vous.
+
+• Quitter une partie en cours, sans bloquer la table
+• Photo de profil : prenez-vous en selfie
+• Réactions à envoyer à table
+• Historique consultable pendant la partie
+• La main se réorganise quand une couleur disparaît
+• Correction du son après un passage en arrière-plan

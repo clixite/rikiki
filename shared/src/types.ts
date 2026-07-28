@@ -18,6 +18,11 @@ export interface PublicUser {
   id: string;
   pseudo: string;
   avatar: string;
+  /**
+   * Photo de profil, en JPEG encodé en data URL (96×96, quelques kilo-octets).
+   * `null` quand le joueur s'en tient à un avatar dessiné.
+   */
+  photo: string | null;
   email: string | null;
   isGuest: boolean;
 }
@@ -92,6 +97,8 @@ export interface Player {
   id: string;
   pseudo: string;
   avatar: string;
+  /** Photo de profil (data URL JPEG) ; absente pour un avatar dessiné ou un robot. */
+  photo?: string | null;
   seat: number;
   connected: boolean;
   totalScore: number;

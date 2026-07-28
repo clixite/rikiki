@@ -1,1 +1,8 @@
-Eerste versie.
+De tafel is opnieuw ontworpen: spelers zitten nu rond het laken, de troef staat groot aan de zijkant en een balk maakt duidelijk wanneer jij aan de beurt bent.
+
+• Een lopende partij verlaten zonder de tafel te blokkeren
+• Profielfoto: maak een selfie
+• Reacties om naar de tafel te sturen
+• Geschiedenis raadpleegbaar tijdens de partij
+• Je hand sorteert opnieuw als een kleur opraakt
+• Geluid hersteld na terugkeer uit de achtergrond

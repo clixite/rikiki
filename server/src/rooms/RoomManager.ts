@@ -43,7 +43,7 @@ export class RoomManager {
     };
   }
 
-  create(host: Pick<Player, 'id' | 'pseudo' | 'avatar'>): Room {
+  create(host: Pick<Player, 'id' | 'pseudo' | 'avatar'> & { photo?: string | null }): Room {
     let code = randomCode();
     while (this.rooms.has(code)) code = randomCode();
     const room = new Room(this.io, code, host, this.roomCallbacks(), this.roomOptions);

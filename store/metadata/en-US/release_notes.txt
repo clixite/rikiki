@@ -1,1 +1,8 @@
-First release.
+The table has been redesigned: players now sit around the felt, the trump suit is shown large on the side, and a banner makes it obvious when it is your turn.
+
+• Leave a game in progress without stalling the table
+• Profile photo: take a selfie
+• Reactions to send around the table
+• History available during a game
+• Your hand re-sorts when a suit runs out
+• Sound fixed after the app goes to the background

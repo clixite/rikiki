@@ -47,6 +47,45 @@ function ensureContext(): AudioContext | null {
   return ctx;
 }
 
+/**
+ * Contexte réellement prêt à jouer, ou rien.
+ *
+ * Tant qu'un contexte est suspendu, `currentTime` reste figé : tout ce qu'on
+ * y programme s'empile sur le même instant et se déclenche d'un seul bloc à la
+ * reprise — une salve de bruit au moment où l'on touche l'écran. On préfère
+ * donc perdre un son plutôt que de le mettre en file : un effet manqué passe
+ * inaperçu, une rafale non.
+ */
+function ready(): AudioContext | null {
+  const audio = ensureContext();
+  if (!audio) return null;
+  if (audio.state !== 'running') {
+    void audio.resume();
+    return null;
+  }
+  return audio;
+}
+
+/*
+ * Déverrouillage du son.
+ *
+ * iOS n'autorise la reprise du contexte que depuis un geste de l'utilisateur,
+ * et suspend à nouveau le contexte dès que l'application passe en arrière-plan
+ * — au retour, plus aucun son ne sortait. On raccroche donc la reprise à
+ * n'importe quel geste, ainsi qu'au retour au premier plan.
+ */
+if (typeof window !== 'undefined') {
+  const wake = () => {
+    ensureContext();
+  };
+  for (const event of ['pointerdown', 'touchend', 'keydown'] as const) {
+    window.addEventListener(event, wake, { passive: true });
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') wake();
+  });
+}
+
 interface ToneOptions {
   freq: number;
   duration: number;
@@ -58,7 +97,7 @@ interface ToneOptions {
 }
 
 function tone({ freq, duration, type = 'sine', gain = 0.5, delay = 0, slideTo }: ToneOptions): void {
-  const audio = ensureContext();
+  const audio = ready();
   if (!audio || !master) return;
   const t0 = audio.currentTime + delay;
 
@@ -83,7 +122,7 @@ function tone({ freq, duration, type = 'sine', gain = 0.5, delay = 0, slideTo }:
 
 /** Bruit filtré : évoque le frottement du carton, sans échantillon. */
 function noiseBurst(duration = 0.09, gain = 0.35, filterFreq = 1800): void {
-  const audio = ensureContext();
+  const audio = ready();
   if (!audio || !master) return;
   const t0 = audio.currentTime;
   const frames = Math.floor(audio.sampleRate * duration);

@@ -1,1 +1,8 @@
-Primeira versão.
+Mesa redesenhada: os jogadores ficam à volta do pano, o trunfo aparece em grande ao lado e uma faixa mostra claramente quando é a tua vez.
+
+• Sair de um jogo a decorrer sem bloquear a mesa
+• Foto de perfil: tira uma selfie
+• Reações para enviar à mesa
+• Histórico consultável durante o jogo
+• A mão reorganiza-se quando um naipe acaba
+• Corrigido o som após a app passar para segundo plano

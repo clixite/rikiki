@@ -1,1 +1,8 @@
-Prvá verzia.
+Prepracovaný stôl: hráči sedia okolo súkna, tromf je veľký po strane a pruh jasne ukazuje, kedy si na rade.
+
+• Opustenie rozohranej hry bez blokovania stola
+• Profilová fotka: odfoť sa
+• Reakcie na odoslanie k stolu
+• História dostupná počas hry
+• Ruka sa preskladá, keď dôjde farba
+• Opravený zvuk po návrate z pozadia

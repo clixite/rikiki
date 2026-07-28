@@ -186,6 +186,15 @@ export const ga: Messages = {
   botTag: 'róbat',
   emotes: 'Frithghníomhartha',
   close: 'Dún',
+  leaveGame: 'Fág an cluiche',
+  leaveGameWarning:
+    'Leanann an cluiche ar aghaidh gan tú agus caillfear do phointí don chluiche seo.',
+  leaveGameAction: 'Tá, fág',
+  takePhoto: 'Tóg grianghraf',
+  removePhoto: 'Bain an grianghraf',
+  photoError: 'Tá an grianghraf rómhór nó doléite.',
+  reportPlayer: 'Tuairiscigh',
+  reportDone: 'Grianghraf folaithe agus tuairiscithe.',
 
   // Staitisticí agus stair
   stats: 'Staitisticí',

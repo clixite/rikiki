@@ -151,6 +151,15 @@ export const sv: Messages = {
   botTag: 'bot',
   emotes: 'Reaktioner',
   close: 'Stäng',
+  leaveGame: 'Lämna partiet',
+  leaveGameWarning:
+    'Partiet fortsätter utan dig och dina poäng i det här partiet går förlorade.',
+  leaveGameAction: 'Ja, lämna',
+  takePhoto: 'Ta ett foto',
+  removePhoto: 'Ta bort foto',
+  photoError: 'Fotot är för stort eller oläsbart.',
+  reportPlayer: 'Rapportera',
+  reportDone: 'Fotot dolt och rapporterat.',
 
   // Statistik och historik
   stats: 'Statistik',

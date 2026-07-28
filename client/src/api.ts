@@ -37,6 +37,22 @@ export function updateProfile(pseudo: string, avatar: string) {
   });
 }
 
+/** Signale un joueur pour contenu inapproprié (photo ou pseudo). */
+export function reportPlayer(playerId: string, reason: 'photo' | 'pseudo' | 'other') {
+  return request<{ ok: true }>('/api/report', {
+    method: 'POST',
+    body: JSON.stringify({ playerId, reason }),
+  });
+}
+
+/** Enregistre (ou retire, avec `null`) la photo de profil. */
+export function updatePhoto(photo: string | null) {
+  return request<{ user: PublicUser }>('/api/me/photo', {
+    method: 'PUT',
+    body: JSON.stringify({ photo }),
+  });
+}
+
 /**
  * Suppression définitive du compte et de tout ce qui s'y rattache.
  * L'App Store l'exige dès lors qu'une création de compte est proposée.

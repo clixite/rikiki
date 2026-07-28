@@ -46,7 +46,7 @@ export default function EmoteBar() {
   };
 
   return (
-    <div className="pointer-events-none absolute bottom-1 right-2 flex flex-col items-end gap-1.5">
+    <div className="pointer-events-none absolute bottom-2 right-3 flex flex-col items-end gap-1.5">
       <AnimatePresence>
         {open && (
           <motion.div

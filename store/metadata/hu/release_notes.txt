@@ -1,1 +1,8 @@
-Első verzió.
+Újratervezett asztal: a játékosok az asztal körül ülnek, az adu nagyban látszik oldalt, és egy sáv egyértelműen jelzi, mikor te következel.
+
+• Folyamatban lévő játszma elhagyása az asztal blokkolása nélkül
+• Profilkép: készíts szelfit
+• Az asztalra küldhető reakciók
+• Az előzmények játék közben is elérhetők
+• A kéz újrarendeződik, ha elfogy egy szín
+• Javított hang a háttérből való visszatérés után

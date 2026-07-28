@@ -4,6 +4,7 @@ import type { GameView } from '@rikiki/shared';
 import { cardId } from '@rikiki/shared';
 import BidPicker from '../components/BidPicker';
 import BidsSummary from '../components/BidsSummary';
+import LeaveGameButton from '../components/LeaveGameButton';
 import EmoteBar, { EMOTE_GLYPH } from '../components/EmoteBar';
 import HandFan from '../components/HandFan';
 import PlayerSeats from '../components/PlayerSeats';
@@ -90,6 +91,8 @@ export default function Table({ view: serverView }: Props) {
     <div className="flex h-dvh flex-col overflow-hidden">
       {/* ---- En-tête : manche, son, scores ---- */}
       <header className="flex shrink-0 items-center gap-2 px-3 pb-1 pt-2">
+        <LeaveGameButton />
+
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-paper-50/50">
             {t.round} {round.roundIndex + 1}/{view.roundsSequence.length}
@@ -137,7 +140,7 @@ export default function Table({ view: serverView }: Props) {
         {/* L'atout se consulte du coin de l'œil : il quitte le centre, que le
             pli réclame, et reste ancré au même endroit toute la manche. */}
         <div className="absolute left-2 top-1/2 -translate-y-1/2">
-          <TrumpBadge trumpCard={round.trumpCard} compact={false} />
+          <TrumpBadge trumpCard={round.trumpCard} />
         </div>
 
         <TrickArea view={view} frozenTrick={frozenTrick} />
@@ -156,6 +159,10 @@ export default function Table({ view: serverView }: Props) {
         >
           {statusText}
         </motion.p>
+
+        {/* Les réactions vivent dans le tapis, jamais par-dessus la main :
+            un bouton posé sur les cartes se déclenche en voulant jouer. */}
+        <EmoteBar />
       </div>
 
       {/* ---- Annonce : au-dessus de la main, jamais par-dessus ---- */}
@@ -177,7 +184,7 @@ export default function Table({ view: serverView }: Props) {
         <MyTurnBanner active={myTurn && !frozenTrick && view.phase === 'playing'} label={t.yourTurn} />
 
         <div className="mb-2 flex items-center justify-center gap-2 px-3">
-          <PlayerAvatar avatar={me.avatar} size={30} />
+          <PlayerAvatar avatar={me.avatar} photo={me.photo} size={30} />
           <span className="max-w-24 truncate text-[15px] font-semibold text-paper-50">{me.pseudo}</span>
           {round.dealerSeat === me.seat && (
             <span className="rounded-full bg-brass-400 px-1.5 text-[10px] font-bold text-felt-950" title={t.dealer}>
@@ -212,8 +219,6 @@ export default function Table({ view: serverView }: Props) {
           dealKey={round.roundIndex}
         />
       </div>
-
-      <EmoteBar />
 
       {showRecap && <RoundRecap view={view} />}
       <ScoreDrawer view={view} open={scoresOpen} onClose={() => setScoresOpen(false)} />
