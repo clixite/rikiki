@@ -31,6 +31,8 @@ function startedRoom(turnSeconds: number) {
 }
 
 afterEach(() => {
+  // Les minuteurs des rooms créées ici sont `unref` : ils n'empêchent pas la
+  // sortie du processus et disparaissent avec l'instance.
   vi.useRealTimers();
 });
 
@@ -45,7 +47,6 @@ describe('minuteur du tour', () => {
     vi.advanceTimersByTime(30_000);
 
     expect(room.state.round!.bids[waiting.id]).not.toBeNull();
-    room.stop?.();
   });
 
   it("n'agit pas si le joueur a joué entre-temps", () => {
@@ -62,7 +63,6 @@ describe('minuteur du tour', () => {
 
     // Son annonce n'a pas été écrasée par le minuteur
     expect(room.state.round!.bids[waiting.id]).toBe(bidsAfterHuman[waiting.id]);
-    room.stop?.();
   });
 
   it('diffuse une échéance tant que la table attend un humain', () => {
@@ -70,7 +70,6 @@ describe('minuteur du tour', () => {
     const room = startedRoom(30);
     expect(room.turnDeadline).not.toBeNull();
     expect(room.turnDeadline! - Date.now()).toBeGreaterThan(25_000);
-    room.stop?.();
   });
 
   it('se désactive avec un délai nul', () => {
@@ -81,7 +80,6 @@ describe('minuteur du tour', () => {
     const waiting = room.state.players.find((p) => p.seat === room.state.round!.currentSeat)!;
     vi.advanceTimersByTime(10 * 60_000);
     expect(room.state.round!.bids[waiting.id]).toBeNull();
-    room.stop?.();
   });
 
   it('laisse un délai par défaut raisonnable', () => {
