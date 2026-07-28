@@ -1,5 +1,5 @@
 import type { Server } from 'socket.io';
-import type { Phase, Player } from '@rikiki/shared';
+import { DEFAULT_PACE, type ActiveGame, type GameState, type Player } from '@rikiki/shared';
 import type { LiveRoomsRepo } from '../db/rooms.repo';
 import { Room, type RoomCallbacks, type RoomOptions } from './Room';
 import { randomCode } from './roomCodes';
@@ -7,16 +7,29 @@ import { randomCode } from './roomCodes';
 const LOBBY_TTL_MS = 30 * 60_000;
 const ABANDONED_TTL_MS = 10 * 60_000;
 const GAME_OVER_TTL_MS = 15 * 60_000;
+/**
+ * Durée de vie d'une partie asynchrone.
+ *
+ * Une table vide n'y est pas un abandon mais l'état normal : on ne peut donc
+ * pas la balayer au bout de dix minutes. Deux semaines laissent le temps d'un
+ * tour de vacances sans garder indéfiniment des parties que plus personne
+ * n'ouvrira.
+ */
+const ASYNC_TTL_MS = 14 * 24 * 3_600_000;
+
+/** Plus longue rétention possible : au-delà, plus rien n'est restaurable. */
+const MAX_TTL_MS = Math.max(LOBBY_TTL_MS, GAME_OVER_TTL_MS, ASYNC_TTL_MS);
 
 /**
  * Durée au-delà de laquelle une partie persistée n'est plus restaurée.
  * On réutilise les TTL du `sweep()` : une room restaurée n'a par construction
  * aucun socket connecté, c'est donc le délai d'abandon (10 min) qui s'applique
- * aux parties en cours.
+ * aux parties en cours — sauf en asynchrone, où l'absence est la règle.
  */
-function restoreTtl(phase: Phase): number {
-  if (phase === 'lobby') return LOBBY_TTL_MS;
-  if (phase === 'game-over') return GAME_OVER_TTL_MS;
+function restoreTtl(state: GameState): number {
+  if (state.phase === 'game-over') return GAME_OVER_TTL_MS;
+  if (state.pace === 'async') return ASYNC_TTL_MS;
+  if (state.phase === 'lobby') return LOBBY_TTL_MS;
   return ABANDONED_TTL_MS;
 }
 
@@ -70,9 +83,9 @@ export class RoomManager {
   private restore(now = Date.now()): void {
     if (!this.live) return;
     // Purge de masse : au-delà du plus grand TTL, plus rien n'est restaurable.
-    this.live.deleteOlderThan(now - LOBBY_TTL_MS);
+    this.live.deleteOlderThan(now - MAX_TTL_MS);
     for (const row of this.live.loadAll()) {
-      if (now - row.updatedAt > restoreTtl(row.state.phase)) {
+      if (now - row.updatedAt > restoreTtl(row.state)) {
         this.live.delete(row.code);
         continue;
       }
@@ -85,6 +98,39 @@ export class RoomManager {
     }
   }
 
+  /**
+   * Parties en cours auxquelles ce joueur participe.
+   *
+   * Celles qui l'attendent viennent en premier : c'est la seule question que
+   * se pose quelqu'un qui ouvre l'application avec cinq parties en cours.
+   */
+  gamesOf(userId: string): ActiveGame[] {
+    const out: ActiveGame[] = [];
+    for (const room of this.rooms.values()) {
+      const s = room.state;
+      if (s.phase === 'game-over' || !s.players.some((p) => p.id === userId)) continue;
+      const awaited =
+        (s.phase === 'bidding' || s.phase === 'playing') && s.round
+          ? (s.players.find((p) => p.seat === s.round!.currentSeat) ?? null)
+          : s.phase === 'round-scoring'
+            ? (s.players.find((p) => p.id === s.hostId) ?? null)
+            : null;
+      out.push({
+        code: s.code,
+        phase: s.phase,
+        pace: s.pace ?? DEFAULT_PACE,
+        playersCount: s.players.length,
+        myTurn: awaited?.id === userId,
+        waitingFor: awaited?.pseudo ?? null,
+        round: (s.round?.roundIndex ?? 0) + 1,
+        roundsTotal: s.roundsSequence.length,
+        myScore: s.players.find((p) => p.id === userId)?.totalScore ?? 0,
+        updatedAt: room.lastActivity,
+      });
+    }
+    return out.sort((a, b) => Number(b.myTurn) - Number(a.myTurn) || b.updatedAt - a.updatedAt);
+  }
+
   /** Écrit sans attendre les états en attente d'enregistrement. */
   flushAll(): void {
     for (const room of this.rooms.values()) room.flush();
@@ -93,10 +139,15 @@ export class RoomManager {
   sweep(now = Date.now()): void {
     for (const [code, room] of this.rooms) {
       const idle = now - room.lastActivity;
+      // Une partie asynchrone désertée n'est pas abandonnée : on ne la balaie
+      // que si plus personne n'y a touché depuis très longtemps.
       const expired =
-        (room.state.phase === 'lobby' && idle > LOBBY_TTL_MS) ||
-        (room.state.phase === 'game-over' && idle > GAME_OVER_TTL_MS) ||
-        (room.connectedCount() === 0 && idle > ABANDONED_TTL_MS);
+        room.state.phase === 'game-over'
+          ? idle > GAME_OVER_TTL_MS
+          : room.isAsync
+            ? idle > ASYNC_TTL_MS
+            : (room.state.phase === 'lobby' && idle > LOBBY_TTL_MS) ||
+              (room.connectedCount() === 0 && idle > ABANDONED_TTL_MS);
       if (expired) this.remove(code, 'expired');
     }
   }

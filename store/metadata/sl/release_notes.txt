@@ -1,8 +1,6 @@
-Prenovljena miza: igralci sedijo okoli sukna, adut je velik ob strani, pas pa jasno pove, kdaj si na vrsti.
+Dve dolgo pričakovani novosti: igranje, ne da bi bili vsi hkrati prisotni, in točkovanje kot doma.
 
-• Zapustitev igre v teku brez blokiranja mize
-• Profilna fotografija: posnemi selfi
-• Odzivi za pošiljanje k mizi
-• Zgodovina dostopna med igro
-• Roka se preuredi, ko zmanjka barve
-• Popravljen zvok po vrnitvi iz ozadja
+• Način »v lastnem ritmu«: vsak igra, ko utegne, igra počaka
+• Vaše igre v teku na začetnem zaslonu, prva tista, ki vas čaka
+• Trije načini točkovanja, ki jih gostitelj izbere v sobi
+• Obvestilo odpre neposredno pravo igro

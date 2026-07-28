@@ -10,7 +10,7 @@ import { openDb } from './db/db';
 import { UsersRepo } from './db/users.repo';
 import { LiveRoomsRepo } from './db/rooms.repo';
 import { GroupsRepo } from './db/groups.repo';
-import { authRoutes } from './auth/routes';
+import { authRoutes, bearerUserId } from './auth/routes';
 import { groupRoutes } from './groups/routes';
 import { magicLinkRoutes } from './auth/magicLink';
 import { createMailer, type Mailer } from './mail/mailer';
@@ -161,6 +161,24 @@ export function createApp(config: Config, overrides: { mailer?: Mailer; pushSend
     liveRooms,
   );
   registerSocketHandlers(io, rooms, users, config, groups);
+
+  /**
+   * Parties en cours du joueur.
+   *
+   * En temps réel, une seule partie à la fois : le client se souvient de son
+   * code et propose de la reprendre. En asynchrone on en mène plusieurs de
+   * front, sur plusieurs jours et depuis plusieurs appareils — la mémoire
+   * locale ne suffit plus, c'est le serveur qui sait où on joue et laquelle
+   * attend après nous.
+   */
+  app.get('/api/me/games', (req, res) => {
+    const userId = bearerUserId(req.headers.authorization, config.JWT_SECRET);
+    if (!userId || !users.getById(userId)) {
+      res.status(401).json({ error: 'INVALID_TOKEN', message: 'Session invalide.' });
+      return;
+    }
+    res.json({ games: rooms.gamesOf(userId) });
+  });
 
   // En production, le serveur sert aussi le build du client (SPA)
   const here = path.dirname(fileURLToPath(import.meta.url));

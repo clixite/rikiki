@@ -1,8 +1,6 @@
-Tavolo ridisegnato: i giocatori sono disposti attorno al panno, la briscola è grande di lato e una fascia indica chiaramente quando tocca a te.
+Due novità molto richieste: giocare senza esserci tutti insieme e contare i punti come si fa a casa.
 
-• Abbandonare una partita in corso senza bloccare il tavolo
-• Foto profilo: scattati un selfie
-• Reazioni da inviare al tavolo
-• Cronologia consultabile durante la partita
-• La mano si riordina quando un seme finisce
-• Corretto l'audio dopo il passaggio in background
+• Modalità «al proprio ritmo»: ognuno gioca quando può, la partita aspetta
+• Le partite in corso nella schermata iniziale, per prima quella che ti aspetta
+• Tre sistemi di punteggio, scelti dall’ospite nella sala
+• La notifica apre direttamente la partita giusta

@@ -1,8 +1,6 @@
-Table entièrement revue : les joueurs sont maintenant disposés autour du tapis, l'atout s'affiche en grand sur le côté, et un bandeau indique clairement quand c'est à vous.
+Deux nouveautés très demandées : jouer sans être là en même temps, et compter les points comme chez vous.
 
-• Quitter une partie en cours, sans bloquer la table
-• Photo de profil : prenez-vous en selfie
-• Réactions à envoyer à table
-• Historique consultable pendant la partie
-• La main se réorganise quand une couleur disparaît
-• Correction du son après un passage en arrière-plan
+• Mode « au rythme de chacun » : chacun joue quand il peut, la partie attend
+• Vos parties en cours sur l’accueil, celle qui vous attend en premier
+• Trois barèmes de score, choisis par l’hôte dans le salon
+• La notification ouvre directement la bonne partie

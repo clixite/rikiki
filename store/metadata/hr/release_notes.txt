@@ -1,8 +1,6 @@
-Redizajniran stol: igrači sjede oko sukna, adut je velik sa strane, a traka jasno pokazuje kad si ti na redu.
+Dvije dugo tražene novosti: igrati bez da svi budu prisutni istovremeno i bodovati kao kod kuće.
 
-• Napuštanje partije u tijeku bez blokiranja stola
-• Profilna fotografija: snimi selfie
-• Reakcije za slanje za stol
-• Povijest dostupna tijekom partije
-• Ruka se preslaguje kad nestane boja
-• Ispravljen zvuk nakon povratka iz pozadine
+• Način „vlastitim ritmom”: svatko igra kad može, igra čeka
+• Vaše igre u tijeku na početnom zaslonu, prva ona koja vas čeka
+• Tri načina bodovanja, bira ih domaćin u sobi
+• Obavijest otvara izravno pravu igru

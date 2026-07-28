@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Navigate } from 'react-router-dom';
 import { useNav } from '../nav';
-import type { UserStats } from '@rikiki/shared';
-import { fetchMe } from '../api';
+import type { ActiveGame, UserStats } from '@rikiki/shared';
+import { fetchActiveGames, fetchMe } from '../api';
 import SoundToggle from '../components/SoundToggle';
 import { unlockAudio } from '../audio';
 import { useT } from '../i18n';
@@ -22,6 +22,9 @@ export default function Home() {
   const navigate = useNav();
   const [stats, setStats] = useState<UserStats | null>(null);
   const [busy, setBusy] = useState(false);
+  // `null` = la liste n'a pas encore été obtenue du serveur (hors ligne, ou
+  // premier rendu) ; on retombe alors sur la dernière partie mémorisée ici.
+  const [games, setGames] = useState<ActiveGame[] | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -32,6 +35,40 @@ export default function Home() {
       })
       .catch(() => undefined);
   }, [user?.id]);
+
+  /**
+   * Parties en cours, relues à chaque retour sur l'écran.
+   *
+   * En asynchrone, ce qui a changé pendant qu'on avait le téléphone dans la
+   * poche est précisément l'information qu'on vient chercher : la liste doit
+   * être fraîche au moment où on la regarde, pas au moment où l'onglet a été
+   * ouvert la première fois.
+   */
+  useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    const refresh = () => {
+      fetchActiveGames()
+        .then((list) => {
+          if (!alive) return;
+          setGames(list);
+          // La partie mémorisée localement n'existe plus : on nettoie, sinon
+          // le bouton « reprendre » mène à une table fermée.
+          const known = useSession.getState().roomCode;
+          if (known && !list.some((g) => g.code === known)) useSession.getState().setRoomCode(null);
+        })
+        .catch(() => undefined);
+    };
+    refresh();
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      alive = false;
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [user?.id, socketConnected]);
 
   if (!user) return <Navigate to="/profile" replace />;
 
@@ -44,10 +81,9 @@ export default function Home() {
     else useGame.getState().showToast(res.error.message);
   };
 
-  const onResume = async () => {
-    if (!roomCode) return;
+  const onResume = async (code: string) => {
     unlockAudio();
-    const res = await joinRoom(roomCode);
+    const res = await joinRoom(code);
     if (res.ok) navigate('/game');
     else useSession.getState().setRoomCode(null);
   };
@@ -142,15 +178,56 @@ export default function Home() {
 
       {/* Actions principales */}
       <div className="space-y-2.5">
-        {roomCode && (
+        {games === null && roomCode && (
           <button
             type="button"
-            onClick={onResume}
+            data-testid="resume-game"
+            onClick={() => onResume(roomCode)}
             disabled={disabled}
             className="w-full rounded-2xl bg-white/8 py-3 text-sm font-semibold ring-1 ring-white/10 transition active:scale-[0.98] disabled:opacity-40"
           >
             {t.resumeGame} · {roomCode}
           </button>
+        )}
+
+        {games !== null && games.length > 0 && (
+          <div data-testid="my-games">
+            <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-paper-50/50">{t.myGames}</p>
+            {/* Au-delà de trois parties, la liste défile plutôt que de pousser
+                les boutons principaux hors de l'écran. */}
+            <ul className="rk-scroll max-h-44 space-y-1.5 overflow-y-auto">
+              {games.map((g) => (
+                <li key={g.code}>
+                  <button
+                    type="button"
+                    data-testid={`game-${g.code}`}
+                    data-my-turn={g.myTurn ? 'true' : 'false'}
+                    onClick={() => onResume(g.code)}
+                    disabled={disabled}
+                    className={`flex w-full min-h-11 items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left ring-1 transition active:scale-[0.98] disabled:opacity-40 ${
+                      g.myTurn ? 'bg-brass-400/15 ring-brass-300/40' : 'bg-white/8 ring-white/10'
+                    }`}
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-bold tracking-widest text-brass-300">{g.code}</span>
+                      <span className="block truncate text-[11px] text-paper-50/50">
+                        {g.phase === 'lobby'
+                          ? t.waitingToStart
+                          : `${t.round} ${g.round}/${g.roundsTotal} · ${g.myScore} ${t.groupTotalPoints}`}
+                      </span>
+                    </span>
+                    <span
+                      className={`shrink-0 text-[11px] font-semibold ${
+                        g.myTurn ? 'text-brass-300' : 'text-paper-50/45'
+                      }`}
+                    >
+                      {g.myTurn ? t.yourTurn : g.waitingFor ? t.waitingForPlayer(g.waitingFor) : ''}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
         <button
           type="button"

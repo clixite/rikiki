@@ -6,9 +6,11 @@ NÄIN SE TOIMII
 • Koko taito on osua tarkalleen oikeaan: ei enempää eikä vähempää
 
 MITÄ MUKANA ON
-• 3–6 pelaajaa, verkossa, reaaliajassa
+• 3–8 pelaajaa, verkossa, reaaliajassa
 • Automaattipelaajat täydentämään pöytää
 • Kolme muotoa: salama (10 min), klassinen (30 min) tai nouseva
+• Asynkroninen tila: kukin pelaa kun ehtii, päivienkin ajan
+• Kolme pisteytystä: löydä se, jota kotona pelataan
 • Koukkusääntö: ilmoitukset eivät voi koskaan mennä tasan
 • Kaveriryhmät ja pistetilanne pelien välillä
 • Pelihistoria ja tilastot

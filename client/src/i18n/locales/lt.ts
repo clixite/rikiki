@@ -91,6 +91,21 @@ export const lt: Messages = {
   },
   scoringLocked: 'Skaičiavimą pasirenka šeimininkas',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Tempas',
+  gamePaceHint: 'Kartu arba kiekvienas kada gali',
+  paceNames: {
+    live: 'Tiesiogiai',
+    async: 'Savo tempu',
+  },
+  paceDescriptions: {
+    live: 'Visi žaidžia vienu metu; per ilgas ėjimas sužaidžiamas savaime.',
+    async: 'Kiekvienas žaidžia kada gali, net kelias dienas. Niekas nežaidžia už tave.',
+  },
+  paceLocked: 'Tempą pasirenka šeimininkas',
+  waitingForPlayer: (pseudo: string) => `Laukiama ${pseudo}`,
+  waitingToStart: 'Laukiama pradžios',
+
   // Žaidimo stalas
   round: 'Ratas',
   cards: (n: number) => ltN(n, 'korta', 'kortos', 'kortų'),

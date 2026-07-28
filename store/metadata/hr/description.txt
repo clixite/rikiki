@@ -6,9 +6,11 @@ KAKO FUNKCIONIRA
 • Sva je vještina pogoditi točno: ni više, ni manje
 
 ŠTO JE UNUTRA
-• Od 3 do 6 igrača, online, u stvarnom vremenu
+• Od 3 do 8 igrača, online, u stvarnom vremenu
 • Automatski igrači kad vas je premalo
 • Tri formata: munjeviti (10 min), klasični (30 min) ili rastući
+• Asinkroni način: svatko igra kad može, danima
+• Tri načina bodovanja: pronađite onaj koji igrate kod kuće
 • Pravilo kuke: najave nikad ne mogu izaći točno
 • Grupe prijatelja s poretkom kroz partije
 • Povijest partija i statistika

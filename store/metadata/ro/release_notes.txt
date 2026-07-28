@@ -1,8 +1,6 @@
-Masă regândită: jucătorii stau acum în jurul pânzei, atuul apare mare pe margine, iar o bandă arată clar când e rândul tău.
+Două noutăți mult cerute: să jucați fără să fiți prezenți în același timp și să numărați punctele ca acasă.
 
-• Părăsirea unei partide în curs fără a bloca masa
-• Poză de profil: fă-ți un selfie
-• Reacții de trimis la masă
-• Istoric consultabil în timpul partidei
-• Mâna se reorganizează când se termină o culoare
-• Sunet corectat după trecerea în fundal
+• Modul „în ritmul tău”: fiecare joacă atunci când poate, jocul așteaptă
+• Jocurile în desfășurare pe ecranul principal, primul cel care vă așteaptă
+• Trei sisteme de punctaj, alese de gazdă în sală
+• Notificarea deschide direct jocul potrivit

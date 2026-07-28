@@ -6,9 +6,11 @@ HOGYAN MŰKÖDIK
 • A művészet a pontos találat: se többet, se kevesebbet
 
 MI VAN BENNE
-• 3–6 játékos, online, valós időben
+• 3–8 játékos, online, valós időben
 • Automatikus játékosok, ha kevesen vagytok
 • Három formátum: villám (10 perc), klasszikus (30 perc) vagy emelkedő
+• Aszinkron mód: mindenki akkor játszik, amikor tud, akár napokon át
+• Három pontozás: megtalálja a családban használtat
 • Horogszabály: a bemondások soha nem jöhetnek ki pontosan
 • Baráti csoportok, tabellával a partik között
 • Játékelőzmények és statisztikák

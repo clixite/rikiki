@@ -1,8 +1,6 @@
-Pöytä on uudistettu: pelaajat istuvat nyt pöydän ympärillä, valtti näkyy suurena sivussa ja palkki kertoo selvästi, milloin on sinun vuorosi.
+Kaksi pitkään toivottua uutuutta: pelaaminen ilman että kaikki ovat yhtä aikaa paikalla, ja pisteiden laskeminen kuten kotona.
 
-• Poistu käynnissä olevasta pelistä jumittamatta pöytää
-• Profiilikuva: ota selfie
-• Reaktiot lähetettäväksi pöytään
-• Historia luettavissa pelin aikana
-• Käsi järjestyy uudelleen, kun maa loppuu
-• Korjattu ääni taustalta palattaessa
+• ”Omaan tahtiin” -tila: kukin pelaa kun ehtii, peli odottaa
+• Kesken olevat pelit aloitusnäytöllä, sinua odottava ensimmäisenä
+• Kolme pisteytystä, isännän valinta aulassa
+• Ilmoitus avaa suoraan oikean pelin

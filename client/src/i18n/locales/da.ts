@@ -73,6 +73,21 @@ export const da: Messages = {
   },
   scoringLocked: 'Pointsystem valgt af værten',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Tempo',
+  gamePaceHint: 'Sammen, eller når hver især kan',
+  paceNames: {
+    live: 'Live',
+    async: 'I eget tempo',
+  },
+  paceDescriptions: {
+    live: 'Alle spiller samtidig; en for lang tur spilles automatisk.',
+    async: 'Hver spiller, når de kan, over flere dage. Ingen spiller for dig.',
+  },
+  paceLocked: 'Tempo valgt af værten',
+  waitingForPlayer: (pseudo: string) => `Venter på ${pseudo}`,
+  waitingToStart: 'Venter på start',
+
   // Spillebordet
   round: 'Runde',
   cards: (n: number) => `${n} kort`,

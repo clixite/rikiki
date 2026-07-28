@@ -1,6 +1,6 @@
 {
   "name": "rikiki",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "private": true,
   "description": "Jeu de Rikiki (Oh Hell) multijoueur : créez une partie, partagez un code à 4 lettres, jouez chacun depuis son téléphone.",
   "author": "Nicolas Simon",

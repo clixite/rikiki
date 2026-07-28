@@ -94,6 +94,21 @@ export const pl: Messages = {
   },
   scoringLocked: 'Punktację wybiera gospodarz',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Tempo',
+  gamePaceHint: 'Razem albo każdy, kiedy może',
+  paceNames: {
+    live: 'Na żywo',
+    async: 'We własnym tempie',
+  },
+  paceDescriptions: {
+    live: 'Wszyscy grają naraz; zbyt długa tura rozgrywa się sama.',
+    async: 'Każdy gra, kiedy może, nawet przez kilka dni. Nikt nie gra za ciebie.',
+  },
+  paceLocked: 'Tempo wybiera gospodarz',
+  waitingForPlayer: (pseudo: string) => `Czeka na ${pseudo}`,
+  waitingToStart: 'Czeka na start',
+
   // Stół
   round: 'Runda',
   cards: (n: number) => plural(n, '1 karta', `${n} karty`, `${n} kart`),

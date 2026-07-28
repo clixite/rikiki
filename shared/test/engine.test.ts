@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { cardId } from '../src/cards';
 import { applyAction, createGame, lowestLegalBid, lowestLegalCard } from '../src/engine';
-import { SCORING_VARIANTS, roundsSequence, scoreRound, type GameFormat, type ScoringVariant } from '../src/rules';
+import {
+  SCORING_VARIANTS,
+  roundsSequence,
+  scoreRound,
+  type GameFormat,
+  type GamePace,
+  type ScoringVariant,
+} from '../src/rules';
 import type { GameState } from '../src/types';
 
 function newLobby(nbPlayers: number): GameState {
@@ -257,6 +264,60 @@ describe('barème de score', () => {
     for (const p of state.players) {
       expect(round.roundScores![p.id]).toBe(scoreRound(round.bids[p.id]!, round.tricksWon[p.id], 'classic'));
     }
+  });
+});
+
+describe('rythme de la partie', () => {
+  it('démarre en temps réel par défaut', () => {
+    expect(newLobby(3).pace).toBe('live');
+  });
+
+  it('refuse un rythme venu d’un non-hôte, d’une valeur inconnue ou hors lobby', () => {
+    const lobby = newLobby(3);
+    expect(applyAction(lobby, { type: 'SET_PACE', playerId: 'p1', pace: 'async' })).toEqual({
+      ok: false,
+      error: 'NOT_HOST',
+    });
+    expect(applyAction(lobby, { type: 'SET_PACE', playerId: 'p0', pace: 'lent' as GamePace })).toEqual({
+      ok: false,
+      error: 'ILLEGAL_FORMAT',
+    });
+
+    const started = mustApply(lobby, { type: 'START_GAME', playerId: 'p0' });
+    expect(applyAction(started, { type: 'SET_PACE', playerId: 'p0', pace: 'async' })).toEqual({
+      ok: false,
+      error: 'BAD_PHASE',
+    });
+  });
+
+  it('en asynchrone, n’importe quel joueur relance la manche', () => {
+    let state = mustApply(newLobby(3), { type: 'SET_PACE', playerId: 'p0', pace: 'async' });
+    state = mustApply(state, { type: 'START_GAME', playerId: 'p0' });
+    while (state.phase !== 'round-scoring') {
+      const current = state.players.find((p) => p.seat === state.round!.currentSeat)!;
+      state =
+        state.phase === 'bidding'
+          ? mustApply(state, { type: 'BID', playerId: current.id, bid: lowestLegalBid(state, current.id) })
+          : mustApply(state, { type: 'PLAY_CARD', playerId: current.id, cardId: lowestLegalCard(state, current.id) });
+    }
+    const other = state.players.find((p) => p.id !== state.hostId)!;
+    expect(applyAction(state, { type: 'NEXT_ROUND', playerId: other.id }).ok).toBe(true);
+  });
+
+  it('en temps réel, la relance reste à l’hôte', () => {
+    let state = mustApply(newLobby(3), { type: 'START_GAME', playerId: 'p0' });
+    while (state.phase !== 'round-scoring') {
+      const current = state.players.find((p) => p.seat === state.round!.currentSeat)!;
+      state =
+        state.phase === 'bidding'
+          ? mustApply(state, { type: 'BID', playerId: current.id, bid: lowestLegalBid(state, current.id) })
+          : mustApply(state, { type: 'PLAY_CARD', playerId: current.id, cardId: lowestLegalCard(state, current.id) });
+    }
+    const other = state.players.find((p) => p.id !== state.hostId)!;
+    expect(applyAction(state, { type: 'NEXT_ROUND', playerId: other.id })).toEqual({
+      ok: false,
+      error: 'NOT_HOST',
+    });
   });
 });
 

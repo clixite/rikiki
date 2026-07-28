@@ -98,6 +98,21 @@ export const sl: Messages = {
   },
   scoringLocked: 'Točkovanje izbere gostitelj',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Ritem',
+  gamePaceHint: 'Skupaj ali vsak, ko utegne',
+  paceNames: {
+    live: 'V živo',
+    async: 'V lastnem ritmu',
+  },
+  paceDescriptions: {
+    live: 'Vsi igrajo hkrati; predolga poteza se odigra sama.',
+    async: 'Vsak igra, ko utegne, tudi več dni. Nihče ne igra namesto tebe.',
+  },
+  paceLocked: 'Ritem izbere gostitelj',
+  waitingForPlayer: (pseudo: string) => `Čaka se ${pseudo}`,
+  waitingToStart: 'Čaka se začetek',
+
   // Miza
   round: 'Krog',
   cards: (n: number) => plural(n, '1 karta', `${n} karti`, `${n} karte`, `${n} kart`),

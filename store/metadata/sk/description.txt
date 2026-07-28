@@ -6,9 +6,11 @@ AKO TO FUNGUJE
 • Celé umenie je trafiť sa presne: ani viac, ani menej
 
 ČO JE VNÚTRI
-• 3 až 6 hráčov, online, v reálnom čase
+• 3 až 8 hráčov, online, v reálnom čase
 • Automatickí hráči, keď vás je málo
 • Tri formáty: blesk (10 min), klasický (30 min) alebo stúpajúci
+• Asynchrónny režim: každý hrá, keď môže, aj niekoľko dní
+• Tri spôsoby bodovania: nájdite ten, ktorý hráte doma
 • Pravidlo háčika: hlášky nikdy nemôžu vyjsť presne
 • Skupiny priateľov s poradím naprieč partiami
 • História hier a štatistiky

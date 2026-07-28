@@ -262,7 +262,8 @@ describe('notification « c’est ton tour »', () => {
       expect(first.payload.title).toContain('À toi de jouer');
       expect(first.payload.body).toContain(room.code);
       expect(first.payload.tag).toBe(`rikiki-turn-${room.code}`);
-      expect(first.payload.url).toBe('/game');
+      // L'avis mène à CETTE partie : en asynchrone, on en a plusieurs en cours.
+      expect(first.payload.url).toBe(`/j/${room.code}`);
       // Les deux phases produisent un message adapté au fil de la partie.
       const bodies = sent.filter((s) => s.endpoint === bobEndpoint).map((s) => s.payload.body);
       expect(bodies.some((b) => b.includes('annonce'))).toBe(true);

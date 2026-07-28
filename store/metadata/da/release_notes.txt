@@ -1,8 +1,6 @@
-Bordet er redesignet: spillerne sidder nu rundt om filten, trumfen vises stort i siden, og et banner viser tydeligt, hvornår det er din tur.
+To længe ønskede nyheder: at spille uden at være til stede samtidig, og at tælle point som derhjemme.
 
-• Forlad et igangværende spil uden at blokere bordet
-• Profilbillede: tag en selfie
-• Reaktioner, du kan sende til bordet
-• Historik tilgængelig under spillet
-• Hånden sorteres igen, når en farve slipper op
-• Lyden rettet efter appen har været i baggrunden
+• Tilstanden “i eget tempo”: hver spiller, når de kan, spillet venter
+• Dine igangværende spil på forsiden, det der venter på dig først
+• Tre pointsystemer, valgt af værten i lobbyen
+• Notifikationen åbner nu direkte det rigtige spil

@@ -73,6 +73,21 @@ export const es: Messages = {
   },
   scoringLocked: 'Puntuación elegida por el anfitrión',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Ritmo',
+  gamePaceHint: 'Juntos, o cada uno cuando pueda',
+  paceNames: {
+    live: 'En directo',
+    async: 'A tu ritmo',
+  },
+  paceDescriptions: {
+    live: 'Todos juegan a la vez; un turno demasiado largo se juega solo.',
+    async: 'Cada uno juega cuando puede, durante días. Nadie juega por ti.',
+  },
+  paceLocked: 'Ritmo elegido por el anfitrión',
+  waitingForPlayer: (pseudo: string) => `Esperando a ${pseudo}`,
+  waitingToStart: 'Esperando el inicio',
+
   // Mesa de juego
   round: 'Ronda',
   cards: (n: number) => (n === 1 ? '1 carta' : `${n} cartas`),

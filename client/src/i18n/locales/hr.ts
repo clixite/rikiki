@@ -95,6 +95,21 @@ export const hr: Messages = {
   },
   scoringLocked: 'Bodovanje bira domaćin',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Ritam',
+  gamePaceHint: 'Zajedno ili svatko kad može',
+  paceNames: {
+    live: 'Uživo',
+    async: 'Vlastitim ritmom',
+  },
+  paceDescriptions: {
+    live: 'Svi igraju istovremeno; predug potez odigra se sam.',
+    async: 'Svatko igra kad može, danima. Nitko ne igra umjesto tebe.',
+  },
+  paceLocked: 'Ritam bira domaćin',
+  waitingForPlayer: (pseudo: string) => `Čeka se ${pseudo}`,
+  waitingToStart: 'Čeka se početak',
+
   // Stol
   round: 'Runda',
   cards: (n: number) => plural(n, `${n} karta`, `${n} karte`, `${n} karata`),

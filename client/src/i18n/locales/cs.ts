@@ -94,6 +94,21 @@ export const cs: Messages = {
   },
   scoringLocked: 'Bodování určuje hostitel',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Tempo',
+  gamePaceHint: 'Společně, nebo každý kdy může',
+  paceNames: {
+    live: 'Živě',
+    async: 'Vlastním tempem',
+  },
+  paceDescriptions: {
+    live: 'Všichni hrají naráz; příliš dlouhý tah se zahraje sám.',
+    async: 'Každý hraje, kdy může, klidně několik dní. Nikdo nehraje za tebe.',
+  },
+  paceLocked: 'Tempo určuje hostitel',
+  waitingForPlayer: (pseudo: string) => `Čeká se na ${pseudo}`,
+  waitingToStart: 'Čeká se na start',
+
   // Stůl
   round: 'Kolo',
   cards: (n: number) => plural(n, '1 karta', `${n} karty`, `${n} karet`),

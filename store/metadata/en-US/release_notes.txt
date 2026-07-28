@@ -1,8 +1,6 @@
-The table has been redesigned: players now sit around the felt, the trump suit is shown large on the side, and a banner makes it obvious when it is your turn.
+Two long-requested additions: playing without everyone being there at once, and counting points the way you do at home.
 
-• Leave a game in progress without stalling the table
-• Profile photo: take a selfie
-• Reactions to send around the table
-• History available during a game
-• Your hand re-sorts when a suit runs out
-• Sound fixed after the app goes to the background
+• “At your own pace” mode: everyone plays when they can, the game waits
+• Your games in progress on the home screen, the one waiting for you first
+• Three scoring systems, picked by the host in the lobby
+• Notifications now open the right game directly

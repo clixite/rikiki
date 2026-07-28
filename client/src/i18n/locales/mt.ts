@@ -107,6 +107,21 @@ export const mt: Messages = {
   },
   scoringLocked: 'Il-punteġġ jagħżlu l-ospitu',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Ritmu',
+  gamePaceHint: 'Flimkien, jew kull wieħed meta jista’',
+  paceNames: {
+    live: 'Live',
+    async: 'Bir-ritmu tiegħek',
+  },
+  paceDescriptions: {
+    live: 'Kulħadd jilgħab fl-istess ħin; dawra twila wisq tintlagħab waħedha.',
+    async: 'Kull wieħed jilgħab meta jista’, anke fuq jiem. Ħadd ma jilgħab minflokek.',
+  },
+  paceLocked: 'Ir-ritmu jagħżlu l-ospitu',
+  waitingForPlayer: (pseudo: string) => `Qed jistenna lil ${pseudo}`,
+  waitingToStart: 'Qed jistenna l-bidu',
+
   // Il-mejda
   round: 'Rawnd',
   cards: (n: number) => karti(n),

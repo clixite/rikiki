@@ -6,9 +6,11 @@ ZO WERKT HET
 • De kunst is precies goed zitten: niet meer, niet minder
 
 WAT ERIN ZIT
-• 3 tot 6 spelers, online en in real time
+• 3 tot 8 spelers, online en in real time
 • Automatische spelers om de tafel vol te maken
 • Drie formats: bliksem (10 min), klassiek (30 min) of oplopend
+• Asynchrone modus: iedereen speelt wanneer het uitkomt, over meerdere dagen
+• Drie puntentellingen: kies die van thuis
 • Haakregel: de voorspellingen kunnen nooit precies uitkomen
 • Vriendengroepen met een klassement over meerdere partijen
 • Geschiedenis van je partijen en statistieken

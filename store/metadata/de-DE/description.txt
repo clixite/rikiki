@@ -6,9 +6,11 @@ SO GEHT ES
 • Die Kunst besteht darin, genau richtig zu liegen: nicht mehr, nicht weniger
 
 WAS DRIN IST
-• 3 bis 6 Spieler, online, in Echtzeit
+• 3 bis 8 Spieler, online, in Echtzeit
 • Automatische Mitspieler, wenn jemand fehlt
 • Drei Formate: Blitz (10 Min.), klassisch (30 Min.) oder aufsteigend
+• Asynchroner Modus: Jeder spielt, wann er kann, über mehrere Tage
+• Drei Wertungen: die eigene Hausregel ist dabei
 • Hook-Regel: die Ansagen können nie genau aufgehen
 • Freundesgruppen mit Rangliste über mehrere Partien
 • Spielverlauf und persönliche Statistiken

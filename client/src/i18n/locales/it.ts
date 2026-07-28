@@ -73,6 +73,21 @@ export const it: Messages = {
   },
   scoringLocked: 'Punteggio scelto dall’ospite',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Ritmo',
+  gamePaceHint: 'Insieme, o ciascuno quando può',
+  paceNames: {
+    live: 'In diretta',
+    async: 'Al proprio ritmo',
+  },
+  paceDescriptions: {
+    live: 'Tutti giocano insieme; un turno troppo lungo si gioca da solo.',
+    async: 'Ognuno gioca quando può, anche su più giorni. Nessuno gioca al posto tuo.',
+  },
+  paceLocked: 'Ritmo scelto dall’ospite',
+  waitingForPlayer: (pseudo: string) => `In attesa di ${pseudo}`,
+  waitingToStart: 'In attesa dell’avvio',
+
   // Tavolo da gioco
   round: 'Mano',
   cards: (n: number) => (n === 1 ? '1 carta' : `${n} carte`),

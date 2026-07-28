@@ -6,9 +6,11 @@ COMMENT ÇA MARCHE
 • Tout l'art est de tomber juste : ni plus, ni moins
 
 CE QUI EST INCLUS
-• De 3 à 6 joueurs, en ligne, en temps réel
+• De 3 à 8 joueurs, en ligne, en temps réel
 • Joueurs automatiques pour compléter la table
 • Trois formats : éclair (10 min), classique (30 min) ou montée en puissance
+• Mode asynchrone : chacun joue quand il peut, sur plusieurs jours
+• Trois barèmes de score : retrouvez celui de votre famille
 • Règle du crochet : le total annoncé ne peut jamais tomber juste
 • Groupes d'amis avec classement au fil des parties
 • Historique de vos parties et statistiques

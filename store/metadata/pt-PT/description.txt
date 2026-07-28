@@ -6,9 +6,11 @@ COMO FUNCIONA
 • A arte está em acertar em cheio: nem mais, nem menos
 
 O QUE ESTÁ INCLUÍDO
-• De 3 a 6 jogadores, online, em tempo real
+• De 3 a 8 jogadores, online, em tempo real
 • Jogadores automáticos para completar a mesa
 • Três formatos: relâmpago (10 min), clássico (30 min) ou crescente
+• Modo assíncrono: cada um joga quando pode, ao longo de dias
+• Três sistemas de pontuação: encontre o da sua família
 • Regra do gancho: os anúncios nunca podem bater certo
 • Grupos de amigos com classificação ao longo dos jogos
 • Histórico de jogos e estatísticas

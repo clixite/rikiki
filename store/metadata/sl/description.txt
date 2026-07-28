@@ -6,9 +6,11 @@ KAKO DELUJE
 • Vsa umetnost je zadeti natanko: ne več, ne manj
 
 KAJ JE VKLJUČENO
-• Od 3 do 6 igralcev, po spletu, v realnem času
+• Od 3 do 8 igralcev, po spletu, v realnem času
 • Samodejni igralci, ko vas je premalo
 • Trije formati: bliskovit (10 min), klasičen (30 min) ali naraščajoč
+• Asinhroni način: vsak igra, ko utegne, tudi več dni
+• Trije načini točkovanja: poiščite tistega, ki ga igrate doma
 • Pravilo kljuke: napovedi nikoli ne morejo iziti natanko
 • Skupine prijateljev z razvrstitvijo med partijami
 • Zgodovina iger in statistika

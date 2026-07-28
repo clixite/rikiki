@@ -1,8 +1,6 @@
-De tafel is opnieuw ontworpen: spelers zitten nu rond het laken, de troef staat groot aan de zijkant en een balk maakt duidelijk wanneer jij aan de beurt bent.
+Twee langgevraagde nieuwigheden: spelen zonder er tegelijk te zijn, en punten tellen zoals thuis.
 
-• Een lopende partij verlaten zonder de tafel te blokkeren
-• Profielfoto: maak een selfie
-• Reacties om naar de tafel te sturen
-• Geschiedenis raadpleegbaar tijdens de partij
-• Je hand sorteert opnieuw als een kleur opraakt
-• Geluid hersteld na terugkeer uit de achtergrond
+• Modus “in eigen tempo”: iedereen speelt wanneer het uitkomt, het spel wacht
+• Je lopende partijen op het startscherm, die op jou wacht als eerste
+• Drie puntentellingen, gekozen door de host in de lobby
+• De melding opent meteen de juiste partij

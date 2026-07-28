@@ -106,6 +106,21 @@ export const ga: Messages = {
   },
   scoringLocked: 'Roghnaíonn an t-óstach an scóráil',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Luas',
+  gamePaceHint: 'Le chéile, nó gach duine nuair is féidir',
+  paceNames: {
+    live: 'Beo',
+    async: 'Ar do luas féin',
+  },
+  paceDescriptions: {
+    live: 'Imríonn cách ag an am céanna; imrítear seal rófhada go huathoibríoch.',
+    async: 'Imríonn gach duine nuair is féidir, thar laethanta. Ní imríonn aon duine ar do shon.',
+  },
+  paceLocked: 'Roghnaíonn an t-óstach an luas',
+  waitingForPlayer: (pseudo: string) => `Ag fanacht le ${pseudo}`,
+  waitingToStart: 'Ag fanacht leis an tús',
+
   // An bord
   round: 'Babhta',
   cards: (n: number) => cartai(n),

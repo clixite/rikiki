@@ -115,6 +115,18 @@ export class Room {
   }
 
   /**
+   * Partie asynchrone : chacun joue quand il peut.
+   *
+   * Tout ce qui, en temps réel, sert à ne pas faire attendre la table — le
+   * minuteur du tour, le passage en jeu automatique après une déconnexion —
+   * devient nuisible ici : une table vide est l'état normal, et jouer à la
+   * place de quelqu'un qui n'a rien demandé lui vole sa partie.
+   */
+  get isAsync(): boolean {
+    return this.state.pace === 'async';
+  }
+
+  /**
    * Reprise après un redémarrage du serveur.
    *
    * Les sockets et les timers vivent dans le processus : rien de tout cela n'a
@@ -138,11 +150,16 @@ export class Room {
       ...this.state,
       players: this.state.players.map((p) => (isBotId(p.id) ? p : { ...p, connected: false })),
     };
-    for (const p of this.state.players) {
-      if (isBotId(p.id)) continue;
-      const t = setTimeout(() => this.onRestoreGraceExpired(p.id), GRACE_SECONDS * 1000);
-      t.unref?.();
-      this.graceTimers.set(p.id, t);
+    // Une partie asynchrone n'attend personne : aucun délai de grâce à armer,
+    // sinon un redémarrage du serveur viderait le salon ou jouerait pour toute
+    // la table alors que personne n'a rien demandé.
+    if (!this.isAsync) {
+      for (const p of this.state.players) {
+        if (isBotId(p.id)) continue;
+        const t = setTimeout(() => this.onRestoreGraceExpired(p.id), GRACE_SECONDS * 1000);
+        t.unref?.();
+        this.graceTimers.set(p.id, t);
+      }
     }
     this.schedulePersist();
     this.scheduleAutoplay();
@@ -252,6 +269,8 @@ export class Room {
 
     const s = this.state;
     if ((s.phase !== 'bidding' && s.phase !== 'playing') || !s.round) return;
+    // En asynchrone, personne ne fait attendre personne : pas de compte à rebours.
+    if (this.isAsync) return;
     const seconds = this.options.turnSeconds ?? TURN_SECONDS;
     if (seconds <= 0) return;
     const current = s.players.find((p) => p.seat === s.round!.currentSeat);
@@ -323,7 +342,11 @@ export class Room {
     socket.data.roomCode = null;
     socket.leave(this.code);
 
-    if (this.state.phase === 'lobby') {
+    // En temps réel, un joueur déconnecté du salon est un fantôme : la partie
+    // démarrerait avec un siège qui bloque son tour. En asynchrone, créer la
+    // table, envoyer le code et refermer l'application est le geste normal —
+    // le salon doit lui survivre.
+    if (this.state.phase === 'lobby' && !this.isAsync) {
       this.removePlayer(userId);
       return;
     }
@@ -334,6 +357,9 @@ export class Room {
       this.broadcastViews();
     }
     this.emitEvent({ type: 'player-disconnected', playerId: userId, graceSeconds: GRACE_SECONDS });
+    // En asynchrone, fermer l'application n'est pas un abandon : c'est la
+    // façon normale de jouer. Son tour l'attendra aussi longtemps qu'il faut.
+    if (this.isAsync) return;
     const t = setTimeout(() => this.onGraceExpired(userId), GRACE_SECONDS * 1000);
     this.graceTimers.set(userId, t);
   }

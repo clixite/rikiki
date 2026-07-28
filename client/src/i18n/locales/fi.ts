@@ -80,6 +80,21 @@ export const fi: Messages = {
   },
   scoringLocked: 'Isäntä valitsee pisteytyksen',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Tahti',
+  gamePaceHint: 'Yhdessä tai kukin silloin kun ehtii',
+  paceNames: {
+    live: 'Reaaliaika',
+    async: 'Omaan tahtiin',
+  },
+  paceDescriptions: {
+    live: 'Kaikki pelaavat yhtä aikaa; liian pitkä vuoro pelataan puolestasi.',
+    async: 'Kukin pelaa kun ehtii, päivienkin ajan. Kukaan ei pelaa puolestasi.',
+  },
+  paceLocked: 'Isäntä valitsee tahdin',
+  waitingForPlayer: (pseudo: string) => `Odotetaan pelaajaa ${pseudo}`,
+  waitingToStart: 'Odotetaan aloitusta',
+
   // Pelipöytä
   round: 'Kierros',
   cards: (n: number) => fiN(n, 'kortti', 'korttia'),

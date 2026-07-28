@@ -1,8 +1,6 @@
-Přepracovaný stůl: hráči sedí kolem sukna, trumf je velký po straně a pruh jasně ukazuje, kdy jsi na řadě.
+Dvě dlouho žádané novinky: hrát, aniž byste museli být online zároveň, a počítat body jako doma.
 
-• Opuštění rozehrané hry bez blokování stolu
-• Profilová fotka: vyfoť se
-• Reakce k odeslání ke stolu
-• Historie dostupná během hry
-• Ruka se přeskládá, když dojde barva
-• Opravený zvuk po návratu z pozadí
+• Režim „vlastním tempem“: každý hraje, kdy může, hra počká
+• Rozehrané hry na úvodní obrazovce, ta čekající na vás jako první
+• Tři způsoby bodování, které vybírá hostitel v místnosti
+• Upozornění otevře rovnou tu správnou hru

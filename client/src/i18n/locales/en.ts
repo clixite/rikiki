@@ -73,6 +73,21 @@ export const en: Messages = {
   },
   scoringLocked: 'Scoring set by the host',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Pace',
+  gamePaceHint: 'Together, or whenever each can',
+  paceNames: {
+    live: 'Live',
+    async: 'At your own pace',
+  },
+  paceDescriptions: {
+    live: 'Everyone plays at once; a turn that drags on plays itself.',
+    async: 'Everyone plays when they can, over days. Nobody plays your hand for you.',
+  },
+  paceLocked: 'Pace set by the host',
+  waitingForPlayer: (pseudo: string) => `Waiting for ${pseudo}`,
+  waitingToStart: 'Waiting to start',
+
   // Table
   round: 'Round',
   cards: (n: number) => (n === 1 ? '1 card' : `${n} cards`),

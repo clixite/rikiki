@@ -90,6 +90,21 @@ export const lv: Messages = {
   },
   scoringLocked: 'Skaitīšanu izvēlas rīkotājs',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Temps',
+  gamePaceHint: 'Kopā vai katrs, kad var',
+  paceNames: {
+    live: 'Tiešraidē',
+    async: 'Savā tempā',
+  },
+  paceDescriptions: {
+    live: 'Visi spēlē vienlaikus; pārāk ilgs gājiens tiek nospēlēts automātiski.',
+    async: 'Katrs spēlē, kad var, pat vairākas dienas. Neviens nespēlē tavā vietā.',
+  },
+  paceLocked: 'Tempu izvēlas rīkotājs',
+  waitingForPlayer: (pseudo: string) => `Gaida ${pseudo}`,
+  waitingToStart: 'Gaida sākumu',
+
   // Spēles galds
   round: 'Kārta',
   cards: (n: number) => lvN(n, 'kārts', 'kārtis', 'kāršu'),

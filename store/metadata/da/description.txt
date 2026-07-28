@@ -6,9 +6,11 @@ SÅDAN FUNGERER DET
 • Hele kunsten er at ramme præcist: hverken mere eller mindre
 
 HVAD DER ER I
-• 3 til 6 spillere, online, i realtid
+• 3 til 8 spillere, online, i realtid
 • Automatiske spillere, når I mangler nogen
 • Tre formater: lyn (10 min), klassisk (30 min) eller stigende
+• Asynkron tilstand: hver spiller, når de kan, over flere dage
+• Tre pointsystemer: find det, I bruger derhjemme
 • Krogreglen: meldingerne kan aldrig gå lige op
 • Vennegrupper med stilling på tværs af spil
 • Spilhistorik og statistik

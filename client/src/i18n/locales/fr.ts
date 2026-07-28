@@ -1,4 +1,4 @@
-import type { GameFormat, ScoringVariant } from '@rikiki/shared';
+import type { GameFormat, GamePace, ScoringVariant } from '@rikiki/shared';
 
 export const fr = {
   appName: 'Rikiki',
@@ -72,6 +72,21 @@ export const fr = {
     always: 'Tes plis comptent toujours, +10 si le contrat est tenu.',
   } as Record<ScoringVariant, string>,
   scoringLocked: 'Barème choisi par l’hôte',
+
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Rythme',
+  gamePaceHint: 'Ensemble, ou chacun quand il peut',
+  paceNames: {
+    live: 'Temps réel',
+    async: 'Au rythme de chacun',
+  } as Record<GamePace, string>,
+  paceDescriptions: {
+    live: 'Tout le monde joue en même temps ; un tour qui s’éternise se joue tout seul.',
+    async: 'Chacun joue quand il peut, sur plusieurs jours. Personne ne joue à ta place.',
+  } as Record<GamePace, string>,
+  paceLocked: 'Rythme choisi par l’hôte',
+  waitingForPlayer: (pseudo: string) => `En attente de ${pseudo}`,
+  waitingToStart: 'En attente du lancement',
 
   // Table de jeu
   round: 'Manche',

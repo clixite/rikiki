@@ -6,9 +6,11 @@ CÓMO FUNCIONA
 • Todo el arte está en acertar justo: ni una más, ni una menos
 
 QUÉ INCLUYE
-• De 3 a 6 jugadores, en línea y en tiempo real
+• De 3 a 8 jugadores, en línea y en tiempo real
 • Jugadores automáticos para completar la mesa
 • Tres formatos: relámpago (10 min), clásico (30 min) o ascendente
+• Modo asíncrono: cada uno juega cuando puede, durante días
+• Tres sistemas de puntuación: encuentra el de tu familia
 • Regla del gancho: los anuncios nunca pueden cuadrar
 • Grupos de amigos con clasificación entre partidas
 • Historial de partidas y estadísticas

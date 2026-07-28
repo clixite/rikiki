@@ -196,6 +196,31 @@ for (const profile of PROFILES) {
   const startDisabledAt2 = await host.page.locator('[data-testid="start-game"]').isDisabled();
   check('salon : démarrage bloqué à 2 joueurs', startDisabledAt2);
 
+  // ---- Rythme : temps réel ou asynchrone
+  const paceVisible = (await host.page.locator('[data-testid="pace-picker"]').count()) > 0;
+  check('salon : choix du rythme', paceVisible);
+  if (paceVisible) {
+    const defaultPace = await host.page.getAttribute('[data-testid="pace-picker"]', 'data-pace');
+    check('salon : temps réel par défaut', defaultPace === 'live', String(defaultPace));
+
+    const paceBox = await host.page.locator('[data-testid="pace-live"]').boundingBox();
+    check('salon : cible du rythme ≥ 44px', (paceBox?.height ?? 0) >= MIN_TOUCH - 0.5, JSON.stringify(paceBox));
+
+    await host.page.click('[data-testid="pace-async"]');
+    const spread = await p2.page
+      .waitForSelector('[data-testid="pace-picker"][data-pace="async"]', { timeout: 10000 })
+      .then(() => true)
+      .catch(() => false);
+    check('salon : rythme diffusé à toute la table', spread);
+
+    const paceRule = (await p2.page.textContent('[data-testid="pace-description"]')) ?? '';
+    check('salon : le rythme est expliqué en toutes lettres', paceRule.trim().length > 20, paceRule.trim());
+
+    // Le reste du parcours se joue en temps réel.
+    await host.page.click('[data-testid="pace-live"]');
+    await host.page.waitForSelector('[data-testid="pace-picker"][data-pace="live"]', { timeout: 10000 });
+  }
+
   // ---- Barème de score : l'hôte choisit, la table entière doit le voir
   const scoringVisible = (await host.page.locator('[data-testid="scoring-picker"]').count()) > 0;
   check('salon : choix du barème de score', scoringVisible);
@@ -242,6 +267,15 @@ for (const profile of PROFILES) {
     const startEnabled = await host.page.locator('[data-testid="start-game"]').isEnabled();
     check('salon : démarrage possible après ajout d’un robot', startEnabled);
   }
+
+  // Le salon porte maintenant trois réglages : le bouton de lancement ne doit
+  // pas être repoussé hors de l'écran pour autant.
+  const startVisible = await isFullyVisible(host.page, '[data-testid="start-game"]');
+  check(
+    'salon : le bouton démarrer reste dans l’écran',
+    startVisible.found && startVisible.visible && startVisible.insideViewport,
+    JSON.stringify(startVisible),
+  );
   if (SHOTS) { await settle(host.page); await host.page.screenshot({ path: `${SHOTS}/${profile.name.replace(/\W+/g, '-')}-02-lobby.png` }); }
 
   // ---- Lancement de la partie
@@ -531,6 +565,54 @@ console.log('\n▸ Accessibilité et préférences système');
     /Supprimer mon compte/.test(privacyBody) && /Delete my account/.test(privacyBody),
   );
 
+  await ctx.close();
+}
+
+{
+  // Parties en cours listées sur l'accueil.
+  //
+  // C'est ce qui rend le mode asynchrone utilisable : sans cette liste, une
+  // partie qu'on a quittée hier n'existe plus que dans la mémoire du
+  // navigateur, et pas du tout sur un autre appareil.
+  const ctx = await browser.newContext({ ...PROFILES[0], ignoreHTTPSErrors: true });
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/`);
+  await createProfile(page, 'Momo');
+  await page.waitForSelector('[data-testid="create-game"]:not([disabled])', { timeout: 15000 });
+  await page.click('[data-testid="create-game"]');
+  await page.waitForSelector('[data-testid="room-code"]', { timeout: 15000 });
+  const myCode = (await page.textContent('[data-testid="room-code"]')).trim();
+
+  // En asynchrone, créer la table puis refermer l'application est le geste
+  // normal : le salon doit encore être là au retour.
+  await page.click('[data-testid="pace-async"]');
+  await page.waitForSelector('[data-testid="pace-picker"][data-pace="async"]', { timeout: 10000 });
+
+  await page.goto(`${BASE}/`);
+  const listed = await page
+    .waitForSelector(`[data-testid="game-${myCode}"]`, { timeout: 15000 })
+    .then(() => true)
+    .catch(() => false);
+  check('accueil : la partie en cours est listée', listed, myCode);
+  if (listed) {
+    check('accueil : liste sans débordement horizontal', await noHorizontalOverflow(page));
+    const box = await page.locator(`[data-testid="game-${myCode}"]`).boundingBox();
+    check('accueil : cible de reprise ≥ 44px', (box?.height ?? 0) >= MIN_TOUCH - 0.5, JSON.stringify(box));
+    const startVisible = await isFullyVisible(page, '[data-testid="create-game"]');
+    check(
+      'accueil : la liste ne chasse pas le bouton principal',
+      startVisible.found && startVisible.visible && startVisible.insideViewport,
+      JSON.stringify(startVisible),
+    );
+    // Un clic ramène bien dans CETTE partie
+    await page.click(`[data-testid="game-${myCode}"]`);
+    const back = await page
+      .waitForSelector('[data-testid="room-code"]', { timeout: 15000 })
+      .then(() => page.textContent('[data-testid="room-code"]'))
+      .catch(() => null);
+    check('accueil : la reprise ouvre la bonne partie', back?.trim() === myCode, String(back));
+  }
+  if (SHOTS) { await settle(page); await page.screenshot({ path: `${SHOTS}/my-games.png` }); }
   await ctx.close();
 }
 

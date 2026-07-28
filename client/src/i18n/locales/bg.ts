@@ -85,6 +85,21 @@ export const bg: Messages = {
   },
   scoringLocked: 'Точкуването се избира от домакина',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Ритъм',
+  gamePaceHint: 'Заедно или всеки когато може',
+  paceNames: {
+    live: 'На живо',
+    async: 'Свободен ритъм',
+  },
+  paceDescriptions: {
+    live: 'Всички играят едновременно; твърде дълъг ход се изиграва сам.',
+    async: 'Всеки играе когато може, в продължение на дни. Никой не играе вместо теб.',
+  },
+  paceLocked: 'Ритъмът се избира от домакина',
+  waitingForPlayer: (pseudo: string) => `Чака се ${pseudo}`,
+  waitingToStart: 'Чака се начало',
+
   // Маса за игра
   round: 'Рунд',
   cards: (n: number) => karti(n),

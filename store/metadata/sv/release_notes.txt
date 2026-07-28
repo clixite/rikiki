@@ -1,8 +1,6 @@
-Bordet är omgjort: spelarna sitter nu runt duken, trumfen visas stort på sidan och en banderoll visar tydligt när det är din tur.
+Två efterlängtade nyheter: att spela utan att alla är på plats samtidigt, och att räkna poäng som hemma.
 
-• Lämna ett pågående parti utan att blockera bordet
-• Profilbild: ta en selfie
-• Reaktioner att skicka till bordet
-• Historiken går att se under partiet
-• Handen sorteras om när en färg tar slut
-• Ljudet fixat efter att appen varit i bakgrunden
+• Läget ”i egen takt”: var och en spelar när det passar, spelet väntar
+• Dina pågående partier på startskärmen, den som väntar på dig först
+• Tre poängräkningar, valda av värden i lobbyn
+• Aviseringen öppnar direkt rätt parti

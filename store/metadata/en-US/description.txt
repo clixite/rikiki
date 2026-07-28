@@ -6,9 +6,11 @@ HOW IT WORKS
 • The whole point is to be exactly right: no more, no less
 
 WHAT'S INSIDE
-• 3 to 6 players, online, in real time
+• 3 to 8 players, online, in real time
 • Bots to fill the table when you're short
 • Three formats: blitz (10 min), classic (30 min) or climb
+• Asynchronous mode: everyone plays when they can, over days
+• Three scoring systems: find the one your family plays
 • The hook rule: the calls can never add up to the tricks available
 • Friend groups with standings across games
 • Game history and personal statistics

@@ -6,9 +6,11 @@ COME FUNZIONA
 • Tutta l'arte sta nell'indovinare esatto: né una in più, né una in meno
 
 COSA C'È DENTRO
-• Da 3 a 6 giocatori, online, in tempo reale
+• Da 3 a 8 giocatori, online, in tempo reale
 • Giocatori automatici per completare il tavolo
 • Tre formati: lampo (10 min), classico (30 min) o crescente
+• Modalità asincrona: ognuno gioca quando può, anche su più giorni
+• Tre sistemi di punteggio: ritrova quello di casa tua
 • Regola dell'uncino: le dichiarazioni non possono mai quadrare
 • Gruppi di amici con classifica tra le partite
 • Cronologia delle partite e statistiche

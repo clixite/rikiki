@@ -22,6 +22,12 @@ entièrement côté serveur, aucun joueur ne voit la main d'un autre.
 - **Règles classiques avec crochet** — manches 1 → 10 → 1, atout retourné, le
   dernier annonceur ne peut pas égaliser le nombre de plis ; contrat réussi
   10 + 2 × plis, sinon −2 par pli d'écart. De 3 à 8 joueurs.
+- **Trois barèmes de score** — classique, bienveillant (jamais de points
+  négatifs) ou « plis toujours comptés » : chaque famille retrouve le sien.
+- **Deux rythmes** — en temps réel, un tour trop long se joue tout seul pour ne
+  pas bloquer la table ; en asynchrone, chacun joue quand il peut sur plusieurs
+  jours, personne n'est jamais joué à sa place, et l'accueil liste les parties
+  en cours en mettant devant celle qui vous attend.
 - **Pensé pour le mobile** — main toujours visible, y compris pendant les
   annonces ; reconnexion automatique ; écran maintenu allumé ; sons coupables
   d'un geste ; animations respectant `prefers-reduced-motion`.
@@ -42,7 +48,7 @@ entièrement côté serveur, aucun joueur ne voit la main d'un autre.
 
 ```bash
 npm install
-npm test                 # 82 tests : règles, moteur, robots, sockets, comptes
+npm test                 # 180 tests : règles, moteur, robots, sockets, comptes
 npm run dev:server       # serveur sur :3000
 npm run dev:client       # client Vite sur :5173 (proxy vers :3000)
 ```
@@ -58,7 +64,7 @@ PORT=3111 DB_PATH=:memory: npx tsx server/src/index.ts &
 BASE_URL=http://localhost:3111 SHOTS_DIR=/tmp/shots FULL_GAME=1 node scripts/e2e.mjs
 ```
 
-**Tests d'ergonomie** — 90 vérifications d'interface sur trois formats de
+**Tests d'ergonomie** — 180 vérifications d'interface sur trois formats de
 téléphone (visibilité de la main pendant l'annonce, cibles tactiles, absence
 de chevauchement et de débordement, persistance du son, manifest PWA) :
 

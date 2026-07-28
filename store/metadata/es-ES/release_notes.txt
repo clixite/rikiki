@@ -1,8 +1,6 @@
-Mesa rediseñada: los jugadores se sitúan alrededor del tapete, el triunfo aparece en grande a un lado y una banda indica claramente cuándo te toca.
+Dos novedades muy pedidas: jugar sin estar todos a la vez y contar los puntos como en casa.
 
-• Salir de una partida en curso sin bloquear la mesa
-• Foto de perfil: hazte un selfie
-• Reacciones para enviar a la mesa
-• Historial consultable durante la partida
-• La mano se reordena cuando desaparece un palo
-• Corregido el sonido tras pasar a segundo plano
+• Modo «a tu ritmo»: cada uno juega cuando puede, la partida espera
+• Tus partidas en curso en la pantalla de inicio, primero la que te espera
+• Tres sistemas de puntuación, elegidos por el anfitrión en la sala
+• La notificación abre directamente la partida correcta

@@ -83,6 +83,21 @@ export const el: Messages = {
   },
   scoringLocked: 'Η βαθμολογία ορίζεται από τον οικοδεσπότη',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Ρυθμός',
+  gamePaceHint: 'Μαζί ή ο καθένας όποτε μπορεί',
+  paceNames: {
+    live: 'Ζωντανά',
+    async: 'Με τον ρυθμό σου',
+  },
+  paceDescriptions: {
+    live: 'Όλοι παίζουν ταυτόχρονα· μια πολύ αργή σειρά παίζεται μόνη της.',
+    async: 'Ο καθένας παίζει όποτε μπορεί, για μέρες. Κανείς δεν παίζει στη θέση σου.',
+  },
+  paceLocked: 'Ο ρυθμός ορίζεται από τον οικοδεσπότη',
+  waitingForPlayer: (pseudo: string) => `Αναμονή για ${pseudo}`,
+  waitingToStart: 'Αναμονή για εκκίνηση',
+
   // Τραπέζι
   round: 'Γύρος',
   cards: (n: number) => fylla(n),

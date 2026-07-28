@@ -78,6 +78,21 @@ export const hu: Messages = {
   },
   scoringLocked: 'A pontozást a házigazda választja',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Tempó',
+  gamePaceHint: 'Együtt, vagy ki-ki amikor tud',
+  paceNames: {
+    live: 'Élő',
+    async: 'Saját tempóban',
+  },
+  paceDescriptions: {
+    live: 'Mindenki egyszerre játszik; a túl hosszú kör magától lejátszódik.',
+    async: 'Mindenki akkor játszik, amikor tud, akár napokon át. Senki nem játszik helyetted.',
+  },
+  paceLocked: 'A tempót a házigazda választja',
+  waitingForPlayer: (pseudo: string) => `${pseudo} következik`,
+  waitingToStart: 'Indulásra vár',
+
   // Asztal
   round: 'Kör',
   cards: (n: number) => `${n} lap`,

@@ -1,8 +1,6 @@
-Przeprojektowany stół: gracze siedzą wokół sukna, atut jest duży z boku, a pasek wyraźnie pokazuje, kiedy jest twoja kolej.
+Dwie długo wyczekiwane nowości: gra bez konieczności bycia online w tym samym czasie i liczenie punktów jak w domu.
 
-• Opuszczenie trwającej rozgrywki bez blokowania stołu
-• Zdjęcie profilowe: zrób sobie selfie
-• Reakcje wysyłane do stołu
-• Historia dostępna w trakcie rozgrywki
-• Ręka porządkuje się, gdy kończy się kolor
-• Poprawiony dźwięk po powrocie z tła
+• Tryb „we własnym tempie”: każdy gra, kiedy może, gra czeka
+• Twoje rozgrywki w toku na ekranie głównym, najpierw ta czekająca na ciebie
+• Trzy punktacje, wybierane przez gospodarza w poczekalni
+• Powiadomienie otwiera od razu właściwą rozgrywkę

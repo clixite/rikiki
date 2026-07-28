@@ -73,6 +73,21 @@ export const sv: Messages = {
   },
   scoringLocked: 'Poängräkning vald av värden',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Tempo',
+  gamePaceHint: 'Tillsammans, eller var och en när det passar',
+  paceNames: {
+    live: 'Live',
+    async: 'I egen takt',
+  },
+  paceDescriptions: {
+    live: 'Alla spelar samtidigt; ett drag som drar ut spelas automatiskt.',
+    async: 'Var och en spelar när det passar, över flera dagar. Ingen spelar åt dig.',
+  },
+  paceLocked: 'Tempo valt av värden',
+  waitingForPlayer: (pseudo: string) => `Väntar på ${pseudo}`,
+  waitingToStart: 'Väntar på start',
+
   // Spelbordet
   round: 'Runda',
   cards: (n: number) => `${n} kort`,

@@ -73,6 +73,21 @@ export const de: Messages = {
   },
   scoringLocked: 'Wertung vom Gastgeber gewählt',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Tempo',
+  gamePaceHint: 'Gemeinsam oder wann jeder kann',
+  paceNames: {
+    live: 'Live',
+    async: 'Im eigenen Tempo',
+  },
+  paceDescriptions: {
+    live: 'Alle spielen gleichzeitig; ein zu langer Zug wird selbst gespielt.',
+    async: 'Jeder spielt, wann er kann, über mehrere Tage. Niemand spielt für dich.',
+  },
+  paceLocked: 'Tempo vom Gastgeber gewählt',
+  waitingForPlayer: (pseudo: string) => `Wartet auf ${pseudo}`,
+  waitingToStart: 'Wartet auf den Start',
+
   // Spieltisch
   round: 'Runde',
   cards: (n: number) => (n === 1 ? '1 Karte' : `${n} Karten`),

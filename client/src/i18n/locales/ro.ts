@@ -103,6 +103,21 @@ export const ro: Messages = {
   },
   scoringLocked: 'Punctajul este ales de gazdă',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Ritm',
+  gamePaceHint: 'Împreună sau fiecare când poate',
+  paceNames: {
+    live: 'În direct',
+    async: 'În ritmul tău',
+  },
+  paceDescriptions: {
+    live: 'Toți joacă în același timp; un tur prea lung se joacă singur.',
+    async: 'Fiecare joacă atunci când poate, chiar zile la rând. Nimeni nu joacă în locul tău.',
+  },
+  paceLocked: 'Ritmul este ales de gazdă',
+  waitingForPlayer: (pseudo: string) => `Se așteaptă ${pseudo}`,
+  waitingToStart: 'Se așteaptă startul',
+
   // Masa de joc
   round: 'Runda',
   cards: (n: number) => carti(n),

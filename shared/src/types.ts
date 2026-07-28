@@ -1,4 +1,4 @@
-import type { GameFormat, ScoringVariant } from './rules';
+import type { GameFormat, GamePace, ScoringVariant } from './rules';
 
 export type Suit = 'S' | 'H' | 'D' | 'C';
 export const SUITS: readonly Suit[] = ['S', 'H', 'D', 'C'];
@@ -43,6 +43,30 @@ export interface UserStats {
   gamesWon: number;
   totalPoints: number;
   bestRound: number;
+}
+
+/**
+ * Une partie en cours à laquelle le joueur participe.
+ *
+ * En temps réel, on n'en a qu'une à la fois et le bouton « reprendre » suffit.
+ * En asynchrone on peut en avoir cinq, chacune en attente d'un autre joueur :
+ * il faut donc pouvoir les lister et voir d'un coup d'œil laquelle attend
+ * après nous.
+ */
+export interface ActiveGame {
+  code: string;
+  phase: Phase;
+  pace: GamePace;
+  playersCount: number;
+  /** C'est à moi de jouer (annonce ou carte). */
+  myTurn: boolean;
+  /** Pseudo du joueur attendu, si la partie attend quelqu'un. */
+  waitingFor: string | null;
+  /** Numéro de la manche en cours, 1 pour la première. */
+  round: number;
+  roundsTotal: number;
+  myScore: number;
+  updatedAt: number;
 }
 
 /* ------------------------------------------------------------------ */
@@ -158,6 +182,11 @@ export interface GameState {
    * v1.3 : toute lecture retombe sur le barème classique.
    */
   scoring?: ScoringVariant;
+  /**
+   * Rythme choisi par l'hôte. Absent des parties créées avant la v1.3 : toute
+   * lecture retombe sur le temps réel, le seul rythme qui existait alors.
+   */
+  pace?: GamePace;
   roundsSequence: number[];
   round: RoundState | null;
   createdAt: number;

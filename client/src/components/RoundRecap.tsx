@@ -14,7 +14,9 @@ export default function RoundRecap({ view }: Props) {
   const t = useT();
   const round = view.round!;
   const outcome = useGame((s) => s.roundOutcome);
-  const isHost = view.hostId === view.you;
+  // En asynchrone, attendre le clic de l'hôte pourrait bloquer la table des
+  // heures : n'importe qui relance la manche (le moteur l'autorise aussi).
+  const canAdvance = view.hostId === view.you || view.pace === 'async';
   const isLastRound = round.roundIndex === view.roundsSequence.length - 1;
   const sorted = [...view.players].sort((a, b) => b.totalScore - a.totalScore);
   const myPoints = round.roundScores?.[view.you] ?? 0;
@@ -106,7 +108,7 @@ export default function RoundRecap({ view }: Props) {
         </ul>
 
         <div className="mt-5">
-          {isHost ? (
+          {canAdvance ? (
             <button
               type="button"
               data-testid="next-round"

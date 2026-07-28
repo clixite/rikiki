@@ -6,9 +6,11 @@ SÅ FUNGERAR DET
 • Hela konsten är att pricka exakt rätt: varken mer eller mindre
 
 DET HÄR INGÅR
-• 3 till 6 spelare, online, i realtid
+• 3 till 8 spelare, online, i realtid
 • Automatiska spelare när ni är för få
 • Tre format: blixt (10 min), klassiskt (30 min) eller stigande
+• Asynkront läge: var och en spelar när det passar, över flera dagar
+• Tre poängräkningar: hitta den ni spelar hemma
 • Krokregeln: buden kan aldrig gå jämnt ut
 • Vängrupper med ställning över flera partier
 • Spelhistorik och statistik

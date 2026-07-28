@@ -1,8 +1,6 @@
-Der Tisch wurde neu gestaltet: Die Spieler sitzen jetzt rund um den Filz, die Trumpffarbe steht groß an der Seite, und ein Banner zeigt deutlich, wann du am Zug bist.
+Zwei lange gewünschte Neuerungen: spielen, ohne gleichzeitig da zu sein, und Punkte zählen wie zu Hause.
 
-• Laufende Partie verlassen, ohne den Tisch zu blockieren
-• Profilfoto: mach ein Selfie
-• Reaktionen an den Tisch senden
-• Verlauf während der Partie einsehbar
-• Die Hand sortiert sich neu, wenn eine Farbe ausgeht
-• Ton nach dem Wechsel in den Hintergrund korrigiert
+• Modus „Im eigenen Tempo“: jeder spielt, wann er kann, das Spiel wartet
+• Laufende Partien auf dem Startbildschirm, die wartende zuerst
+• Drei Wertungen, vom Gastgeber im Raum gewählt
+• Die Mitteilung öffnet direkt die richtige Partie

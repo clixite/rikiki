@@ -4,6 +4,7 @@ import type {
   Ack,
   ClientToServerEvents,
   GameFormat,
+  GamePace,
   ScoringVariant,
   ServerToClientEvents,
 } from '@rikiki/shared';
@@ -103,6 +104,7 @@ export const addBot = () => emitAck<{ playerId: string }>('room:addBot');
 export const removeBot = (playerId: string) => emitAck('room:removeBot', { playerId });
 export const setFormat = (format: GameFormat) => emitAck('room:setFormat', { format });
 export const setScoring = (scoring: ScoringVariant) => emitAck('room:setScoring', { scoring });
+export const setPace = (pace: GamePace) => emitAck('room:setPace', { pace });
 /** Rattache la partie en cours à un groupe (hôte, lobby) ; `null` la détache. */
 export const setRoomGroup = (groupId: string | null) => emitAck('room:setGroup', { groupId });
 export const startGame = () => emitAck('game:start');

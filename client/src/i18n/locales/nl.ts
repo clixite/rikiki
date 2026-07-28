@@ -73,6 +73,21 @@ export const nl: Messages = {
   },
   scoringLocked: 'Telling gekozen door de host',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Tempo',
+  gamePaceHint: 'Samen, of ieder wanneer het uitkomt',
+  paceNames: {
+    live: 'Live',
+    async: 'In eigen tempo',
+  },
+  paceDescriptions: {
+    live: 'Iedereen speelt tegelijk; een beurt die te lang duurt speelt zichzelf.',
+    async: 'Iedereen speelt wanneer het uitkomt, over dagen. Niemand speelt voor jou.',
+  },
+  paceLocked: 'Tempo gekozen door de host',
+  waitingForPlayer: (pseudo: string) => `Wacht op ${pseudo}`,
+  waitingToStart: 'Wacht op de start',
+
   // Speeltafel
   round: 'Ronde',
   cards: (n: number) => (n === 1 ? '1 kaart' : `${n} kaarten`),

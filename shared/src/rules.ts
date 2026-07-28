@@ -89,6 +89,23 @@ export function formatSummary(nbPlayers: number, format: GameFormat = DEFAULT_FO
 }
 
 /**
+ * Rythme de la partie.
+ *
+ * - `live`  : tout le monde est là en même temps. Un joueur qui traîne bloque
+ *   la table, donc son tour se joue tout seul au bout d'un moment.
+ * - `async` : chacun joue quand il peut, sur des heures ou des jours. Personne
+ *   n'est jamais joué à sa place et la table ne se ferme pas parce qu'elle est
+ *   vide — c'est précisément l'état normal d'une partie asynchrone.
+ */
+export const GAME_PACES = ['live', 'async'] as const;
+export type GamePace = (typeof GAME_PACES)[number];
+export const DEFAULT_PACE: GamePace = 'live';
+
+export function isGamePace(value: unknown): value is GamePace {
+  return typeof value === 'string' && (GAME_PACES as readonly string[]).includes(value);
+}
+
+/**
  * Enchères autorisées. Règle du crochet : le dernier enchérisseur ne peut
  * pas amener le total des annonces au nombre exact de plis de la manche.
  */

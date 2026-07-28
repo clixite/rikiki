@@ -77,7 +77,9 @@ export class PushService {
         room.phase === 'bidding'
           ? `Partie ${room.code} : annonce ton nombre de plis.`
           : `Partie ${room.code} : c'est à toi de poser une carte.`,
-      url: '/game',
+      // On ouvre la partie *nommée*, pas « la » partie : en asynchrone, le
+      // joueur en a plusieurs en cours et l'avis doit mener à la bonne.
+      url: `/j/${room.code}`,
       // Un seul avis par partie à l'écran : les tours ne s'empilent pas.
       tag: `rikiki-turn-${room.code}`,
     });

@@ -2,10 +2,12 @@ import { isBotId } from './bot';
 import { cardFromId, cardId, fullDeck, hashSeed, mulberry32, shuffle, sortHand } from './cards';
 import {
   DEFAULT_FORMAT,
+  DEFAULT_PACE,
   DEFAULT_SCORING,
   MAX_PLAYERS,
   MIN_PLAYERS,
   isGameFormat,
+  isGamePace,
   isScoringVariant,
   legalBids,
   legalCards,
@@ -13,6 +15,7 @@ import {
   scoreRound,
   trickWinner,
   type GameFormat,
+  type GamePace,
   type ScoringVariant,
 } from './rules';
 import type { CardId, GameState, Player, RoundState } from './types';
@@ -36,6 +39,7 @@ export type GameAction =
   | { type: 'SET_CONNECTED'; playerId: string; connected: boolean }
   | { type: 'SET_FORMAT'; playerId: string; format: GameFormat }
   | { type: 'SET_SCORING'; playerId: string; scoring: ScoringVariant }
+  | { type: 'SET_PACE'; playerId: string; pace: GamePace }
   | { type: 'START_GAME'; playerId: string }
   | { type: 'BID'; playerId: string; bid: number }
   | { type: 'PLAY_CARD'; playerId: string; cardId: CardId }
@@ -63,6 +67,7 @@ export function createGame(
     maxPlayers: MAX_PLAYERS,
     format: DEFAULT_FORMAT,
     scoring: DEFAULT_SCORING,
+    pace: DEFAULT_PACE,
     roundsSequence: [],
     round: null,
     createdAt,
@@ -175,6 +180,14 @@ export function applyAction(prev: GameState, action: GameAction): EngineResult {
       return { ok: true, state };
     }
 
+    case 'SET_PACE': {
+      if (state.phase !== 'lobby') return err('BAD_PHASE');
+      if (action.playerId !== state.hostId) return err('NOT_HOST');
+      if (!isGamePace(action.pace)) return err('ILLEGAL_FORMAT');
+      state.pace = action.pace;
+      return { ok: true, state };
+    }
+
     case 'START_GAME': {
       if (state.phase !== 'lobby') return err('BAD_PHASE');
       if (action.playerId !== state.hostId) return err('NOT_HOST');
@@ -258,7 +271,14 @@ export function applyAction(prev: GameState, action: GameAction): EngineResult {
 
     case 'NEXT_ROUND': {
       if (state.phase !== 'round-scoring' || !state.round) return err('BAD_PHASE');
-      if (action.playerId !== state.hostId) return err('NOT_HOST');
+      // En temps réel, l'hôte donne le rythme : il laisse la table lire les
+      // scores. En asynchrone il peut être absent des heures, et attendre son
+      // clic bloquerait tout le monde — chacun peut donc relancer la manche.
+      const canAdvance =
+        state.pace === 'async'
+          ? state.players.some((p) => p.id === action.playerId)
+          : action.playerId === state.hostId;
+      if (!canAdvance) return err('NOT_HOST');
       const nextIndex = state.round.roundIndex + 1;
       if (nextIndex < state.roundsSequence.length) {
         const dealerSeat = (state.round.dealerSeat + 1) % state.players.length;

@@ -1,4 +1,4 @@
-import type { GameHistoryEntry, Group, GroupDetail, PublicUser, UserStats } from '@rikiki/shared';
+import type { ActiveGame, GameHistoryEntry, Group, GroupDetail, PublicUser, UserStats } from '@rikiki/shared';
 import { API_BASE } from './config';
 import { useSession } from './store/session';
 
@@ -81,6 +81,17 @@ function writeCachedHistory(userId: string, games: GameHistoryEntry[]): void {
   } catch {
     // quota plein ou navigation privée : le cache est optionnel
   }
+}
+
+/**
+ * Parties en cours du joueur, celles qui l'attendent en premier.
+ *
+ * Le serveur fait autorité : en asynchrone on joue depuis plusieurs appareils
+ * et sur plusieurs jours, la mémoire locale du navigateur ne suffit plus.
+ */
+export async function fetchActiveGames(): Promise<ActiveGame[]> {
+  const { games } = await request<{ games: ActiveGame[] }>('/api/me/games');
+  return games;
 }
 
 export async function fetchHistory(userId: string): Promise<GameHistoryEntry[]> {

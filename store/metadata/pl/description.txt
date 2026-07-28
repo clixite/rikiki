@@ -6,9 +6,11 @@ JAK TO DZIAŁA
 • Cała sztuka polega na trafieniu dokładnie: ani więcej, ani mniej
 
 CO ZNAJDZIESZ W ŚRODKU
-• Od 3 do 6 graczy, online, w czasie rzeczywistym
+• Od 3 do 8 graczy, online, w czasie rzeczywistym
 • Gracze automatyczni, gdy brakuje osób
 • Trzy formaty: błyskawiczny (10 min), klasyczny (30 min) lub rosnący
+• Tryb asynchroniczny: każdy gra, kiedy może, nawet przez kilka dni
+• Trzy punktacje: znajdź tę, w którą gracie w domu
 • Zasada haczyka: zapowiedzi nigdy nie mogą się zgadzać
 • Grupy znajomych z rankingiem między rozgrywkami
 • Historia rozgrywek i statystyki

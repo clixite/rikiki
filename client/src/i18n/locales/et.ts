@@ -82,6 +82,21 @@ export const et: Messages = {
   },
   scoringLocked: 'Punktiarvestuse valib võõrustaja',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Tempo',
+  gamePaceHint: 'Koos või igaüks siis, kui saab',
+  paceNames: {
+    live: 'Otse',
+    async: 'Omas tempos',
+  },
+  paceDescriptions: {
+    live: 'Kõik mängivad korraga; liiga pikk käik mängitakse ise ära.',
+    async: 'Igaüks mängib siis, kui saab, mitme päeva jooksul. Keegi ei mängi sinu eest.',
+  },
+  paceLocked: 'Tempo valib võõrustaja',
+  waitingForPlayer: (pseudo: string) => `Ootame mängijat ${pseudo}`,
+  waitingToStart: 'Ootame algust',
+
   // Mängulaud
   round: 'Voor',
   cards: (n: number) => etN(n, 'kaart', 'kaarti'),

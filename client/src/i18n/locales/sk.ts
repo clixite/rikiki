@@ -93,6 +93,21 @@ export const sk: Messages = {
   },
   scoringLocked: 'Bodovanie určuje hostiteľ',
 
+  // Rythme de la partie (temps réel / asynchrone)
+  gamePace: 'Tempo',
+  gamePaceHint: 'Spoločne alebo každý keď môže',
+  paceNames: {
+    live: 'Naživo',
+    async: 'Vlastným tempom',
+  },
+  paceDescriptions: {
+    live: 'Všetci hrajú naraz; príliš dlhý ťah sa zahrá sám.',
+    async: 'Každý hrá, keď môže, aj niekoľko dní. Nikto nehrá za teba.',
+  },
+  paceLocked: 'Tempo určuje hostiteľ',
+  waitingForPlayer: (pseudo: string) => `Čaká sa na ${pseudo}`,
+  waitingToStart: 'Čaká sa na štart',
+
   // Stôl
   round: 'Kolo',
   cards: (n: number) => plural(n, '1 karta', `${n} karty`, `${n} kariet`),
