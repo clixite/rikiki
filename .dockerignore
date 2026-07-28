@@ -1,0 +1,33 @@
+# Contexte de build : seul le code source compte.
+# Sans ce filtre, chaque déploiement transfère au démon Docker les captures
+# d'écran de la fiche App Store et les dépendances éventuellement installées
+# sur le serveur — des dizaines de mégaoctets qui n'entrent jamais dans l'image.
+
+node_modules
+**/node_modules
+
+# Sorties de compilation : l'image les régénère elle-même
+client/dist
+server/dist
+shared/dist
+
+# Matériel de publication et documentation
+store
+ios
+docs
+*.md
+
+# Données locales et environnement
+data
+*.db
+*.db-shm
+*.db-wal
+.env
+.env.*
+
+# Outils de développement
+.git
+.github
+scripts
+.vscode
+.idea
