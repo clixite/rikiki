@@ -98,6 +98,12 @@ else
   git clone --branch "$BRANCH" "$REPO_URL" "$APP_DIR"
 fi
 
+# Version réellement déployée : elle s'affiche en bas de l'accueil et permet de
+# vérifier d'un coup d'œil, depuis un téléphone, ce qui tourne vraiment.
+DEPLOYED_VERSION="$(sed -n 's/.*"version": "\([^"]*\)".*/\1/p' "$APP_DIR/package.json" | head -1)"
+DEPLOYED_COMMIT="$(git -C "$APP_DIR" rev-parse --short HEAD)"
+echo "    version ${DEPLOYED_VERSION} (${DEPLOYED_COMMIT})"
+
 # ---------------------------------------------------------------- 4/6 config
 echo "--- 4/6 Configuration (.env)"
 if [ ! -f "$APP_DIR/.env" ]; then
@@ -294,7 +300,7 @@ if [ "$PROXY_MODE" = "traefik" ]; then
   sleep 12
   if curl -fsS --max-time 20 "https://${DOMAIN}/api/health" >/dev/null 2>&1; then
     echo ""
-    echo "✅ Rikiki est en ligne : https://${DOMAIN}"
+    echo "✅ Rikiki ${DEPLOYED_VERSION} (${DEPLOYED_COMMIT}) est en ligne : https://${DOMAIN}"
   else
     echo ""
     echo "⏳ Le routage est en place mais le site ne répond pas encore en HTTPS."
@@ -348,7 +354,7 @@ fi
 
 if certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m "$CERTBOT_EMAIL" --redirect; then
   echo ""
-  echo "✅ Rikiki est en ligne : https://${DOMAIN}"
+  echo "✅ Rikiki ${DEPLOYED_VERSION} (${DEPLOYED_COMMIT}) est en ligne : https://${DOMAIN}"
 else
   echo ""
   echo "⚠️  Le site répond en HTTP, mais le certificat HTTPS a échoué."

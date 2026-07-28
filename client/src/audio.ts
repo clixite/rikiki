@@ -244,11 +244,22 @@ const SOUNDS: Record<SoundName, () => void> = {
 
 export function playSound(name: SoundName): void {
   if (muted) return;
-  try {
-    SOUNDS[name]();
-  } catch {
-    // Le son ne doit jamais casser le jeu
+  const audio = ensureContext();
+  const emit = () => {
+    try {
+      SOUNDS[name]();
+    } catch {
+      // Le son ne doit jamais casser le jeu
+    }
+  };
+  // Premier son après un geste : le contexte se réveille de façon asynchrone.
+  // On attend sa reprise avant de jouer, plutôt que de perdre l'effet ou —
+  // pire — de le programmer sur une horloge encore figée.
+  if (audio && audio.state !== 'running') {
+    void audio.resume().then(emit, () => undefined);
+    return;
   }
+  emit();
 }
 
 export function isMuted(): boolean {
