@@ -1,16 +1,37 @@
 import crypto from 'node:crypto';
 import { z } from 'zod';
 
+/**
+ * Une variable présente mais vide (`MAIL_PROVIDER=` dans un fichier `.env`, cas
+ * courant avec `env_file` de Docker Compose) vaut « non renseignée » : sans ce
+ * nettoyage, la chaîne vide ferait échouer les énumérations et passerait les
+ * tests de présence des chaînes optionnelles.
+ */
+const blankAsAbsent = (v: unknown) => (typeof v === 'string' && v.trim() === '' ? undefined : v);
+const optionalText = z.preprocess(blankAsAbsent, z.string().optional());
+
 const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
   PUBLIC_URL: z.string().default('http://localhost:5173'),
   JWT_SECRET: z.string().optional(),
   DB_PATH: z.string().default('./data/rikiki.db'),
-  SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.coerce.number().default(465),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
-  SMTP_FROM: z.string().optional(),
+  /**
+   * Fournisseur d'envoi des liens magiques. Absent : déduit des clés présentes
+   * (voir `detectProvider`), ce qui suffit dans la quasi-totalité des cas.
+   */
+  MAIL_PROVIDER: z.preprocess(blankAsAbsent, z.enum(['resend', 'brevo', 'smtp', 'console']).optional()),
+  /** Expéditeur commun à tous les fournisseurs : « Rikiki <no-reply@domaine.fr> ». */
+  MAIL_FROM: optionalText,
+  /** Clé d'API Resend (`re_…`) — offre gratuite, envoi par HTTPS. */
+  RESEND_API_KEY: optionalText,
+  /** Clé d'API Brevo (`xkeysib-…`) — offre gratuite, envoi par HTTPS. */
+  BREVO_API_KEY: optionalText,
+  SMTP_HOST: optionalText,
+  SMTP_PORT: z.preprocess(blankAsAbsent, z.coerce.number().default(465)),
+  SMTP_USER: optionalText,
+  SMTP_PASS: optionalText,
+  /** Historique : conservé comme repli de `MAIL_FROM`. */
+  SMTP_FROM: optionalText,
   NODE_ENV: z.string().default('development'),
   /** Délai minimal (ms) avant qu'un joueur automatique ne joue. 0 = instantané. */
   BOT_DELAY_MS: z.coerce.number().min(0).default(800),

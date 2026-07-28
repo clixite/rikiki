@@ -112,8 +112,22 @@ PORT=3000
 PUBLIC_URL=https://${DOMAIN}
 JWT_SECRET=$(openssl rand -hex 32)
 DB_PATH=/app/data/rikiki.db
+
+# Envoi des liens magiques (« Sauvegarder ma progression ») — décommentez UNE
+# option et relancez « docker compose up -d ». Détails : deploy/DEPLOY.md
+#MAIL_FROM="Rikiki <no-reply@${DOMAIN}>"
+# Resend — gratuit 3 000/mois, exige un domaine vérifié (https://resend.com)
+#RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxx
+# Brevo — gratuit 300/jour, une simple adresse d'expéditeur validée suffit
+#BREVO_API_KEY=xkeysib-xxxxxxxxxxxxxxxxxxxxxxxx
+# SMTP classique — attention, beaucoup d'hébergeurs bloquent 25/465/587 en sortie
+#SMTP_HOST=smtp.gmail.com
+#SMTP_PORT=465
+#SMTP_USER=vous@gmail.com
+#SMTP_PASS=mot-de-passe-d-application
 EOF
-  echo "    .env créé (sans SMTP : la sauvegarde de profil par e-mail est désactivée — voir deploy/DEPLOY.md)"
+  echo "    .env créé (sans envoi d'e-mails : la sauvegarde de profil par e-mail est désactivée)"
+  echo "    → pour l'activer gratuitement : deploy/DEPLOY.md § « Envoi des e-mails »"
 else
   echo "    .env existant conservé"
 fi

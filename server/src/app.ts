@@ -68,8 +68,11 @@ export function createApp(config: Config, overrides: { mailer?: Mailer; pushSend
     next();
   });
 
+  // L'état de l'envoi d'e-mails est exposé ici — et nulle part ailleurs — pour
+  // qu'un `curl /api/health` depuis le serveur dise tout de suite si les liens
+  // magiques peuvent partir, sans rien révéler des identifiants.
   app.get('/api/health', (_req, res) => {
-    res.json({ ok: true });
+    res.json({ ok: true, mail: { enabled: mailer.enabled, provider: mailer.provider } });
   });
 
   /**

@@ -42,7 +42,7 @@ entièrement côté serveur, aucun joueur ne voit la main d'un autre.
 
 ```bash
 npm install
-npm test                 # 82 tests : règles, moteur, robots, sockets, comptes
+npm test                 # 167 tests : règles, moteur, robots, sockets, comptes, e-mails
 npm run dev:server       # serveur sur :3000
 npm run dev:client       # client Vite sur :5173 (proxy vers :3000)
 ```
@@ -80,7 +80,17 @@ Traefik…) et s'y adapte sans toucher aux services existants.
 ## Variables d'environnement
 
 Voir `.env.example` : `PORT`, `PUBLIC_URL`, `JWT_SECRET`, `DB_PATH`,
-`BOT_DELAY_MS`, et `SMTP_*` (facultatif, pour les liens magiques).
+`BOT_DELAY_MS`, et la configuration d'envoi des liens magiques (facultative).
+
+**Liens magiques** — au choix, et une seule option suffit : `RESEND_API_KEY`
+(Resend, 3 000 e-mails/mois gratuits), `BREVO_API_KEY` (Brevo, 300/jour
+gratuits, sans domaine à posséder) ou `SMTP_HOST`/`SMTP_USER`/`SMTP_PASS`
+(Gmail avec mot de passe d'application, messagerie du domaine…) ; `MAIL_FROM`
+donne l'expéditeur. Les deux premières passent par HTTPS et fonctionnent donc
+là où l'hébergeur bloque les ports SMTP sortants. Sans rien, le jeu tourne
+normalement et seule la sauvegarde de profil est désactivée ; en développement,
+les liens sont écrits dans le terminal du serveur. Marche à suivre détaillée :
+[deploy/DEPLOY.md](deploy/DEPLOY.md#envoi-des-e-mails-liens-magiques).
 
 ---
 

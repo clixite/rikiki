@@ -15,6 +15,7 @@ const MAX_ACTIVE_LINKS = 3;
 
 const fakeMailer: Mailer = {
   enabled: true,
+  provider: 'smtp',
   sendMagicLink: async (email, url) => {
     if (email === BROKEN_EMAIL) throw new Error('SMTP indisponible');
     sentLinks.push({ email, url });

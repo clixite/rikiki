@@ -11,7 +11,7 @@ import { GROUP_CODE_LENGTH, isValidGroupCodeFormat } from '../src/rooms/roomCode
 let server: ReturnType<typeof createApp>;
 let baseUrl: string;
 
-const silentMailer: Mailer = { enabled: false, sendMagicLink: async () => undefined };
+const silentMailer: Mailer = { enabled: false, provider: 'none', sendMagicLink: async () => undefined };
 
 beforeAll(async () => {
   const config = loadConfig({
