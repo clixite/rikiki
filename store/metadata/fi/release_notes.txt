@@ -1,6 +1,9 @@
-Kaksi pitkään toivottua uutuutta: pelaaminen ilman että kaikki ovat yhtä aikaa paikalla, ja pisteiden laskeminen kuten kotona.
+Rikikin ensimmäinen versio.
 
-• ”Omaan tahtiin” -tila: kukin pelaa kun ehtii, peli odottaa
-• Kesken olevat pelit aloitusnäytöllä, sinua odottava ensimmäisenä
-• Kolme pisteytystä, isännän valinta aulassa
-• Ilmoitus avaa suoraan oikean pelin
+Tikkipeli 3–8 pelaajalle, kukin omalla puhelimellaan. Luo peli, jaa nelikirjaiminen koodi ja pelaa — saman pöydän ääressä tai etänä.
+
+• Kolme muotoa: salama, klassinen tai nouseva
+• ”Omaan tahtiin” -tila: kukin pelaa kun ehtii
+• Kolme pisteytystä
+• Automaattipelaajat, kun väkeä on liian vähän
+• Ei mainoksia, ei sovelluksen sisäisiä ostoja, ei tilausta

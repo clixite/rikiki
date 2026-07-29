@@ -1,6 +1,9 @@
-Due novità molto richieste: giocare senza esserci tutti insieme e contare i punti come si fa a casa.
+Prima versione di Rikiki.
 
-• Modalità «al proprio ritmo»: ognuno gioca quando può, la partita aspetta
-• Le partite in corso nella schermata iniziale, per prima quella che ti aspetta
-• Tre sistemi di punteggio, scelti dall’ospite nella sala
-• La notifica apre direttamente la partita giusta
+Un gioco di prese da 3 a 8 giocatori, ognuno sul proprio telefono. Crea una partita, condividi il codice di quattro lettere e gioca — allo stesso tavolo o a distanza.
+
+• Tre formati: lampo, classico o crescente
+• Modalità «al proprio ritmo»: ognuno gioca quando può
+• Tre sistemi di punteggio
+• Giocatori automatici quando siete in pochi
+• Nessuna pubblicità, nessun acquisto in-app, nessun abbonamento

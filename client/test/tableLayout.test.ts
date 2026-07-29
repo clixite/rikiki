@@ -4,6 +4,7 @@ import {
   INDEX_H,
   INDEX_W,
   STATUS_H,
+  WINNER_GROWTH,
   feltLayout,
   type FeltLayout,
   type Point,
@@ -46,6 +47,16 @@ function trickBoxes(l: FeltLayout): { box: Box; z: number }[] {
   // La mienne, jetée par le bas, passe devant toutes les autres.
   cards.push({ box: box(l.mySlot, l.trickCardW, l.trickCardH), z: 1000 });
   return cards;
+}
+
+/**
+ * Les mêmes, mais chacune supposée remporter le pli : la carte gagnante est
+ * agrandie, et c'est elle qui débordait de l'écran depuis un siège d'extrémité.
+ */
+function winnerBoxes(l: FeltLayout): Box[] {
+  const w = l.trickCardW * (1 + WINNER_GROWTH);
+  const h = l.trickCardH * (1 + WINNER_GROWTH);
+  return [...l.slots, l.mySlot].map((s) => box(s, w, h));
 }
 
 /**
@@ -125,6 +136,16 @@ describe('géométrie du tapis', () => {
     );
   });
 
+  it('garde dans le tapis la carte du pli remporté, agrandissement compris', () => {
+    expectNone(
+      CASES.flatMap(({ layout, width, height, ctx }) =>
+        winnerBoxes(layout)
+          .filter((b) => b.l < -0.5 || b.t < -0.5 || b.r > width + 0.5 || b.b > height + 0.5)
+          .map((b) => `${ctx} → gagnante ${JSON.stringify(b)}`),
+      ),
+    );
+  });
+
   it('laisse lisible l’index de chaque carte posée', () => {
     expectNone(
       CASES.flatMap(({ layout, ctx }) => {
@@ -148,15 +169,15 @@ describe('géométrie du tapis', () => {
     );
   });
 
-  it('pose chaque carte à l’aplomb de son propriétaire', () => {
+  it('pose chaque carte exactement à l’aplomb de son propriétaire', () => {
     expectNone(
       CASES.flatMap(({ layout, ctx }) =>
         layout.slots
-          .map((slot, i) => ({ slot, i, dx: Math.abs(slot.x - layout.seats[i].x) }))
-          // Un écart n'apparaît que lorsque la carte a dû être rentrée dans le
-          // bord du tapis, et il reste alors inférieur à une demi-carte.
-          .filter(({ dx }) => dx > layout.trickCardW / 2)
-          .map(({ i, dx }) => `${ctx} → carte ${i} décalée de ${Math.round(dx)}px`),
+          .map((slot, i) => ({ i, dx: Math.abs(slot.x - layout.seats[i].x) }))
+          // C'est tout l'intérêt de la disposition : la position dit qui a
+          // joué. Le moindre décalage brouille cette lecture.
+          .filter(({ dx }) => dx > 0.01)
+          .map(({ i, dx }) => `${ctx} → carte ${i} décalée de ${dx.toFixed(1)}px`),
       ),
     );
   });

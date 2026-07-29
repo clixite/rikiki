@@ -1,7 +1,9 @@
-# Publication sur l'App Store — dossier complet
+# Publication sur l'App Store — le dossier
 
-Tout ce qui est nécessaire pour soumettre Rikiki, plus ce qui a été vérifié et
-ce qui reste à faire de votre côté.
+Ce fichier explique **les choix** : pourquoi tel prix, telle catégorie, telle
+réponse aux questionnaires, et ce qui a été corrigé pour être publiable.
+
+**La marche à suivre, geste par geste, est dans [`PUBLIER.md`](PUBLIER.md).**
 
 ---
 
@@ -20,24 +22,19 @@ victoire, les groupes et l'historique.
 
 ---
 
-## 2. Ce qui reste à faire — et que je ne peux pas faire d'ici
+## 2. Ce qui ne peut pas se faire depuis ce dépôt
 
 **La publication exige un binaire natif signé, donc un Mac avec Xcode.** Une PWA
-ne peut pas être déposée telle quelle sur l'App Store. Le dossier `ios/`
-contient la configuration Capacitor et la marche à suivre exacte.
+ne se dépose pas telle quelle sur l'App Store. Le dossier `ios/` contient la
+configuration Capacitor ; `PUBLIER.md` déroule les étapes.
 
-Sur votre Mac :
+Tout le reste — textes des 18 langues, icône, écrans de lancement, captures —
+est produit et vérifié ici, sur n'importe quelle machine :
 
 ```bash
-cd ios
-npm install
-npx cap add ios          # génère le projet Xcode
-npx cap sync ios
-npx cap open ios         # ouvre Xcode
+npm run store:assets     # icône, écrans de lancement, captures localisées
+npm run store:check      # contrôle mécanique du dossier
 ```
-
-Puis dans Xcode : équipe de signature, numéro de version, **Product → Archive**,
-**Distribute App → App Store Connect**.
 
 ---
 
@@ -55,7 +52,10 @@ faveur, et qu'il faut **écrire noir sur blanc dans les notes de relecture** :
 - fonctionne hors connexion pour tout ce qui ne demande pas d'adversaire
   (règles, historique, profil, groupes en cache) ;
 - les fichiers du jeu sont embarqués dans le binaire, pas chargés depuis un
-  site : l'app s'ouvre sans réseau (voir `ios/README.md`).
+  site : l'app s'ouvre sans réseau (voir `ios/README.md`) ;
+- le mode asynchrone donne à l'application une raison d'exister sur le
+  téléphone : une partie s'y mène sur plusieurs jours, l'accueil liste celles
+  qui attendent après vous — c'est un usage d'application, pas de page web.
 
 N'invoquez pas les notifications dans les notes de relecture pour la première
 version : elles ne fonctionnent pas encore dans le conteneur natif (voir la
@@ -93,32 +93,44 @@ Chaque dossier contient, aux longueurs maximales d'Apple (vérifiées) :
 | `keywords.txt` | Mots-clés | 100 |
 | `description.txt` | Description | 4000 |
 | `release_notes.txt` | Nouveautés de cette version | 4000 |
+
+Le contenu livré dans `release_notes.txt` décrit la **première** version : App
+Store Connect n'affiche pas ce champ pour une app jamais publiée, mais il le
+réclame dès la mise à jour suivante — autant qu'il soit juste dès maintenant.
 | `support_url.txt` | URL d'assistance — page dédiée avec contact et FAQ, pas l'app | — |
 | `marketing_url.txt` | URL marketing | — |
 | `privacy_url.txt` | URL de politique de confidentialité | — |
 
 ### Visuels
 
-- `assets/icon-1024.png` — 1024×1024, **PNG sans canal alpha**, sans coins
-  arrondis (iOS applique le masque lui-même). Apple refuse toute transparence.
-- `assets/screenshots/<langue>/` — 5 captures **1320×2868** (iPhone 6,9",
-  la seule taille obligatoire aujourd'hui), en JPEG donc sans canal alpha :
-  1. accueil ;
-  2. salon avec code d'invitation ;
-  3. annonce du contrat, main visible ;
-  4. pli en cours ;
-  5. tableau des scores.
+Tous produits par `npm run store:assets`, depuis l'application réelle.
 
-Les captures sont produites depuis l'application réelle, en jouant une vraie
-partie jusqu'à une manche à 5 cartes : aucune image de synthèse, aucun écran
-maquillé — une capture qui ne correspond pas à l'app est un motif de rejet.
+| Fichier | Format | Usage |
+|---|---|---|
+| `assets/icon-1024.png` | 1024×1024, PNG **sans canal alpha**, sans coins arrondis | l'icône de la fiche |
+| `ios/assets/icon-only.png` | le **même fichier**, à l'octet près | source du jeu d'icônes du binaire (`npx cap assets generate`) |
+| `ios/assets/splash.png` · `splash-dark.png` | 2732×2732 | écran de lancement, toutes déclinaisons dérivées |
+| `assets/screenshots/<langue>/1..6-*.jpg` | 1320×2868, JPEG | 6 captures par langue |
 
-Pour les régénérer après une modification de l'interface :
+Les six captures : accueil · salon avec le code d'invitation · réglages de la
+partie · annonce du contrat, main visible · pli en cours · tableau des scores.
+
+Elles sont prises en jouant une **vraie partie** jusqu'à une manche fournie :
+aucune image de synthèse, aucun écran maquillé. Une capture qui ne correspond
+pas à l'app est un motif de rejet, et c'est une vérification que le relecteur
+fait systématiquement — donc **à régénérer après toute retouche d'interface**.
+
+Apple n'exige plus qu'une taille par famille d'appareils : l'iPhone 6,9", dont
+il dérive tous les écrans plus petits. L'iPad 13" (2064×2752) n'est requis que
+si l'application est livrée pour iPad — ce que la v1 ne fait pas
+(`TARGETED_DEVICE_FAMILY = 1`). Si vous changez d'avis :
+`DEVICE=ipad npm run store:assets`.
+
+Pour téléverser sans y passer l'après-midi, la structure de `metadata/` est
+exactement celle qu'attend [`fastlane deliver`](https://docs.fastlane.tools/actions/deliver/) :
 
 ```bash
-npm run build
-JWT_SECRET=… BOT_DELAY_MS=60 npm start &
-npm run store:assets
+fastlane deliver --metadata_path store/metadata --screenshots_path store/assets/screenshots
 ```
 
 ### Champs à renseigner à la main
@@ -196,7 +208,7 @@ Répondre **Aucun / Non** à toutes les questions. Points d'attention :
 |---|---|---|
 | Jeux d'argent et de hasard simulés | **Non** | Aucune mise, aucune monnaie virtuelle, aucun gain — un jeu de plis n'est pas un jeu de casino |
 | Concours | Non | |
-| Contenu généré par les utilisateurs | **Oui — rare/léger** | Depuis la version 1.1, un joueur peut mettre une photo de profil, visible des seuls joueurs de sa partie ou de ses groupes. Ni chat, ni fil public, ni texte libre au-delà du pseudo. Les contrôles exigés par la règle 1.2 sont en place : signalement (drapeau dans le tableau des scores), masquage immédiat sur l'appareil, retrait du joueur par l'hôte, et contact publié sur la page d'assistance |
+| Contenu généré par les utilisateurs | **Oui — rare/léger** | Un joueur peut mettre une photo de profil, visible des seuls joueurs de sa partie ou de ses groupes. Ni chat, ni fil public, ni texte libre au-delà du pseudo. Les contrôles exigés par la règle 1.2 sont en place : signalement (drapeau dans le tableau des scores), masquage immédiat sur l'appareil, retrait du joueur par l'hôte, et contact publié sur la page d'assistance |
 | Accès web illimité | Non | |
 | Violence, contenu sexuel, langage grossier | Non | |
 
@@ -269,6 +281,10 @@ Ajouter dans `Info.plist` (déjà prévu dans la configuration Capacitor) :
 > signalement est enregistré. L'hôte peut par ailleurs retirer n'importe quel
 > joueur de la table.
 >
+> Les fichiers du jeu sont embarqués dans le binaire : l'application s'ouvre
+> sans réseau, et les règles, le profil et l'historique restent consultables
+> hors connexion. Seules les parties en cours nécessitent une connexion.
+>
 > L'application est vendue à l'unité : elle ne contient ni publicité, ni achat
 > intégré, ni abonnement, ni monnaie virtuelle, ni mise d'argent. Les données
 > sont hébergées dans l'Union européenne.
@@ -285,24 +301,36 @@ npm run store:check
 ```
 
 Contrôle mécaniquement ce qu'Apple refuse sans discussion : langue manquante,
-texte trop long, mot-clé gaspillant des caractères en espaces, URL non https,
-icône transparente ou mal dimensionnée, capture à la mauvaise taille ou porteuse
-d'un canal alpha. À relancer après chaque retouche.
+texte trop long, mention de prix dans un texte (interdite), mot-clé gaspillant
+des caractères en espaces, URL non https, icône transparente ou mal
+dimensionnée, icône de la fiche différente de celle du binaire, sources iOS
+absentes, capture à la mauvaise taille ou porteuse d'un canal alpha, nombre de
+captures inégal d'une langue à l'autre. À relancer après chaque retouche.
+
+Pour vérifier en plus que les URL publiées répondent — le relecteur les
+ouvrira :
+
+```bash
+CHECK_URLS=1 npm run store:check
+```
 
 ---
 
 ## 10. Avant d'appuyer sur « Soumettre » — vérifications
 
 - [ ] **Contrat « Paid Applications » actif**, coordonnées bancaires et formulaires fiscaux validés — sans cela le prix ne peut pas être fixé
+- [ ] Compte développeur de type **Organization**, au nom de Clixite SRL
 - [ ] Prix réglé sur **1,99 €**, disponibilité étendue aux pays visés
+- [ ] `npm run store:check` passe, y compris `CHECK_URLS=1`
 - [ ] Le serveur de production répond : `https://rikiki.clixite-prod.cloud/api/health` → `{"ok":true}`
 - [ ] La page d'assistance est en ligne : `/support.html` → 200
 - [ ] La politique de confidentialité est en ligne : `/privacy.html` → 200
 - [ ] La suppression de compte fonctionne sur la production, pas seulement en local
 - [ ] Le signalement d'un joueur masque bien sa photo et répond 200 (`POST /api/report`)
 - [ ] La version déployée correspond au binaire soumis (la date de build est affichée en bas de l'accueil)
-- [ ] L'icône ne comporte ni coins arrondis, ni transparence, ni texte illisible en petit
-- [ ] Les captures correspondent bien à la version soumise
+- [ ] L'icône du binaire n'est pas celle de Capacitor (`npm run assets` dans `ios/` a bien été lancé)
+- [ ] Les captures montrent la version soumise, pas la précédente
+- [ ] Xcode : destination **iPhone seulement**, orientation **portrait**, `ITSAppUsesNonExemptEncryption` dans `Info.plist`
 - [ ] Le nom de l'app n'est pas déjà pris — à vérifier dans App Store Connect, c'est le premier point de blocage possible
 
 ---

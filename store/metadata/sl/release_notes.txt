@@ -1,6 +1,9 @@
-Dve dolgo pričakovani novosti: igranje, ne da bi bili vsi hkrati prisotni, in točkovanje kot doma.
+Prva različica Rikikija.
 
-• Način »v lastnem ritmu«: vsak igra, ko utegne, igra počaka
-• Vaše igre v teku na začetnem zaslonu, prva tista, ki vas čaka
-• Trije načini točkovanja, ki jih gostitelj izbere v sobi
-• Obvestilo odpre neposredno pravo igro
+Igra štihov za 3 do 8 igralcev, vsak na svojem telefonu. Ustvarite igro, delite štirimestno kodo in igrajte — za isto mizo ali na daljavo.
+
+• Trije formati: bliskovit, klasičen ali naraščajoč
+• Način »v lastnem ritmu«: vsak igra, ko utegne
+• Trije načini točkovanja
+• Samodejni igralci, kadar vas je premalo
+• Brez oglasov, brez nakupov v aplikaciji, brez naročnine

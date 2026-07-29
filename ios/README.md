@@ -8,6 +8,10 @@ une application native.
 Linux : la compilation, la signature et l'envoi passent obligatoirement par les
 outils Apple.
 
+> La marche à suivre complète, du compte développeur à la mise en ligne, est
+> dans **[`../store/PUBLIER.md`](../store/PUBLIER.md)**. Le présent fichier ne
+> couvre que le conteneur natif.
+
 ---
 
 ## Principe retenu
@@ -37,20 +41,31 @@ npm install
 npm run build:web        # compile le client avec l'adresse absolue du serveur
 npx cap add ios          # génère une seule fois le projet Xcode
 npx cap sync ios
+npm run assets           # icône et écran de lancement, depuis ios/assets/
 npx cap open ios
 ```
+
+`npm run assets` décline `assets/icon-only.png` et `assets/splash*.png` en
+toutes les tailles attendues par Xcode. **Sans cette commande, l'application
+est publiée avec l'icône par défaut de Capacitor** — refus automatique.
+
+Les sources de `assets/` sont produites par `npm run store:assets` à la racine
+du dépôt : l'icône du binaire et celle de la fiche App Store sont ainsi le même
+fichier, ce que vérifie `npm run store:check`.
 
 ### Dans Xcode
 
 1. **Signing & Capabilities** → sélectionner votre équipe de développeur.
 2. **General** → *Display Name* : `Rikiki` · *Bundle Identifier* :
-   `be.clixite.rikiki` · *Version* : `1.0.0` · *Build* : `1`.
+   `be.clixite.rikiki` · *Version* : `1.3.0` (celle de `package.json`) ·
+   *Build* : `1`, à incrémenter à chaque envoi.
 3. **Deployment Info** → *iPhone* uniquement, *Portrait* uniquement.
    L'interface est pensée pour le portrait ; déclarer l'iPad obligerait à
    fournir des captures 13" et à soigner une mise en page qui n'a pas été
    conçue pour.
-4. Icône : glisser `store/assets/icon-1024.png` dans
-   `App/Assets.xcassets/AppIcon.appiconset` (emplacement 1024×1024).
+4. Icône : rien à glisser à la main, `npm run assets` s'en est chargé.
+   Vérifier tout de même que `App/Assets.xcassets/AppIcon.appiconset` porte
+   bien l'emplacement 1024×1024.
 5. Ajouter dans `App/Info.plist` :
 
 ```xml

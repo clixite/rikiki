@@ -1,6 +1,9 @@
-Two long-requested additions: playing without everyone being there at once, and counting points the way you do at home.
+First release of Rikiki.
 
-• “At your own pace” mode: everyone plays when they can, the game waits
-• Your games in progress on the home screen, the one waiting for you first
-• Three scoring systems, picked by the host in the lobby
-• Notifications now open the right game directly
+A trick-taking game for 3 to 8 players, everyone on their own phone. Create a game, share the four-letter code, and play — around the same table or miles apart.
+
+• Three formats: blitz, classic or climb
+• “At your own pace” mode: everyone plays when they can
+• Three scoring systems
+• Automatic players when you are short of people
+• No ads, no in-app purchases, no subscription

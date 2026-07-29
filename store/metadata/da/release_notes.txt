@@ -1,6 +1,9 @@
-To længe ønskede nyheder: at spille uden at være til stede samtidig, og at tælle point som derhjemme.
+Første version af Rikiki.
 
-• Tilstanden “i eget tempo”: hver spiller, når de kan, spillet venter
-• Dine igangværende spil på forsiden, det der venter på dig først
-• Tre pointsystemer, valgt af værten i lobbyen
-• Notifikationen åbner nu direkte det rigtige spil
+Et stikspil for 3 til 8 spillere, hver på sin telefon. Opret et spil, send den firebogstavs kode, og spil — omkring bordet eller på afstand.
+
+• Tre formater: lyn, klassisk eller stigende
+• Tilstanden “i eget tempo”: hver spiller, når de kan
+• Tre pointsystemer
+• Automatiske spillere, når I er for få
+• Ingen reklamer, ingen køb i appen, intet abonnement

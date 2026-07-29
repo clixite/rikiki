@@ -1,6 +1,9 @@
-Dwie długo wyczekiwane nowości: gra bez konieczności bycia online w tym samym czasie i liczenie punktów jak w domu.
+Pierwsza wersja Rikiki.
 
-• Tryb „we własnym tempie”: każdy gra, kiedy może, gra czeka
-• Twoje rozgrywki w toku na ekranie głównym, najpierw ta czekająca na ciebie
-• Trzy punktacje, wybierane przez gospodarza w poczekalni
-• Powiadomienie otwiera od razu właściwą rozgrywkę
+Gra w lewy dla 3 do 8 graczy, każdy na swoim telefonie. Utwórz rozgrywkę, podaj czteroliterowy kod i grajcie — przy jednym stole albo na odległość.
+
+• Trzy formaty: błyskawiczny, klasyczny lub rosnący
+• Tryb „we własnym tempie”: każdy gra, kiedy może
+• Trzy punktacje
+• Gracze automatyczni, gdy jest was za mało
+• Bez reklam, bez zakupów w aplikacji, bez abonamentu

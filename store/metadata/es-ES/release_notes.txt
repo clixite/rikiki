@@ -1,6 +1,9 @@
-Dos novedades muy pedidas: jugar sin estar todos a la vez y contar los puntos como en casa.
+Primera versión de Rikiki.
 
-• Modo «a tu ritmo»: cada uno juega cuando puede, la partida espera
-• Tus partidas en curso en la pantalla de inicio, primero la que te espera
-• Tres sistemas de puntuación, elegidos por el anfitrión en la sala
-• La notificación abre directamente la partida correcta
+Un juego de bazas para 3 a 8 jugadores, cada uno en su móvil. Crea una partida, comparte el código de cuatro letras y juega — en la misma mesa o a distancia.
+
+• Tres formatos: relámpago, clásico o ascendente
+• Modo «a tu ritmo»: cada uno juega cuando puede
+• Tres sistemas de puntuación
+• Jugadores automáticos cuando sois pocos
+• Sin anuncios, sin compras integradas, sin suscripción

@@ -82,6 +82,22 @@ toute retouche du tapis, trop lent pour l'intégration continue :
 OPP=7 MIN_CARDS=6 SHOTS_DIR=/tmp/shots node scripts/table-audit.mjs
 ```
 
+## Publication sur l'App Store
+
+Le dossier de soumission est complet et vérifié dans [`store/`](store/) :
+textes des 18 langues acceptées par Apple, icône, écrans de lancement et
+captures localisées, tous produits depuis l'application réelle.
+
+- [`store/PUBLIER.md`](store/PUBLIER.md) — la marche à suivre, étape par étape
+- [`store/README.md`](store/README.md) — les choix : prix, catégories, réponses
+  aux questionnaires de classification et de confidentialité
+
+```bash
+npm run store:assets              # icône, écrans de lancement, captures
+npm run store:check               # 647 contrôles mécaniques
+CHECK_URLS=1 npm run store:check  # + les URL que le relecteur ouvrira
+```
+
 ## Production
 
 ```bash

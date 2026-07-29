@@ -1,6 +1,9 @@
-Twee langgevraagde nieuwigheden: spelen zonder er tegelijk te zijn, en punten tellen zoals thuis.
+Eerste versie van Rikiki.
 
-• Modus “in eigen tempo”: iedereen speelt wanneer het uitkomt, het spel wacht
-• Je lopende partijen op het startscherm, die op jou wacht als eerste
-• Drie puntentellingen, gekozen door de host in de lobby
-• De melding opent meteen de juiste partij
+Een slagenspel voor 3 tot 8 spelers, ieder op zijn eigen telefoon. Maak een partij aan, deel de code van vier letters en spelen maar — aan dezelfde tafel of op afstand.
+
+• Drie formats: bliksem, klassiek of oplopend
+• Modus “in eigen tempo”: iedereen speelt wanneer het uitkomt
+• Drie puntentellingen
+• Automatische spelers als jullie met te weinig zijn
+• Geen reclame, geen in-app-aankopen, geen abonnement

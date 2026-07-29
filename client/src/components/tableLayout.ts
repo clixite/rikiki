@@ -68,7 +68,17 @@ export const STATUS_H = 52;
 /** Part de la hauteur d'une carte dont celle du joueur dépasse vers le bas. */
 const MY_CARD_DROP = 0.55;
 export const CARD_RATIO = 1.5;
-const CARD_W_MAX = 66;
+/**
+ * Bornes de la carte posée.
+ *
+ * Le plafond n'est pas fixe : sur un grand téléphone à trois joueurs, une carte
+ * de 66 px laissait le centre du tapis désespérément vide, alors que la place
+ * ne manquait pas. La taille suit donc l'espace réellement disponible, dans ces
+ * bornes — au-delà de 96 px les cartes du pli concurrenceraient celles de la
+ * main, en dessous de 38 le rang n'est plus lisible.
+ */
+const CARD_W_MAX = 96;
+const CARD_W_FLOOR = 66;
 const CARD_W_MIN = 38;
 /**
  * Part de la carte occupée par l'index du coin haut-gauche (rang et enseigne).
@@ -79,10 +89,19 @@ export const INDEX_W = 0.42;
 export const INDEX_H = 0.34;
 /**
  * Recouvrement maximal entre deux cartes voisines. Un tiers caché ne gêne pas :
- * l'index du coin haut-gauche reste lu, et l'ordre d'empilement va de gauche à
- * droite, donc c'est toujours le bord droit qui disparaît — jamais le rang.
+ * l'ordre d'empilement va de gauche à droite, donc c'est toujours le bord DROIT
+ * qui disparaît — jamais l'index.
+ *
+ * La valeur doit rester franchement inférieure à `INDEX_W` : à égalité, la
+ * voisine mord pile sur le rang. Huit points d'écart absorbent les arrondis.
  */
-const MAX_OVERLAP = 0.42;
+const MAX_OVERLAP = 0.34;
+/**
+ * Part de sa taille que gagne la carte du pli remporté : elle grossit et
+ * s'entoure d'un anneau pour se distinguer. La géométrie doit lui réserver
+ * cette place, sinon elle déborde du tapis depuis un siège d'extrémité.
+ */
+export const WINNER_GROWTH = 0.1;
 
 /** Mesure vivante d'un élément : la géométrie suit les rotations d'écran. */
 export function useElementSize<T extends HTMLElement>(): [
@@ -151,13 +170,20 @@ export function feltLayout(n: number, width: number, height: number): FeltLayout
   // Arc surbaissé : les sièges doivent tenir dans le haut du tapis pour laisser
   // au pli une bande entière. Un arc trop bombé repousserait les cartes dehors.
   const ry = clamp(height * 0.2, 24, Math.max(24, height * 0.5 - seatH));
-  const cy = PAD + seatH / 2 + ry;
 
   /** Position relative d'un siège, de 0 (ma gauche) à 1 (ma droite). */
   const t = (i: number) => (n === 1 ? 0.5 : i / (n - 1));
+  const rise = (i: number) => Math.sin(Math.PI * t(i));
+  // L'arc se cale sur le siège le plus HAUT réellement occupé, pas sur le
+  // sommet théorique de la courbe : à deux adversaires, personne n'occupe le
+  // sommet, et réserver sa place laissait un tiers de tapis vide au-dessus des
+  // têtes.
+  const topRise = n > 0 ? Math.max(...Array.from({ length: n }, (_, i) => rise(i))) : 0;
+  const cy = PAD + seatH / 2 + ry * topRise;
+
   const seats: Point[] = [];
   for (let i = 0; i < n; i++) {
-    seats.push({ x: xLeft + t(i) * (xRight - xLeft), y: cy - ry * Math.sin(Math.PI * t(i)) });
+    seats.push({ x: xLeft + t(i) * (xRight - xLeft), y: cy - ry * rise(i) });
   }
 
   // Bande des cartes jouées : tout ce qui reste sous le siège le plus bas.
@@ -169,8 +195,32 @@ export function feltLayout(n: number, width: number, height: number): FeltLayout
   // cartes, puisque chacune se pose sous le sien.
   const gap = seats.length > 1 ? (xRight - xLeft) / (n - 1) : width;
 
+  // La carte occupe la place disponible, sans jamais déborder de la bande ni
+  // recouvrir l'index de sa voisine. Le plancher garantit qu'une table serrée
+  // sur grand écran ne se retrouve pas avec des vignettes.
+  //
+  // `WINNER_GROWTH` réserve ce que la carte gagnante prend en plus : elle est
+  // agrandie et cerclée pour se distinguer, et sans cette marge elle sortait de
+  // l'écran quand son propriétaire occupait un siège d'extrémité.
+  const roomy = clamp(bandH / 2.6, CARD_W_FLOOR, CARD_W_MAX);
+  /*
+   * La carte du siège le plus à gauche est centrée sur lui : pour qu'elle
+   * tienne dans le tapis, agrandissement de gagnante compris, il faut
+   *
+   *     cardW × (1 + WINNER_GROWTH) / 2 ≤ seatW / 2 + PAD
+   *
+   * Rentrer la carte à l'intérieur serait plus simple, mais elle se
+   * rapprocherait alors de sa voisine au point de lui masquer l'index — et
+   * elle ne serait plus à l'aplomb de son joueur, ce qui est tout l'intérêt.
+   */
+  const edgeCap = (seatW + 2 * PAD) / (1 + WINNER_GROWTH);
   const trickCardW = clamp(
-    Math.min(gap / (1 - MAX_OVERLAP), bandH / ((1 + MY_CARD_DROP) * CARD_RATIO)),
+    Math.min(
+      gap / (1 - MAX_OVERLAP),
+      bandH / ((1 + MY_CARD_DROP + WINNER_GROWTH) * CARD_RATIO),
+      roomy,
+      edgeCap,
+    ),
     CARD_W_MIN,
     CARD_W_MAX,
   );
@@ -185,11 +235,8 @@ export function feltLayout(n: number, width: number, height: number): FeltLayout
     Math.max(cardH / 2, height - cardH * (0.5 + MY_CARD_DROP)),
   );
 
-  // Les cartes s'alignent sur leur siège, en restant dans le tapis.
-  const slots: Point[] = seats.map((s) => ({
-    x: clamp(s.x, trickCardW / 2 + PAD, width - trickCardW / 2 - PAD),
-    y: rowY,
-  }));
+  // Aucun rattrapage : chaque carte est exactement à l'aplomb de son siège.
+  const slots: Point[] = seats.map((s) => ({ x: s.x, y: rowY }));
 
   return {
     seats,

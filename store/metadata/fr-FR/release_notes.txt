@@ -1,6 +1,9 @@
-Deux nouveautés très demandées : jouer sans être là en même temps, et compter les points comme chez vous.
+Première version de Rikiki.
 
-• Mode « au rythme de chacun » : chacun joue quand il peut, la partie attend
-• Vos parties en cours sur l’accueil, celle qui vous attend en premier
-• Trois barèmes de score, choisis par l’hôte dans le salon
-• La notification ouvre directement la bonne partie
+Un jeu de plis de 3 à 8 joueurs, chacun sur son téléphone. Créez une partie, partagez le code à quatre lettres, et jouez — autour de la même table ou à distance.
+
+• Trois formats : éclair, classique ou montante
+• Mode « au rythme de chacun » : chacun joue quand il peut
+• Trois barèmes de score
+• Joueurs automatiques quand vous n’êtes pas assez nombreux
+• Aucune publicité, aucun achat intégré, aucun abonnement

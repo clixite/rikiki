@@ -1,6 +1,9 @@
-Dve dlho žiadané novinky: hrať bez toho, aby ste boli online naraz, a počítať body ako doma.
+Prvá verzia Rikiki.
 
-• Režim „vlastným tempom“: každý hrá, keď môže, hra počká
-• Rozohraté hry na úvodnej obrazovke, tá čakajúca na vás ako prvá
-• Tri spôsoby bodovania, ktoré vyberá hostiteľ v miestnosti
-• Upozornenie otvorí rovno tú správnu hru
+Hra o zdvihy pre 3 až 8 hráčov, každý na svojom telefóne. Vytvorte hru, pošlite štvorpísmenový kód a hrajte — pri jednom stole alebo na diaľku.
+
+• Tri formáty: blesk, klasický alebo stúpajúci
+• Režim „vlastným tempom“: každý hrá, keď môže
+• Tri spôsoby bodovania
+• Automatickí hráči, keď vás je málo
+• Bez reklám, bez nákupov v aplikácii, bez predplatného

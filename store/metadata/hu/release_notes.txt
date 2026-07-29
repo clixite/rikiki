@@ -1,6 +1,9 @@
-Két régóta kért újdonság: játék anélkül, hogy mindenki egyszerre jelen lenne, és pontozás úgy, ahogy otthon szokás.
+A Rikiki első változata.
 
-• „Saját tempóban” mód: mindenki akkor játszik, amikor tud, a játék vár
-• Folyamatban lévő játékai a kezdőképernyőn, elöl az, amelyik önre vár
-• Három pontozás, a házigazda választ a váróban
-• Az értesítés közvetlenül a megfelelő játékot nyitja meg
+Ütésvivő kártyajáték 3–8 játékosnak, mindenki a saját telefonján. Hozzon létre játékot, ossza meg a négybetűs kódot, és játsszanak — egy asztal körül vagy távolról.
+
+• Három formátum: villám, klasszikus vagy emelkedő
+• „Saját tempóban” mód: mindenki akkor játszik, amikor tud
+• Három pontozás
+• Automatikus játékosok, ha kevesen vannak
+• Nincs reklám, nincs alkalmazáson belüli vásárlás, nincs előfizetés

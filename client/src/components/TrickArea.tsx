@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import type { CompletedTrick, GameView, Trick } from '@rikiki/shared';
 import { cardId } from '@rikiki/shared';
 import CardFace from './CardFace';
-import type { FeltLayout } from './tableLayout';
+import { WINNER_GROWTH, type FeltLayout } from './tableLayout';
 
 interface Props {
   view: GameView;
@@ -77,7 +77,7 @@ export default function TrickArea({ view, frozenTrick, layout }: Props) {
             <motion.div
               key={playerId}
               initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: isWinner ? 1.12 : 1 }}
+              animate={{ opacity: 1, scale: isWinner ? 1 + WINNER_GROWTH : 1 }}
               exit={{ opacity: 0, scale: 0.7, transition: { duration: 0.18 } }}
               transition={{ type: 'spring', stiffness: 320, damping: 26 }}
               data-testid={`trick-card-${playerId}`}

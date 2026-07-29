@@ -1,6 +1,9 @@
-Två efterlängtade nyheter: att spela utan att alla är på plats samtidigt, och att räkna poäng som hemma.
+Första versionen av Rikiki.
 
-• Läget ”i egen takt”: var och en spelar när det passar, spelet väntar
-• Dina pågående partier på startskärmen, den som väntar på dig först
-• Tre poängräkningar, valda av värden i lobbyn
-• Aviseringen öppnar direkt rätt parti
+Ett stickspel för 3 till 8 spelare, var och en på sin egen telefon. Skapa ett parti, dela koden på fyra bokstäver och spela — vid samma bord eller på distans.
+
+• Tre format: blixt, klassiskt eller stigande
+• Läget ”i egen takt”: var och en spelar när det passar
+• Tre poängräkningar
+• Automatiska spelare när ni är för få
+• Inga annonser, inga köp i appen, ingen prenumeration

@@ -1,6 +1,9 @@
-Duas novidades muito pedidas: jogar sem estarem todos ao mesmo tempo e contar os pontos como em casa.
+Primeira versão do Rikiki.
 
-• Modo «ao teu ritmo»: cada um joga quando pode, o jogo espera
-• Os seus jogos a decorrer no ecrã inicial, primeiro o que está à sua espera
-• Três sistemas de pontuação, escolhidos pelo anfitrião na sala
-• A notificação abre diretamente o jogo certo
+Um jogo de vazas para 3 a 8 jogadores, cada um no seu telemóvel. Crie um jogo, partilhe o código de quatro letras e joguem — à mesma mesa ou à distância.
+
+• Três formatos: relâmpago, clássico ou crescente
+• Modo «ao teu ritmo»: cada um joga quando pode
+• Três sistemas de pontuação
+• Jogadores automáticos quando são poucos
+• Sem publicidade, sem compras na aplicação, sem subscrição
