@@ -63,6 +63,12 @@ export const cs: Messages = {
   removeBot: 'Odebrat robota',
 
   // Formát hry (délka)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Nastavení hry',
+  gameSettingsHint: 'Hostitel volí před startem',
+  gameSettingsLocked: 'Nastavení určuje hostitel',
+  settingsDone: 'Hotovo',
+
   gameFormat: 'Formát hry',
   gameFormatHint: 'Vyber délku před spuštěním',
   formatNames: {

@@ -76,6 +76,12 @@ export const mt: Messages = {
   removeBot: 'Neħħi r-robot',
 
   // Format tal-logħba (tul)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Settings tal-logħba',
+  gameSettingsHint: 'L-ospitu jagħżel qabel il-bidu',
+  gameSettingsLocked: 'Is-settings jagħżilhom l-ospitu',
+  settingsDone: 'Lest',
+
   gameFormat: 'Format tal-logħba',
   gameFormatHint: 'Agħżel it-tul qabel tibda',
   formatNames: {

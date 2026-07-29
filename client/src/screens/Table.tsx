@@ -15,6 +15,7 @@ import SoundToggle from '../components/SoundToggle';
 import TrickArea from '../components/TrickArea';
 import TrumpBadge from '../components/TrumpBadge';
 import PlayerAvatar from '../components/PlayerAvatar';
+import { feltLayout, useElementSize } from '../components/tableLayout';
 import { vibrate } from '../haptics';
 import { useT } from '../i18n';
 
@@ -40,6 +41,9 @@ export default function Table({ view: serverView }: Props) {
   // Le coup local s'affiche sans attendre la réponse du serveur
   const view = applyOptimistic(serverView, optimistic);
   const [scoresOpen, setScoresOpen] = useState(false);
+  // La géométrie du tapis se déduit de sa taille réelle : à huit joueurs sur un
+  // petit téléphone, aucune position écrite à l'avance ne tient.
+  const [feltRef, felt] = useElementSize<HTMLDivElement>();
   const round = view.round!;
   const me = view.players.find((p) => p.id === view.you)!;
   const currentPlayer = view.players.find((p) => p.seat === round.currentSeat);
@@ -54,6 +58,7 @@ export default function Table({ view: serverView }: Props) {
   const contractDone = myBid !== null && myTricks === myBid;
   const contractBusted = myBid !== null && myTricks > myBid;
   const trickBusy = round.currentTrick.plays.length > 0 || frozenTrick !== null;
+  const layout = feltLayout(view.players.length - 1, felt.width, felt.height);
 
   const onPlay = async (id: string) => {
     const card = round.myHand.find((c) => cardId(c) === id);
@@ -81,9 +86,7 @@ export default function Table({ view: serverView }: Props) {
   const statusText = frozenTrick
     ? t.trickWonBy(view.players.find((p) => p.id === frozenTrick.winnerId)?.pseudo ?? '')
     : myTurn
-      ? view.phase === 'playing'
-        ? t.yourTurn
-        : ''
+      ? ''
       : currentPlayer
         ? t.turnOf(currentPlayer.pseudo)
         : '';
@@ -91,15 +94,19 @@ export default function Table({ view: serverView }: Props) {
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
       {/* ---- En-tête : manche, son, scores ---- */}
-      <header className="flex shrink-0 items-center gap-2 px-3 pb-1 pt-2">
+      <header className="flex shrink-0 items-center gap-1.5 px-2 pb-1 pt-2">
         <LeaveGameButton />
 
-        <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-paper-50/50">
+        <div className="min-w-0 flex-1 leading-tight">
+          <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-paper-50/50">
             {t.round} {round.roundIndex + 1}/{view.roundsSequence.length}
           </p>
           <p className="truncate text-sm font-medium text-paper-50">{t.cards(round.cardsCount)}</p>
         </div>
+
+        {/* L'atout est une donnée de la manche, pas un objet du tapis : sa
+            place est ici, où il ne peut masquer personne. */}
+        <TrumpBadge trumpCard={round.trumpCard} />
 
         <SoundToggle />
 
@@ -125,35 +132,39 @@ export default function Table({ view: serverView }: Props) {
         occupe le centre, l'atout tient le coin gauche : le regard n'a plus à
         chercher qui joue ni quelle est la couleur maîtresse.
       */}
-      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center">
+      {/* `isolate` enferme les plans d'empilement du tapis : sans lui, le
+          z-index d'une carte du pli remonte jusqu'à la racine et passe
+          par-dessus le récapitulatif de fin de manche. */}
+      <div ref={feltRef} className="relative isolate min-h-0 flex-1">
         {/* Ancrage visuel : suggère la zone de dépose au centre de la table */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full"
+          className="pointer-events-none absolute rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgb(255 255 255 / 0.05) 0%, transparent 68%)',
-            boxShadow: 'inset 0 0 70px -20px rgb(0 0 0 / 0.5)',
+            width: felt.width * 0.7,
+            height: felt.width * 0.7,
+            left: layout.centre.x - felt.width * 0.35,
+            top: layout.centre.y - felt.width * 0.35,
+            background: 'radial-gradient(circle, rgb(255 255 255 / 0.07) 0%, transparent 70%)',
+            boxShadow: 'inset 0 0 60px -24px rgb(0 0 0 / 0.45)',
           }}
         />
 
-        <PlayerSeats view={view} />
+        <PlayerSeats view={view} layout={layout} />
 
-        {/* L'atout se consulte du coin de l'œil : il quitte le centre, que le
-            pli réclame, et reste ancré au même endroit toute la manche. */}
-        <div className="absolute left-2 top-1/2 -translate-y-1/2">
-          <TrumpBadge trumpCard={round.trumpCard} />
-        </div>
-
-        <TrickArea view={view} frozenTrick={frozenTrick} />
+        <TrickArea view={view} frozenTrick={frozenTrick} layout={layout} />
 
         <MyEmotes />
 
+        {/* État de la table : qui l'on attend, ou qui vient de ramasser. Le
+            « à toi de jouer » n'est PAS répété ici — le bandeau collé à la
+            main le dit déjà, et deux fois le même message brouille les deux. */}
         <motion.p
           key={statusText}
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`relative mt-2 h-6 px-4 text-center text-base font-semibold ${
-            myTurn && !frozenTrick ? 'text-brass-300' : 'text-paper-50/60'
+          className={`absolute inset-x-0 bottom-3 h-6 truncate px-16 text-center text-[15px] font-semibold ${
+            frozenTrick ? 'text-brass-200' : 'text-paper-50/70'
           }`}
           data-testid="turn-status"
           aria-live="polite"
@@ -188,29 +199,38 @@ export default function Table({ view: serverView }: Props) {
           deadline={myTurn ? view.turnDeadline : null}
         />
 
-        <div className="mb-2 flex items-center justify-center gap-2 px-3">
+        {/* Le pseudo prend ce qui reste : les pastilles sont de largeur fixe, et
+            c'est le nom qui était rogné jusqu'à devenir illisible. */}
+        <div className="mb-2 flex items-center gap-2 px-3" data-testid="my-row">
           <PlayerAvatar avatar={me.avatar} photo={me.photo} size={30} />
-          <span className="max-w-24 truncate text-[15px] font-semibold text-paper-50">{me.pseudo}</span>
+          <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-paper-50">{me.pseudo}</span>
           {round.dealerSeat === me.seat && (
-            <span className="rounded-full bg-brass-400 px-1.5 text-[10px] font-bold text-felt-950" title={t.dealer}>
+            <span
+              className="shrink-0 rounded-full bg-brass-400 px-1.5 text-[10px] font-bold text-felt-950"
+              title={t.dealer}
+            >
               D
             </span>
           )}
-          <span
-            data-testid="my-contract"
-            className={`rounded-full px-2.5 py-1 text-[14px] font-bold tabular-nums ${
-              myBid === null
-                ? 'bg-white/8 text-paper-50/55'
-                : contractBusted
+          {/* La pastille n'apparaît qu'une fois le contrat pris : vide, elle
+              ressemblait à un bouton inerte, et la phrase « pas encore
+              annoncé » mangeait toute la ligne. Pendant les annonces,
+              l'information est de toute façon juste au-dessus. */}
+          {myBid !== null && (
+            <span
+              data-testid="my-contract"
+              className={`shrink-0 rounded-full px-2.5 py-1 text-[14px] font-bold tabular-nums ${
+                contractBusted
                   ? 'bg-danger/20 text-danger'
                   : contractDone
                     ? 'bg-success/20 text-success'
                     : 'bg-brass-400/15 text-brass-300'
-            }`}
-          >
-            {myBid === null ? t.noBidYet : t.tricksOfContract(myTricks, myBid)}
-          </span>
-          <span className="text-[13px] tabular-nums text-paper-50/45">
+              }`}
+            >
+              {t.tricksOfContract(myTricks, myBid)}
+            </span>
+          )}
+          <span className="shrink-0 text-[12px] tabular-nums text-paper-50/45">
             {t.total} {me.totalScore}
           </span>
         </div>

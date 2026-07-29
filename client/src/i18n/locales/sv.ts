@@ -42,6 +42,12 @@ export const sv: Messages = {
   removeBot: 'Ta bort roboten',
 
   // Spelformat (längd)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Spelinställningar',
+  gameSettingsHint: 'Värden väljer innan start',
+  gameSettingsLocked: 'Inställningar valda av värden',
+  settingsDone: 'Klart',
+
   gameFormat: 'Spelformat',
   gameFormatHint: 'Välj längden innan ni startar',
   formatNames: {

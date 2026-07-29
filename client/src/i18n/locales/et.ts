@@ -51,6 +51,12 @@ export const et: Messages = {
   removeBot: 'Eemalda robot',
 
   // Mängu formaat (pikkus)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Mängu seaded',
+  gameSettingsHint: 'Võõrustaja valib enne algust',
+  gameSettingsLocked: 'Seaded valib võõrustaja',
+  settingsDone: 'Valmis',
+
   gameFormat: 'Mängu formaat',
   gameFormatHint: 'Vali pikkus enne alustamist',
   formatNames: {

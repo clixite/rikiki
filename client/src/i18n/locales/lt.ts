@@ -60,6 +60,12 @@ export const lt: Messages = {
   removeBot: 'Pašalinti robotą',
 
   // Partijos formatas (trukmė)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Žaidimo nustatymai',
+  gameSettingsHint: 'Šeimininkas pasirenka prieš pradžią',
+  gameSettingsLocked: 'Nustatymus pasirenka šeimininkas',
+  settingsDone: 'Atlikta',
+
   gameFormat: 'Partijos formatas',
   gameFormatHint: 'Pasirink trukmę prieš pradedant',
   formatNames: {

@@ -58,6 +58,12 @@ interface Props {
   layoutId?: string;
   /** Carte de la couleur d'atout : liseré laiton discret. */
   trump?: boolean;
+  /**
+   * Largeur imposée, en pixels. Le tapis calcule la sienne à partir de la place
+   * réellement disponible : aucune taille figée ne peut convenir à la fois à
+   * trois joueurs sur un grand écran et à huit sur un petit.
+   */
+  width?: number;
   className?: string;
   ariaLabel?: string;
 }
@@ -80,6 +86,7 @@ export default function CardFace({
   onClick,
   layoutId,
   trump,
+  width,
   className = '',
   ariaLabel,
 }: Props) {
@@ -103,7 +110,7 @@ export default function CardFace({
     </>
   );
 
-  const base = `${s.w} aspect-[2/3] ${s.radius} relative flex items-center justify-center
+  const base = `${width === undefined ? s.w : ''} aspect-[2/3] ${s.radius} relative flex items-center justify-center
     bg-linear-to-b from-paper-50 to-paper-100
     ${trump ? 'ring-2 ring-brass-400' : 'ring-1 ring-black/15'}
     ${suitInkClass(card.suit)}
@@ -112,6 +119,7 @@ export default function CardFace({
 
   const style = {
     boxShadow: raised ? 'var(--shadow-card-lifted)' : 'var(--shadow-card)',
+    ...(width === undefined ? {} : { width }),
   };
 
   if (!interactive) {

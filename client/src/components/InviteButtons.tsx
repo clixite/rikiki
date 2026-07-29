@@ -34,7 +34,7 @@ export default function InviteButtons({ code }: Props) {
   };
 
   const btn =
-    'flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold shadow-md active:scale-95 transition';
+    'flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold shadow-md active:scale-95 transition';
 
   return (
     <div>

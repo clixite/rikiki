@@ -59,6 +59,12 @@ export const lv: Messages = {
   removeBot: 'Noņemt robotu',
 
   // Spēles formāts (garums)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Spēles iestatījumi',
+  gameSettingsHint: 'Rīkotājs izvēlas pirms sākuma',
+  gameSettingsLocked: 'Iestatījumus izvēlas rīkotājs',
+  settingsDone: 'Gatavs',
+
   gameFormat: 'Spēles formāts',
   gameFormatHint: 'Izvēlies garumu pirms sākuma',
   formatNames: {

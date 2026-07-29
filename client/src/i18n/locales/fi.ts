@@ -49,6 +49,12 @@ export const fi: Messages = {
   removeBot: 'Poista robotti',
 
   // Pelin muoto (kesto)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Pelin asetukset',
+  gameSettingsHint: 'Isäntä valitsee ennen aloitusta',
+  gameSettingsLocked: 'Isäntä valitsee asetukset',
+  settingsDone: 'Valmis',
+
   gameFormat: 'Pelin muoto',
   gameFormatHint: 'Valitse kesto ennen aloitusta',
   formatNames: {

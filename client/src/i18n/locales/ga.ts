@@ -75,6 +75,12 @@ export const ga: Messages = {
   removeBot: 'Bain an róbat',
 
   // Formáid an chluiche (fad)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Socruithe an chluiche',
+  gameSettingsHint: 'Roghnaíonn an t-óstach roimh thosú',
+  gameSettingsLocked: 'Roghnaíonn an t-óstach na socruithe',
+  settingsDone: 'Déanta',
+
   gameFormat: 'Formáid an chluiche',
   gameFormatHint: 'Roghnaigh an fad sula dtosaíonn tú',
   formatNames: {

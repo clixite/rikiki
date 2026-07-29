@@ -42,6 +42,12 @@ export const en: Messages = {
   removeBot: 'Remove bot',
 
   // Game format (length)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Game settings',
+  gameSettingsHint: 'The host picks before the start',
+  gameSettingsLocked: 'Settings chosen by the host',
+  settingsDone: 'Done',
+
   gameFormat: 'Game format',
   gameFormatHint: 'Pick the length before you start',
   formatNames: {

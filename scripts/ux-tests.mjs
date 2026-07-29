@@ -196,66 +196,69 @@ for (const profile of PROFILES) {
   const startDisabledAt2 = await host.page.locator('[data-testid="start-game"]').isDisabled();
   check('salon : démarrage bloqué à 2 joueurs', startDisabledAt2);
 
-  // ---- Rythme : temps réel ou asynchrone
-  const paceVisible = (await host.page.locator('[data-testid="pace-picker"]').count()) > 0;
-  check('salon : choix du rythme', paceVisible);
-  if (paceVisible) {
-    const defaultPace = await host.page.getAttribute('[data-testid="pace-picker"]', 'data-pace');
-    check('salon : temps réel par défaut', defaultPace === 'live', String(defaultPace));
+  // ---- Réglages de la partie : durée, rythme, barème
+  //
+  // Ils vivaient à la suite dans le salon et sortaient de l'écran sans que
+  // rien ne le signale. Ils tiennent maintenant dans une feuille, résumée en
+  // une ligne — encore faut-il qu'on puisse l'ouvrir et la lire.
+  check('salon : réglages accessibles', (await host.page.locator('[data-testid="open-settings"]').count()) > 0);
+  const summary = (await host.page.textContent('[data-testid="open-settings"]')) ?? '';
+  check('salon : les réglages sont résumés sur place', summary.split('·').length >= 3, summary.trim());
 
-    const paceBox = await host.page.locator('[data-testid="pace-live"]').boundingBox();
-    check('salon : cible du rythme ≥ 44px', (paceBox?.height ?? 0) >= MIN_TOUCH - 0.5, JSON.stringify(paceBox));
+  await host.page.click('[data-testid="open-settings"]');
+  await host.page.waitForSelector('[data-testid="settings-sheet"]', { timeout: 10000 });
+  await settle(host.page, 500);
 
-    await host.page.click('[data-testid="pace-async"]');
-    const spread = await p2.page
-      .waitForSelector('[data-testid="pace-picker"][data-pace="async"]', { timeout: 10000 })
-      .then(() => true)
-      .catch(() => false);
-    check('salon : rythme diffusé à toute la table', spread);
+  check('réglages : sans débordement horizontal', await noHorizontalOverflow(host.page));
+  const settingsSmall = await smallTouchTargets(host.page, MIN_TOUCH);
+  check('réglages : cibles tactiles ≥ 44px', settingsSmall.length === 0, settingsSmall.join(' | '));
 
-    const paceRule = (await p2.page.textContent('[data-testid="pace-description"]')) ?? '';
-    check('salon : le rythme est expliqué en toutes lettres', paceRule.trim().length > 20, paceRule.trim());
-
-    // Le reste du parcours se joue en temps réel.
-    await host.page.click('[data-testid="pace-live"]');
-    await host.page.waitForSelector('[data-testid="pace-picker"][data-pace="live"]', { timeout: 10000 });
+  for (const [group, fallback] of [
+    ['format', 'normal'],
+    ['pace', 'live'],
+    ['scoring', 'classic'],
+  ]) {
+    const value = await host.page.getAttribute(`[data-testid="${group}-picker"]`, 'data-value');
+    check(`réglages : ${group} par défaut`, value === fallback, String(value));
+    const rule = (await host.page.textContent(`[data-testid="${group}-description"]`)) ?? '';
+    check(`réglages : ${group} expliqué en toutes lettres`, rule.trim().length > 20, rule.trim());
+    const box = await host.page.locator(`[data-testid="${group}-${fallback}"]`).boundingBox();
+    check(`réglages : cible ${group} ≥ 44px`, (box?.height ?? 0) >= MIN_TOUCH - 0.5, JSON.stringify(box));
   }
 
-  // ---- Barème de score : l'hôte choisit, la table entière doit le voir
-  const scoringVisible = (await host.page.locator('[data-testid="scoring-picker"]').count()) > 0;
-  check('salon : choix du barème de score', scoringVisible);
-  if (scoringVisible) {
-    const defaultScoring = await host.page.getAttribute('[data-testid="scoring-picker"]', 'data-scoring');
-    check('salon : barème classique par défaut', defaultScoring === 'classic', String(defaultScoring));
+  // Un choix de l'hôte se diffuse à toute la table
+  await host.page.click('[data-testid="pace-async"]');
+  await host.page.click('[data-testid="scoring-gentle"]');
+  await host.page.click('[data-testid="settings-close"]');
+  await host.page.waitForSelector('[data-testid="settings-sheet"]', { state: 'detached', timeout: 10000 });
 
-    const scoringBox = await host.page.locator('[data-testid="scoring-classic"]').boundingBox();
-    check(
-      'salon : cible du barème ≥ 44px',
-      (scoringBox?.height ?? 0) >= MIN_TOUCH - 0.5,
-      JSON.stringify(scoringBox),
-    );
+  const guestSummary = await p2.page
+    .waitForFunction(
+      () => (document.querySelector('[data-testid="open-settings"]')?.textContent ?? '').length > 0,
+      { timeout: 10000 },
+    )
+    .then(() => p2.page.textContent('[data-testid="open-settings"]'))
+    .catch(() => null);
+  check('salon : les réglages sont diffusés à toute la table', Boolean(guestSummary), String(guestSummary));
 
-    // Un invité ne choisit pas le barème, mais il doit pouvoir le lire
-    check(
-      'salon : l’invité ne modifie pas le barème',
-      (await p2.page.locator('[data-testid="scoring-gentle"]').count()) === 0,
-    );
+  // L'invité peut les lire, pas les changer
+  await p2.page.click('[data-testid="open-settings"]');
+  await p2.page.waitForSelector('[data-testid="settings-sheet"]', { timeout: 10000 });
+  const guestPace = await p2.page.getAttribute('[data-testid="pace-picker"]', 'data-value');
+  check('salon : l’invité voit le rythme choisi', guestPace === 'async', String(guestPace));
+  check(
+    'salon : l’invité ne modifie pas les réglages',
+    await p2.page.locator('[data-testid="pace-live"]').isDisabled(),
+  );
+  await p2.page.click('[data-testid="settings-close"]');
 
-    await host.page.click('[data-testid="scoring-gentle"]');
-    await p2.page.waitForSelector('[data-testid="scoring-picker"][data-scoring="gentle"]', { timeout: 10000 })
-      .then(() => check('salon : barème diffusé à toute la table', true))
-      .catch(async () => {
-        const seen = await p2.page.getAttribute('[data-testid="scoring-picker"]', 'data-scoring');
-        check('salon : barème diffusé à toute la table', false, String(seen));
-      });
-
-    const rule = (await p2.page.textContent('[data-testid="scoring-description"]')) ?? '';
-    check('salon : la règle du barème est écrite en toutes lettres', rule.trim().length > 20, rule.trim());
-
-    // On revient au barème classique pour la suite du parcours
-    await host.page.click('[data-testid="scoring-classic"]');
-    await host.page.waitForSelector('[data-testid="scoring-picker"][data-scoring="classic"]', { timeout: 10000 });
-  }
+  // Le reste du parcours se joue en temps réel, barème classique.
+  await host.page.click('[data-testid="open-settings"]');
+  await host.page.waitForSelector('[data-testid="pace-live"]', { timeout: 10000 });
+  await host.page.click('[data-testid="pace-live"]');
+  await host.page.click('[data-testid="scoring-classic"]');
+  await host.page.click('[data-testid="settings-close"]');
+  await host.page.waitForSelector('[data-testid="settings-sheet"]', { state: 'detached', timeout: 10000 });
 
   // On complète avec un robot → 3 joueurs
   if (addBotVisible) {
@@ -267,9 +270,10 @@ for (const profile of PROFILES) {
     const startEnabled = await host.page.locator('[data-testid="start-game"]').isEnabled();
     check('salon : démarrage possible après ajout d’un robot', startEnabled);
   }
+  if (SHOTS) { await settle(host.page); await host.page.screenshot({ path: `${SHOTS}/${profile.name.replace(/\W+/g, '-')}-02-lobby.png` }); }
 
-  // Le salon porte maintenant trois réglages : le bouton de lancement ne doit
-  // pas être repoussé hors de l'écran pour autant.
+  // Le salon porte trois réglages derrière un bouton : celui de lancement ne
+  // doit pas être repoussé hors de l'écran pour autant.
   const startVisible = await isFullyVisible(host.page, '[data-testid="start-game"]');
   check(
     'salon : le bouton démarrer reste dans l’écran',
@@ -331,7 +335,7 @@ for (const profile of PROFILES) {
     check('ANNONCE : marge sous la main ≥ 8px', bottomGap >= 8, `${bottomGap}px`);
 
     // Les cartes ne doivent recouvrir aucune information au-dessus d'elles
-    const clashContract = await overlaps(bidderPage, '[data-testid="hand-fan"]', '[data-testid="my-contract"]');
+    const clashContract = await overlaps(bidderPage, '[data-testid="hand-fan"]', '[data-testid="my-row"]');
     check(
       'ANNONCE : la main ne recouvre pas la ligne du joueur',
       clashContract.found && !clashContract.overlap,
@@ -375,7 +379,7 @@ for (const profile of PROFILES) {
     check('JEU : pas de débordement horizontal', await noHorizontalOverflow(playPage));
     check('JEU : indication du tour affichée', (await playPage.locator('[data-testid="turn-status"]').count()) > 0);
     check('JEU : contrat personnel affiché', (await playPage.locator('[data-testid="my-contract"]').count()) > 0);
-    const playClash = await overlaps(playPage, '[data-testid="hand-fan"]', '[data-testid="my-contract"]');
+    const playClash = await overlaps(playPage, '[data-testid="hand-fan"]', '[data-testid="my-row"]');
     check(
       'JEU : la main ne recouvre pas la ligne du joueur',
       playClash.found && !playClash.overlap,
@@ -433,8 +437,51 @@ for (const profile of PROFILES) {
     // L'atout doit se lire d'un coup d'œil : enseigne annoncée, pas devinée
     const trumpSuit = await playPage.locator('[data-testid="trump-badge"]').getAttribute('data-trump');
     check('JEU : enseigne d’atout annoncée', ['S', 'H', 'D', 'C', 'none'].includes(trumpSuit ?? ''), String(trumpSuit));
-    const trumpBox = await playPage.locator('[data-testid="trump-badge"]').boundingBox();
-    check('JEU : atout suffisamment grand', (trumpBox?.height ?? 0) >= 80, JSON.stringify(trumpBox));
+    // L'atout a quitté le tapis pour l'en-tête : ce qui compte n'est plus la
+    // hauteur du cartouche mais la taille de l'enseigne elle-même.
+    const suitBox = await playPage.locator('[data-testid="trump-suit"]').boundingBox();
+    const suitSize = await playPage.evaluate(() => {
+      const el = document.querySelector('[data-testid="trump-suit"] span');
+      return el ? parseFloat(getComputedStyle(el).fontSize) : 0;
+    });
+    check(
+      'JEU : atout suffisamment grand',
+      (suitBox?.height ?? 0) >= 32 && (suitBox?.width ?? 0) >= 32 && suitSize >= 22,
+      JSON.stringify({ suitBox, suitSize }),
+    );
+
+    // Géométrie du tapis : rien ne sort de l'écran, rien ne se recouvre.
+    const felt = await playPage.evaluate(() => {
+      const rect = (el) => {
+        const r = el.getBoundingClientRect();
+        return { l: r.left, t: r.top, r: r.right, b: r.bottom };
+      };
+      const hit = (a, b) => !(a.r <= b.l || a.l >= b.r || a.b <= b.t || a.t >= b.b);
+      const qa = (s) => [...document.querySelectorAll(s)];
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const seats = qa('[data-testid^="opponent-"]').map(rect);
+      const trick = qa('[data-testid^="trick-card-"]').map(rect);
+      const hand = qa('[data-testid^="hand-"]')
+        .filter((e) => e.getAttribute('data-testid') !== 'hand-fan')
+        .map(rect);
+      const trump = document.querySelector('[data-testid="trump-badge"]');
+      const outside = (b) => b.l < -0.5 || b.t < -0.5 || b.r > vw + 0.5 || b.b > vh + 0.5;
+      return {
+        seatsOut: seats.filter(outside).length,
+        trickOut: trick.filter(outside).length,
+        handOut: hand.filter(outside).length,
+        seatOnSeat: seats.filter((a, i) => seats.some((b, j) => j > i && hit(a, b))).length,
+        seatOnTrick: seats.filter((s) => trick.some((c) => hit(s, c))).length,
+        seatOnTrump: trump ? seats.filter((s) => hit(s, rect(trump))).length : 0,
+      };
+    });
+    check('TAPIS : aucun siège hors écran', felt.seatsOut === 0, JSON.stringify(felt));
+    check('TAPIS : aucune carte du pli hors écran', felt.trickOut === 0, JSON.stringify(felt));
+    check('TAPIS : aucune carte de la main hors écran', felt.handOut === 0, JSON.stringify(felt));
+    check('TAPIS : les sièges ne se chevauchent pas', felt.seatOnSeat === 0, JSON.stringify(felt));
+    check('TAPIS : le pli ne recouvre aucun siège', felt.seatOnTrick === 0, JSON.stringify(felt));
+    check('TAPIS : l’atout ne masque aucun joueur', felt.seatOnTrump === 0, JSON.stringify(felt));
 
     // Réactions : palette accessible, cibles confortables, envoi sans casse
     await playPage.click('[data-testid="open-emotes"]');
@@ -585,8 +632,11 @@ console.log('\n▸ Accessibilité et préférences système');
 
   // En asynchrone, créer la table puis refermer l'application est le geste
   // normal : le salon doit encore être là au retour.
+  await page.click('[data-testid="open-settings"]');
+  await page.waitForSelector('[data-testid="pace-async"]', { timeout: 10000 });
   await page.click('[data-testid="pace-async"]');
-  await page.waitForSelector('[data-testid="pace-picker"][data-pace="async"]', { timeout: 10000 });
+  await page.waitForSelector('[data-testid="pace-picker"][data-value="async"]', { timeout: 10000 });
+  await page.click('[data-testid="settings-close"]');
 
   await page.goto(`${BASE}/`);
   const listed = await page

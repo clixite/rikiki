@@ -52,6 +52,12 @@ export const el: Messages = {
   removeBot: 'Αφαίρεσε το ρομπότ',
 
   // Μορφή παιχνιδιού (διάρκεια)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Ρυθμίσεις παιχνιδιού',
+  gameSettingsHint: 'Ο οικοδεσπότης επιλέγει πριν την έναρξη',
+  gameSettingsLocked: 'Οι ρυθμίσεις ορίζονται από τον οικοδεσπότη',
+  settingsDone: 'Έτοιμο',
+
   gameFormat: 'Μορφή παιχνιδιού',
   gameFormatHint: 'Διάλεξε διάρκεια πριν ξεκινήσεις',
   formatNames: {

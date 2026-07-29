@@ -72,6 +72,12 @@ export const ro: Messages = {
   removeBot: 'Scoate robotul',
 
   // Formatul partidei (durata)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Setările jocului',
+  gameSettingsHint: 'Gazda alege înainte de start',
+  gameSettingsLocked: 'Setările sunt alese de gazdă',
+  settingsDone: 'Gata',
+
   gameFormat: 'Formatul partidei',
   gameFormatHint: 'Alege durata înainte de start',
   formatNames: {

@@ -48,7 +48,7 @@ entièrement côté serveur, aucun joueur ne voit la main d'un autre.
 
 ```bash
 npm install
-npm test                 # 180 tests : règles, moteur, robots, sockets, comptes
+npm test                 # 190 tests : règles, moteur, robots, sockets, comptes, géométrie
 npm run dev:server       # serveur sur :3000
 npm run dev:client       # client Vite sur :5173 (proxy vers :3000)
 ```
@@ -64,12 +64,22 @@ PORT=3111 DB_PATH=:memory: npx tsx server/src/index.ts &
 BASE_URL=http://localhost:3111 SHOTS_DIR=/tmp/shots FULL_GAME=1 node scripts/e2e.mjs
 ```
 
-**Tests d'ergonomie** — 180 vérifications d'interface sur trois formats de
+**Tests d'ergonomie** — 214 vérifications d'interface sur trois formats de
 téléphone (visibilité de la main pendant l'annonce, cibles tactiles, absence
 de chevauchement et de débordement, persistance du son, manifest PWA) :
 
 ```bash
 BASE_URL=http://localhost:3111 node scripts/ux-tests.mjs
+```
+
+**Audit du tapis** — la géométrie de la table (sièges, pli, main) est fixée par
+un test unitaire exhaustif (`client/test/tableLayout.test.ts`) qui balaie toutes
+les tailles d'écran plausibles. Pour vérifier que le rendu s'y conforme
+réellement, un script monte une vraie partie et mesure le DOM — utile après
+toute retouche du tapis, trop lent pour l'intégration continue :
+
+```bash
+OPP=7 MIN_CARDS=6 SHOTS_DIR=/tmp/shots node scripts/table-audit.mjs
 ```
 
 ## Production

@@ -63,6 +63,12 @@ export const pl: Messages = {
   removeBot: 'Usuń bota',
 
   // Format partii (długość)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Ustawienia gry',
+  gameSettingsHint: 'Gospodarz wybiera przed startem',
+  gameSettingsLocked: 'Ustawienia wybiera gospodarz',
+  settingsDone: 'Gotowe',
+
   gameFormat: 'Format partii',
   gameFormatHint: 'Wybierz długość przed startem',
   formatNames: {

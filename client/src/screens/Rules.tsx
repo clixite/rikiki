@@ -80,7 +80,7 @@ export default function Rules() {
         <Section step="3" title={t.rulesBidTitle}>
           <p>{t.rulesBidText}</p>
           <div className="rounded-xl bg-brass-400/10 p-2.5 ring-1 ring-brass-400/20">
-            <p className="text-xs font-semibold text-brass-300">⛓ {t.rulesHookTitle}</p>
+            <p className="text-xs font-semibold text-brass-300">⛓️ {t.rulesHookTitle}</p>
             <p className="mt-1 text-xs leading-snug text-paper-50/65">{t.rulesHookText}</p>
           </div>
         </Section>

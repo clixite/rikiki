@@ -5,9 +5,11 @@ import PlayerAvatar from './PlayerAvatar';
 import { EMOTE_GLYPH } from './EmoteBar';
 import { useGame } from '../store/game';
 import TurnCountdown from './TurnCountdown';
+import type { FeltLayout } from './tableLayout';
 
 interface Props {
   view: GameView;
+  layout: FeltLayout;
 }
 
 /**
@@ -19,59 +21,13 @@ interface Props {
  * partir de soi — le joueur suivant est toujours à gauche, comme sur une vraie
  * table où l'on joue dans le sens des aiguilles d'une montre.
  *
+ * Les positions viennent de `feltLayout` : calculées depuis la taille réelle du
+ * feutre, elles ne peuvent plus sortir de l'écran ni se recouvrir entre elles.
+ *
  * Le joueur dont c'est le tour est le seul élément lumineux du tapis : c'est
  * la question qu'on se pose dix fois par manche.
  */
-
-/**
- * Position de chaque siège, en pourcentage du tapis, selon le nombre
- * d'adversaires. On part du bas-gauche, on remonte par le haut, on redescend
- * à droite : soi-même occupe le bas de l'écran.
- */
-const SEATS: Record<number, [number, number][]> = {
-  1: [[50, 4]],
-  2: [
-    [15, 8],
-    [85, 8],
-  ],
-  3: [
-    [11, 20],
-    [50, 2],
-    [89, 20],
-  ],
-  4: [
-    [9, 28],
-    [29, 3],
-    [71, 3],
-    [91, 28],
-  ],
-  5: [
-    [7, 34],
-    [21, 9],
-    [50, 1],
-    [79, 9],
-    [93, 34],
-  ],
-  6: [
-    [7, 38],
-    [15, 13],
-    [37, 2],
-    [63, 2],
-    [85, 13],
-    [93, 38],
-  ],
-  7: [
-    [6, 42],
-    [11, 19],
-    [29, 5],
-    [50, 0],
-    [71, 5],
-    [89, 19],
-    [94, 42],
-  ],
-};
-
-export default function PlayerSeats({ view }: Props) {
+export default function PlayerSeats({ view, layout }: Props) {
   const t = useT();
   const emotes = useGame((s) => s.emotes);
   const me = view.players.find((p) => p.id === view.you);
@@ -84,12 +40,10 @@ export default function PlayerSeats({ view }: Props) {
     .filter((p) => p.id !== view.you)
     .sort((a, b) => ((a.seat - mySeat + n) % n) - ((b.seat - mySeat + n) % n));
 
-  const positions = SEATS[others.length] ?? SEATS[7];
-
   return (
     <div className="pointer-events-none absolute inset-0" data-testid="player-seats">
       {others.map((p, i) => {
-        const [x, y] = positions[i] ?? positions[positions.length - 1];
+        const pos = layout.seats[i] ?? layout.centre;
         const isCurrent =
           round !== null &&
           view.phase !== 'round-scoring' &&
@@ -105,13 +59,20 @@ export default function PlayerSeats({ view }: Props) {
         return (
           <motion.div
             key={p.id}
-            layout
-            animate={{ scale: isCurrent ? 1.08 : 1 }}
+            animate={{ scale: isCurrent ? 1.06 : 1 }}
             transition={{ type: 'spring', stiffness: 360, damping: 26 }}
             data-testid={`opponent-${p.id}`}
             data-current={isCurrent ? 'true' : 'false'}
-            className="absolute flex w-24 -translate-x-1/2 flex-col items-center"
-            style={{ left: `${x}%`, top: `${y}%` }}
+            className="absolute flex flex-col items-center"
+            style={{
+              width: layout.seatW,
+              // La hauteur est imposée, pas déduite du contenu : c'est elle que
+              // la géométrie réserve, et c'est sur elle que se cale le pseudo
+              // du joueur attendu quand les autres noms ne tiennent pas.
+              minHeight: layout.seatH,
+              left: pos.x - layout.seatW / 2,
+              top: pos.y - layout.seatH / 2,
+            }}
           >
             <SeatEmotes emotes={emotes.filter((e) => e.playerId === p.id)} />
 
@@ -120,8 +81,14 @@ export default function PlayerSeats({ view }: Props) {
                 isCurrent ? 'rk-turn bg-brass-400/20' : 'bg-felt-900/50 ring-1 ring-white/8'
               } ${p.connected ? '' : 'opacity-45'}`}
             >
-              <PlayerAvatar playerId={p.id} avatar={p.avatar} photo={p.photo} size={44} className="rounded-full" />
-              {isCurrent && <TurnCountdown deadline={view.turnDeadline} size={56} />}
+              <PlayerAvatar
+                playerId={p.id}
+                avatar={p.avatar}
+                photo={p.photo}
+                size={layout.avatar}
+                className="rounded-full"
+              />
+              {isCurrent && <TurnCountdown deadline={view.turnDeadline} size={layout.avatar + 12} />}
               {isDealer && (
                 <span
                   className="absolute -right-1 -top-1 rounded-full bg-brass-400 px-1.5 text-[10px] font-bold leading-tight text-felt-950"
@@ -132,26 +99,42 @@ export default function PlayerSeats({ view }: Props) {
               )}
             </div>
 
-            <span className="mt-1 max-w-full truncate text-[13px] font-semibold leading-tight text-paper-50">
-              {p.pseudo}
-            </span>
+            {/* Le pseudo tient sur la largeur du siège, jamais au-delà : sinon
+                deux voisins se recouvrent dès qu'un nom est long. Sur une table
+                très serrée il disparaît — l'avatar identifie déjà le joueur, et
+                trois lettres suivies de points de suspension n'apprennent
+                rien à personne. */}
+            {layout.showName ? (
+              <span className="mt-1 w-full truncate px-0.5 text-center text-[12px] font-semibold leading-tight text-paper-50">
+                {p.pseudo}
+              </span>
+            ) : isCurrent ? (
+              // Une table à huit ne laisse pas la place à huit pseudos ; celui
+              // qu'on attend, en revanche, doit pouvoir se nommer. Il se pose
+              // dans la bande réservée en bas du siège, jamais sur les cartes.
+              <span className="absolute bottom-0 left-1/2 max-w-24 -translate-x-1/2 truncate rounded-full bg-felt-950/85 px-1.5 text-[11px] font-semibold leading-tight text-brass-200">
+                {p.pseudo}
+              </span>
+            ) : (
+              <span className="sr-only">{p.pseudo}</span>
+            )}
 
             {/* Contrat : la donnée qu'on relit sans arrêt pendant la manche */}
             {hasBid ? (
               <span
-                className={`mt-0.5 rounded-full px-2 py-0.5 text-[13px] font-bold tabular-nums leading-tight ${
+                className={`mt-0.5 rounded-full px-1.5 py-0.5 text-[12px] font-bold tabular-nums leading-tight ${
                   over
-                    ? 'bg-danger/20 text-danger'
+                    ? 'bg-danger/25 text-danger'
                     : done
-                      ? 'bg-success/20 text-success'
-                      : 'bg-felt-950/60 text-brass-300'
+                      ? 'bg-success/25 text-success'
+                      : 'bg-felt-950/70 text-brass-300'
                 }`}
                 title={t.tricksOfContract(tricks, bid)}
               >
                 {tricks}/{bid}
               </span>
             ) : (
-              <span className="mt-0.5 text-[12px] leading-tight text-paper-50/40">
+              <span className="mt-0.5 text-[11px] leading-tight text-paper-50/40">
                 {view.phase === 'bidding' ? t.thinking : '—'}
               </span>
             )}
@@ -172,7 +155,7 @@ export default function PlayerSeats({ view }: Props) {
  */
 function SeatEmotes({ emotes }: { emotes: { id: number; emote: keyof typeof EMOTE_GLYPH }[] }) {
   return (
-    <div className="pointer-events-none absolute -top-9 left-1/2 flex -translate-x-1/2 gap-0.5">
+    <div className="pointer-events-none absolute -top-8 left-1/2 flex -translate-x-1/2 gap-0.5">
       <AnimatePresence>
         {emotes.map((e) => (
           <motion.span
@@ -181,7 +164,7 @@ function SeatEmotes({ emotes }: { emotes: { id: number; emote: keyof typeof EMOT
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.7, y: -14 }}
             transition={{ type: 'spring', stiffness: 500, damping: 22 }}
-            className="text-3xl drop-shadow-lg"
+            className="text-2xl drop-shadow-lg"
             aria-hidden="true"
           >
             {EMOTE_GLYPH[e.emote]}

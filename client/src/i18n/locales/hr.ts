@@ -64,6 +64,12 @@ export const hr: Messages = {
   removeBot: 'Ukloni robota',
 
   // Format igre (trajanje)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Postavke igre',
+  gameSettingsHint: 'Domaćin bira prije početka',
+  gameSettingsLocked: 'Postavke bira domaćin',
+  settingsDone: 'Gotovo',
+
   gameFormat: 'Format igre',
   gameFormatHint: 'Odaberi trajanje prije početka',
   formatNames: {

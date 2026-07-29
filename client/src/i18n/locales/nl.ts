@@ -42,6 +42,12 @@ export const nl: Messages = {
   removeBot: 'Bot verwijderen',
 
   // Spelformaat (duur)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Spelinstellingen',
+  gameSettingsHint: 'De host kiest voor de start',
+  gameSettingsLocked: 'Instellingen gekozen door de host',
+  settingsDone: 'Klaar',
+
   gameFormat: 'Spelformaat',
   gameFormatHint: 'Kies de speelduur voor je begint',
   formatNames: {

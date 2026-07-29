@@ -41,6 +41,12 @@ export const fr = {
   botsFull: 'La table est complète',
   removeBot: 'Retirer le robot',
 
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Réglages de la partie',
+  gameSettingsHint: 'L’hôte choisit avant de lancer',
+  gameSettingsLocked: 'Réglages choisis par l’hôte',
+  settingsDone: 'Terminé',
+
   // Format de partie (durée)
   gameFormat: 'Format de la partie',
   gameFormatHint: 'Choisis la durée avant de lancer',

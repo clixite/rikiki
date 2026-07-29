@@ -42,6 +42,12 @@ export const it: Messages = {
   removeBot: 'Rimuovi il bot',
 
   // Formato della partita (durata)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Impostazioni della partita',
+  gameSettingsHint: 'L’ospite sceglie prima di iniziare',
+  gameSettingsLocked: 'Impostazioni scelte dall’ospite',
+  settingsDone: 'Fatto',
+
   gameFormat: 'Formato della partita',
   gameFormatHint: 'Scegli la durata prima di iniziare',
   formatNames: {

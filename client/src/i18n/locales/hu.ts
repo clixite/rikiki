@@ -47,6 +47,12 @@ export const hu: Messages = {
   removeBot: 'Robot eltávolítása',
 
   // Játék hossza
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Játékbeállítások',
+  gameSettingsHint: 'A házigazda választ indulás előtt',
+  gameSettingsLocked: 'A beállításokat a házigazda választja',
+  settingsDone: 'Kész',
+
   gameFormat: 'Játék hossza',
   gameFormatHint: 'Indítás előtt válaszd ki a hosszát',
   formatNames: {

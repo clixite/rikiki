@@ -38,7 +38,10 @@ export default function BidPicker({ cardsCount, legalBids, bidsSoFar, onBid }: P
         </p>
       </div>
 
-      <div className="rk-scroll -mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5">
+      {/* Les annonces s'enroulent sur plusieurs lignes plutôt que de défiler :
+          à dix cartes, la moitié des choix se cachait hors écran sans que rien
+          ne l'indique — on annonçait petit faute de voir les grands nombres. */}
+      <div className="flex flex-wrap justify-center gap-1.5">
         {all.map((b) => {
           const legal = legalBids.includes(b);
           const isPending = pending === b;
@@ -53,7 +56,7 @@ export default function BidPicker({ cardsCount, legalBids, bidsSoFar, onBid }: P
                 setPending(b);
                 onBid(b);
               }}
-              className={`relative h-12 min-w-12 shrink-0 rounded-xl text-lg font-bold tabular-nums transition-all duration-150 ${
+              className={`relative h-11 min-w-11 shrink-0 rounded-xl px-1 text-lg font-bold tabular-nums transition-all duration-150 ${
                 legal
                   ? 'bg-linear-to-b from-brass-300 to-brass-500 text-felt-950 ring-1 ring-brass-200/50 active:scale-90'
                   : 'bg-white/6 text-paper-50/25 ring-1 ring-white/8'
@@ -74,7 +77,7 @@ export default function BidPicker({ cardsCount, legalBids, bidsSoFar, onBid }: P
 
       {forbidden !== undefined && (
         <p className="mt-1.5 text-[11px] leading-snug text-brass-200/70">
-          ⛓ {t.hookExplain(forbidden, cardsCount)}
+          ⛓️ {t.hookExplain(forbidden, cardsCount)}
         </p>
       )}
     </motion.div>

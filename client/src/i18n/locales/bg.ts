@@ -54,6 +54,12 @@ export const bg: Messages = {
   removeBot: 'Махни робота',
 
   // Формат на играта (продължителност)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Настройки на играта',
+  gameSettingsHint: 'Домакинът избира преди старта',
+  gameSettingsLocked: 'Настройките се избират от домакина',
+  settingsDone: 'Готово',
+
   gameFormat: 'Формат на играта',
   gameFormatHint: 'Избери продължителността преди старта',
   formatNames: {

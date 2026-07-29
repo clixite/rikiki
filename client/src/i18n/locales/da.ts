@@ -42,6 +42,12 @@ export const da: Messages = {
   removeBot: 'Fjern robotten',
 
   // Spilformat (længde)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Spilindstillinger',
+  gameSettingsHint: 'Værten vælger inden start',
+  gameSettingsLocked: 'Indstillinger valgt af værten',
+  settingsDone: 'Færdig',
+
   gameFormat: 'Spilformat',
   gameFormatHint: 'Vælg længden, før I starter',
   formatNames: {

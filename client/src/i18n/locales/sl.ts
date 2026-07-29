@@ -66,6 +66,12 @@ export const sl: Messages = {
   removeBot: 'Odstrani robota',
 
   // Format igre (dolžina)
+  // Réglages de la partie (feuille du salon)
+  gameSettings: 'Nastavitve igre',
+  gameSettingsHint: 'Gostitelj izbere pred začetkom',
+  gameSettingsLocked: 'Nastavitve izbere gostitelj',
+  settingsDone: 'Končano',
+
   gameFormat: 'Format igre',
   gameFormatHint: 'Izberi dolžino pred začetkom',
   formatNames: {

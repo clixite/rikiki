@@ -1,22 +1,14 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { useNav } from '../nav';
-import type { GameFormat, GamePace, GameView, ScoringVariant } from '@rikiki/shared';
-import {
-  DEFAULT_PACE,
-  DEFAULT_SCORING,
-  GAME_FORMATS,
-  GAME_PACES,
-  MIN_PLAYERS,
-  SCORING_VARIANTS,
-  formatSummary,
-  isBotId,
-} from '@rikiki/shared';
+import type { GameView } from '@rikiki/shared';
+import { DEFAULT_PACE, DEFAULT_SCORING, MIN_PLAYERS, isBotId } from '@rikiki/shared';
+import GameSettingsSheet from '../components/GameSettingsSheet';
 import InviteButtons from '../components/InviteButtons';
 import SoundToggle from '../components/SoundToggle';
 import { useT } from '../i18n';
 
-import { addBot, kickPlayer, leaveRoom, removeBot, setFormat, setPace, setScoring, startGame } from '../socket';
+import { addBot, kickPlayer, leaveRoom, removeBot, startGame } from '../socket';
 import { useGame } from '../store/game';
 import PlayerAvatar from '../components/PlayerAvatar';
 
@@ -28,45 +20,20 @@ export default function Lobby({ view }: Props) {
   const t = useT();
   const navigate = useNav();
   const [busy, setBusy] = useState(false);
-  // Format affiché en attendant l'aller-retour serveur (retour tactile immédiat).
-  const [pendingFormat, setPendingFormat] = useState<GameFormat | null>(null);
-  const [pendingScoring, setPendingScoring] = useState<ScoringVariant | null>(null);
-  const [pendingPace, setPendingPace] = useState<GamePace | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const isHost = view.hostId === view.you;
-  const selectedFormat = pendingFormat ?? view.format;
-  // Les parties créées avant l'arrivée des barèmes n'en portent aucun.
-  const selectedScoring = pendingScoring ?? view.scoring ?? DEFAULT_SCORING;
-  const selectedPace = pendingPace ?? view.pace ?? DEFAULT_PACE;
+  // Résumé des trois réglages : ce qu'on vérifie d'un coup d'œil avant de lancer.
+  const settingsSummary = [
+    t.formatNames[view.format],
+    t.paceNames[view.pace ?? DEFAULT_PACE],
+    t.scoringNames[view.scoring ?? DEFAULT_SCORING],
+  ].join(' · ');
   const missing = Math.max(0, MIN_PLAYERS - view.players.length);
   const canStart = missing === 0;
   const isFull = view.players.length >= view.maxPlayers;
 
   const onStart = async () => {
     const res = await startGame();
-    if (!res.ok) useGame.getState().showToast(res.error.message);
-  };
-
-  const onPickFormat = async (format: GameFormat) => {
-    if (format === selectedFormat) return;
-    setPendingFormat(format);
-    const res = await setFormat(format);
-    setPendingFormat(null);
-    if (!res.ok) useGame.getState().showToast(res.error.message);
-  };
-
-  const onPickScoring = async (scoring: ScoringVariant) => {
-    if (scoring === selectedScoring) return;
-    setPendingScoring(scoring);
-    const res = await setScoring(scoring);
-    setPendingScoring(null);
-    if (!res.ok) useGame.getState().showToast(res.error.message);
-  };
-
-  const onPickPace = async (pace: GamePace) => {
-    if (pace === selectedPace) return;
-    setPendingPace(pace);
-    const res = await setPace(pace);
-    setPendingPace(null);
     if (!res.ok) useGame.getState().showToast(res.error.message);
   };
 
@@ -138,7 +105,7 @@ export default function Lobby({ view }: Props) {
                     type="button"
                     onClick={() => (bot ? removeBot(p.id) : kickPlayer(p.id))}
                     aria-label={bot ? t.removeBot : t.kick}
-                    className="flex h-9 w-9 items-center justify-center rounded-full text-paper-50/40 transition active:scale-90 hover:text-danger"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-paper-50/40 transition active:scale-90 hover:text-danger"
                   >
                     ✕
                   </button>
@@ -168,176 +135,26 @@ export default function Lobby({ view }: Props) {
           </button>
         )}
 
-        {/* Format de partie : l'hôte choisit la durée, les autres la voient */}
-        <div className="pt-4" data-testid="format-picker" data-format={selectedFormat}>
-          <div className="mb-2 flex items-baseline justify-between gap-2">
-            <p className="text-xs font-medium uppercase tracking-wide text-paper-50/50">{t.gameFormat}</p>
-            <p className="text-[11px] text-paper-50/40">{isHost ? t.gameFormatHint : t.formatLocked}</p>
-          </div>
-
-          {isHost ? (
-            <div className="grid grid-cols-3 gap-1.5">
-              {GAME_FORMATS.map((f) => {
-                const summary = formatSummary(view.players.length, f);
-                const selected = f === selectedFormat;
-                return (
-                  <button
-                    key={f}
-                    type="button"
-                    data-testid={`format-${f}`}
-                    aria-pressed={selected}
-                    title={t.formatDescriptions[f]}
-                    onClick={() => onPickFormat(f)}
-                    className={`relative flex min-h-[68px] flex-col items-center justify-center gap-0.5 rounded-xl px-1.5 py-2 transition active:scale-95 ${
-                      selected ? 'text-felt-950' : 'bg-felt-900/45 text-paper-50 ring-1 ring-white/6'
-                    }`}
-                  >
-                    {selected && (
-                      <motion.span
-                        layoutId="format-active"
-                        aria-hidden="true"
-                        transition={{ type: 'spring', stiffness: 420, damping: 34 }}
-                        className="absolute inset-0 rounded-xl bg-linear-to-b from-brass-300 to-brass-500 ring-1 ring-brass-200/50"
-                        style={{ boxShadow: '0 2px 8px -2px rgb(0 0 0 / 0.5)' }}
-                      />
-                    )}
-                    <span className="relative text-[13px] font-bold leading-tight">{t.formatNames[f]}</span>
-                    <span
-                      className={`relative text-[10px] leading-tight tabular-nums ${
-                        selected ? 'text-felt-900/75' : 'text-paper-50/50'
-                      }`}
-                    >
-                      {t.formatRounds(summary.rounds)}
-                    </span>
-                    <span
-                      className={`relative text-[10px] font-semibold leading-tight tabular-nums ${
-                        selected ? 'text-felt-900/75' : 'text-brass-300/80'
-                      }`}
-                    >
-                      {t.formatDuration(summary.minutes)}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          ) : (
-            <div
-              data-testid={`format-${selectedFormat}`}
-              className="flex items-center gap-3 rounded-xl bg-felt-900/45 px-3 py-2.5 ring-1 ring-white/6"
-            >
-              <span className="min-w-0 flex-1">
-                <span className="block text-[15px] font-medium text-paper-50">{t.formatNames[selectedFormat]}</span>
-                <span className="block text-[11px] text-paper-50/45">{t.formatDescriptions[selectedFormat]}</span>
-              </span>
-              <span className="shrink-0 text-right text-[11px] tabular-nums text-paper-50/55">
-                <span className="block">{t.formatRounds(formatSummary(view.players.length, selectedFormat).rounds)}</span>
-                <span className="block font-semibold text-brass-300/80">
-                  {t.formatDuration(formatSummary(view.players.length, selectedFormat).minutes)}
-                </span>
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Rythme : à cinq amis dispersés, se retrouver au même moment est le
-            vrai obstacle. Une partie asynchrone n'attend personne. */}
-        <div className="pt-3" data-testid="pace-picker" data-pace={selectedPace}>
-          <div className="mb-2 flex items-baseline justify-between gap-2">
-            <p className="text-xs font-medium uppercase tracking-wide text-paper-50/50">{t.gamePace}</p>
-            <p className="text-[11px] text-paper-50/40">{isHost ? t.gamePaceHint : t.paceLocked}</p>
-          </div>
-
-          {isHost ? (
-            <div className="grid grid-cols-2 gap-1.5">
-              {GAME_PACES.map((p) => {
-                const selected = p === selectedPace;
-                return (
-                  <button
-                    key={p}
-                    type="button"
-                    data-testid={`pace-${p}`}
-                    aria-pressed={selected}
-                    title={t.paceDescriptions[p]}
-                    onClick={() => onPickPace(p)}
-                    className={`relative flex min-h-[44px] items-center justify-center rounded-xl px-1.5 py-2 text-center transition active:scale-95 ${
-                      selected ? 'text-felt-950' : 'bg-felt-900/45 text-paper-50 ring-1 ring-white/6'
-                    }`}
-                  >
-                    {selected && (
-                      <motion.span
-                        layoutId="pace-active"
-                        aria-hidden="true"
-                        transition={{ type: 'spring', stiffness: 420, damping: 34 }}
-                        className="absolute inset-0 rounded-xl bg-linear-to-b from-brass-300 to-brass-500 ring-1 ring-brass-200/50"
-                        style={{ boxShadow: '0 2px 8px -2px rgb(0 0 0 / 0.5)' }}
-                      />
-                    )}
-                    <span className="relative text-[13px] font-bold leading-tight">{t.paceNames[p]}</span>
-                  </button>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="rounded-xl bg-felt-900/45 px-3 py-2.5 text-[15px] font-medium text-paper-50 ring-1 ring-white/6">
-              {t.paceNames[selectedPace]}
-            </p>
-          )}
-
-          <p className="mt-1.5 text-[11px] leading-snug text-paper-50/50" data-testid="pace-description">
-            {t.paceDescriptions[selectedPace]}
-          </p>
-        </div>
-
-        {/* Barème de score : chaque famille compte à sa façon, il faut pouvoir
-            retrouver la sienne — sinon le jeu paraît « faux ». */}
-        <div className="pt-3" data-testid="scoring-picker" data-scoring={selectedScoring}>
-          <div className="mb-2 flex items-baseline justify-between gap-2">
-            <p className="text-xs font-medium uppercase tracking-wide text-paper-50/50">{t.scoringVariant}</p>
-            <p className="text-[11px] text-paper-50/40">{isHost ? t.scoringHint : t.scoringLocked}</p>
-          </div>
-
-          {isHost ? (
-            <div className="grid grid-cols-3 gap-1.5">
-              {SCORING_VARIANTS.map((s) => {
-                const selected = s === selectedScoring;
-                return (
-                  <button
-                    key={s}
-                    type="button"
-                    data-testid={`scoring-${s}`}
-                    aria-pressed={selected}
-                    title={t.scoringDescriptions[s]}
-                    onClick={() => onPickScoring(s)}
-                    className={`relative flex min-h-[44px] items-center justify-center rounded-xl px-1.5 py-2 text-center transition active:scale-95 ${
-                      selected ? 'text-felt-950' : 'bg-felt-900/45 text-paper-50 ring-1 ring-white/6'
-                    }`}
-                  >
-                    {selected && (
-                      <motion.span
-                        layoutId="scoring-active"
-                        aria-hidden="true"
-                        transition={{ type: 'spring', stiffness: 420, damping: 34 }}
-                        className="absolute inset-0 rounded-xl bg-linear-to-b from-brass-300 to-brass-500 ring-1 ring-brass-200/50"
-                        style={{ boxShadow: '0 2px 8px -2px rgb(0 0 0 / 0.5)' }}
-                      />
-                    )}
-                    <span className="relative text-[13px] font-bold leading-tight">{t.scoringNames[s]}</span>
-                  </button>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="rounded-xl bg-felt-900/45 px-3 py-2.5 text-[15px] font-medium text-paper-50 ring-1 ring-white/6">
-              {t.scoringNames[selectedScoring]}
-            </p>
-          )}
-
-          {/* La règle en toutes lettres : c'est elle qu'on vient vérifier */}
-          <p className="mt-1.5 text-[11px] leading-snug text-paper-50/50" data-testid="scoring-description">
-            {t.scoringDescriptions[selectedScoring]}
-          </p>
-        </div>
       </div>
+
+      {/* Réglages : un résumé d'une ligne, le détail dans une feuille. Empilés
+          dans le salon, les trois sélecteurs sortaient de l'écran sans que
+          rien ne le signale — autant dire qu'ils n'existaient pas. */}
+      <button
+        type="button"
+        data-testid="open-settings"
+        onClick={() => setSettingsOpen(true)}
+        className="mt-3 flex w-full items-center gap-3 rounded-xl bg-felt-900/45 px-3 py-2.5 text-left ring-1 ring-white/6 transition active:scale-[0.98]"
+      >
+        <span className="text-lg leading-none" aria-hidden="true">
+          ⚙️
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[13px] font-medium text-paper-50/90">{t.gameSettings}</span>
+          <span className="block truncate text-[11px] text-paper-50/50">{settingsSummary}</span>
+        </span>
+        <span className="shrink-0 text-lg text-paper-50/40">›</span>
+      </button>
 
       {/* Actions */}
       <div className="space-y-2 pt-3">
@@ -365,11 +182,13 @@ export default function Lobby({ view }: Props) {
         <button
           type="button"
           onClick={onLeave}
-          className="w-full py-2.5 text-sm text-paper-50/50 transition active:scale-95"
+          className="min-h-11 w-full text-sm text-paper-50/50 transition active:scale-95"
         >
           {t.leave}
         </button>
       </div>
+
+      {settingsOpen && <GameSettingsSheet view={view} onClose={() => setSettingsOpen(false)} />}
     </div>
   );
 }
