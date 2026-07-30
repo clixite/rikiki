@@ -3,7 +3,7 @@ import { cardFromId, cardId } from '../src/cards';
 import { BOT_ID_PREFIX, botBid, botCard, chooseBid, chooseCard, isBotId, nextBotProfile } from '../src/bot';
 import { applyAction, createGame } from '../src/engine';
 import { legalBids, legalCards } from '../src/rules';
-import type { Card, GameState, Trick } from '../src/types';
+import type { Card, CompletedTrick, GameState, Trick } from '../src/types';
 
 const hand = (...ids: string[]): Card[] => ids.map(cardFromId);
 
@@ -247,6 +247,93 @@ describe('choix de carte du bot', () => {
       tricksWon: 0,
     };
     expect(chooseCard(input)).toBe(chooseCard(input));
+  });
+});
+
+describe('mémoire des renonces sur toute la manche', () => {
+  it('n’entame pas une couleur où un adversaire en quête de plis a renoncé au pli 1, même au pli 4', () => {
+    // p0 = le bot qui va entamer, p1 et p2 des adversaires.
+    const players = [
+      { id: 'p0', pseudo: 'Bot', avatar: '🤖', seat: 0, connected: true, totalScore: 0 },
+      { id: 'p1', pseudo: 'Alice', avatar: '🦊', seat: 1, connected: true, totalScore: 0 },
+      { id: 'p2', pseudo: 'Bob', avatar: '🐼', seat: 2, connected: true, totalScore: 0 },
+    ];
+
+    // Pli 1 : p1 entame à cœur, p2 ne fournit pas → p2 n'a plus de cœur.
+    const trick1: CompletedTrick = {
+      leaderSeat: 1,
+      plays: [
+        { playerId: 'p1', card: cardFromId('H5') },
+        { playerId: 'p2', card: cardFromId('C2') },
+        { playerId: 'p0', card: cardFromId('H6') },
+      ],
+      winnerId: 'p0',
+    };
+    // Plis 2 et 3 : sans rapport avec le cœur, pour éloigner la renonce du pli
+    // en cours — c'est précisément ce que l'ancien code (lastTrick + pli en
+    // cours seulement) oubliait.
+    const trick2: CompletedTrick = {
+      leaderSeat: 0,
+      plays: [
+        { playerId: 'p0', card: cardFromId('C3') },
+        { playerId: 'p1', card: cardFromId('C4') },
+        { playerId: 'p2', card: cardFromId('C5') },
+      ],
+      winnerId: 'p1',
+    };
+    const trick3: CompletedTrick = {
+      leaderSeat: 1,
+      plays: [
+        { playerId: 'p1', card: cardFromId('D5') },
+        { playerId: 'p2', card: cardFromId('D6') },
+        { playerId: 'p0', card: cardFromId('D7') },
+      ],
+      winnerId: 'p2',
+    };
+
+    const state: GameState = {
+      code: 'TEST',
+      hostId: 'p0',
+      phase: 'playing',
+      players,
+      maxPlayers: 8,
+      format: 'normal',
+      roundsSequence: [10],
+      createdAt: 0,
+      seed: 'seed',
+      round: {
+        roundIndex: 0,
+        cardsCount: 10,
+        dealerSeat: 2,
+        trumpCard: { suit: 'S', rank: 2 },
+        hands: {
+          // Le bot a le choix entre l'as de cœur (entame la plus forte a
+          // priori) et le roi de carreau : le premier est dangereux, p2 étant
+          // toujours en quête de plis et vide à cœur.
+          p0: hand('H14', 'D13'),
+          p1: hand('S3', 'C6', 'D2'),
+          p2: hand('S4', 'C7', 'D8'),
+        },
+        bids: { p0: 5, p1: 3, p2: 4 },
+        currentSeat: 0,
+        currentTrick: { leaderSeat: 0, plays: [] },
+        lastTrick: trick3,
+        playedCards: [
+          ...trick1.plays.map((p) => p.card),
+          ...trick2.plays.map((p) => p.card),
+          ...trick3.plays.map((p) => p.card),
+        ],
+        completedTricks: [trick1, trick2, trick3],
+        tricksWon: { p0: 1, p1: 1, p2: 1 },
+        roundScores: null,
+      },
+    };
+
+    const chosen = botCard(state, 'p0');
+    // Sans la mémoire de la renonce du pli 1, le bot entamerait l'as de cœur
+    // (plus fort a priori) et se ferait couper par p2.
+    expect(chosen).toBe('D13');
+    expect(chosen).not.toBe('H14');
   });
 });
 

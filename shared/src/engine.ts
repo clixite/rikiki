@@ -117,6 +117,7 @@ function dealRound(state: GameState, roundIndex: number, dealerSeat: number): vo
     currentTrick: { leaderSeat: firstSeat, plays: [] },
     lastTrick: null,
     playedCards: [],
+    completedTricks: [],
     tricksWon: Object.fromEntries(state.players.map((p) => [p.id, 0])),
     roundScores: null,
   };
@@ -257,6 +258,10 @@ export function applyAction(prev: GameState, action: GameAction): EngineResult {
         const winner = trickWinner(round.currentTrick, round.trumpCard?.suit ?? null);
         round.tricksWon[winner.playerId] += 1;
         round.lastTrick = { ...round.currentTrick, winnerId: winner.playerId };
+        // Journal de la manche : borné à `cardsCount` plis (dix au plus), donc
+        // sans risque de croissance de l'état — c'est ce qui permet au bot de
+        // se souvenir d'une renonce bien après le pli où elle a eu lieu.
+        (round.completedTricks ??= []).push(round.lastTrick);
         const winnerSeat = state.players.find((p) => p.id === winner.playerId)!.seat;
 
         const handsEmpty = state.players.every((p) => round.hands[p.id].length === 0);

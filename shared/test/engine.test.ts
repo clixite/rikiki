@@ -88,6 +88,29 @@ describe('démarrage et enchères', () => {
     const res = applyAction(state, { type: 'BID', playerId: notCurrent.id, bid: 0 });
     expect(res).toEqual({ ok: false, error: 'NOT_YOUR_TURN' });
   });
+
+  it('rejette une enchère intrinsèquement invalide (négative, non entière, ou hors bornes)', () => {
+    // Manche à 1 carte : la seule enchère de 0 à 1 carte, donc tout ce qui
+    // s'écarte de l'intervalle [0, cardsCount] est illégal en soi — avant
+    // même d'appliquer la règle du crochet (`ILLEGAL_BID_HOOK`, testée
+    // ailleurs), qui elle porte sur la valeur totale annoncée à table.
+    const state = mustApply(newLobby(3), { type: 'START_GAME', playerId: 'p0' });
+    const current = state.players.find((p) => p.seat === state.round!.currentSeat)!;
+    expect(state.round!.cardsCount).toBe(1);
+
+    expect(applyAction(state, { type: 'BID', playerId: current.id, bid: -1 })).toEqual({
+      ok: false,
+      error: 'ILLEGAL_BID',
+    });
+    expect(applyAction(state, { type: 'BID', playerId: current.id, bid: 1.5 })).toEqual({
+      ok: false,
+      error: 'ILLEGAL_BID',
+    });
+    expect(applyAction(state, { type: 'BID', playerId: current.id, bid: 2 })).toEqual({
+      ok: false,
+      error: 'ILLEGAL_BID',
+    });
+  });
 });
 
 /**
@@ -334,5 +357,68 @@ describe('validation des cartes jouées', () => {
     const foreignCard = cardId(state.round!.hands[notMine.id][0]);
     const res = applyAction(state, { type: 'PLAY_CARD', playerId: current.id, cardId: foreignCard });
     expect(res).toEqual({ ok: false, error: 'ILLEGAL_CARD' });
+  });
+});
+
+/** Fait avancer une manche jusqu'à la fin de la phase d'enchères. */
+function finishBidding(state: GameState): GameState {
+  while (state.phase === 'bidding') {
+    const current = state.players.find((p) => p.seat === state.round!.currentSeat)!;
+    state = mustApply(state, { type: 'BID', playerId: current.id, bid: lowestLegalBid(state, current.id) });
+  }
+  return state;
+}
+
+/** Joue une carte pour le joueur au trait, avec la plus petite carte légale. */
+function playOneCard(state: GameState): GameState {
+  const current = state.players.find((p) => p.seat === state.round!.currentSeat)!;
+  return mustApply(state, { type: 'PLAY_CARD', playerId: current.id, cardId: lowestLegalCard(state, current.id) });
+}
+
+describe('journal des plis achevés (completedTricks)', () => {
+  it('se remplit pli après pli et repart à vide à la manche suivante', () => {
+    let state = mustApply(newLobby(3), { type: 'START_GAME', playerId: 'p0' });
+    // Manche 1 : une seule carte, un seul pli — on l'expédie pour atteindre
+    // la manche 2 (2 cartes), qui donne deux plis à observer.
+    state = finishBidding(state);
+    while (state.phase === 'playing') state = playOneCard(state);
+    state = mustApply(state, { type: 'NEXT_ROUND', playerId: 'p0' });
+
+    expect(state.round!.cardsCount).toBe(2);
+    state = finishBidding(state);
+    // Fraîchement distribuée : le journal est vide.
+    expect(state.round!.completedTricks ?? []).toEqual([]);
+
+    // Premier pli de la manche (3 joueurs → 3 cartes posées).
+    state = playOneCard(state);
+    state = playOneCard(state);
+    state = playOneCard(state);
+    expect(state.round!.completedTricks).toHaveLength(1);
+    expect(state.round!.completedTricks![0]).toEqual(state.round!.lastTrick);
+    // L'attribution joueur↔carte est bien conservée.
+    expect(state.round!.completedTricks![0].plays).toHaveLength(3);
+
+    // Second et dernier pli de la manche.
+    state = playOneCard(state);
+    state = playOneCard(state);
+    state = playOneCard(state);
+    expect(state.phase).toBe('round-scoring');
+    expect(state.round!.completedTricks).toHaveLength(2);
+
+    // Nouvelle manche : le journal repart à vide, pas de fuite entre manches.
+    state = mustApply(state, { type: 'NEXT_ROUND', playerId: 'p0' });
+    expect(state.round!.completedTricks).toEqual([]);
+  });
+
+  it('ne plante pas sur une manche restaurée sans le champ (parties d’avant cette version)', () => {
+    let state = mustApply(newLobby(3), { type: 'START_GAME', playerId: 'p0' });
+    state = finishBidding(state);
+    // Simule un état persisté avant l'ajout du journal : le champ est absent.
+    state = { ...state, round: { ...state.round!, completedTricks: undefined } };
+    expect(() => {
+      while (state.phase === 'playing') state = playOneCard(state);
+    }).not.toThrow();
+    // Le pli joué après restauration alimente quand même le journal.
+    expect(state.round!.completedTricks).toHaveLength(1);
   });
 });

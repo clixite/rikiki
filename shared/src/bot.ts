@@ -365,18 +365,19 @@ export function botBid(state: GameState, playerId: string): number {
  * Coupes déduites de la manche.
  *
  * Un joueur qui ne fournit pas la couleur demandée n'en a plus : c'est la
- * déduction la plus rentable d'un jeu de plis, et elle est gratuite. On ne
- * peut l'établir que sur le pli en cours, seul historique détaillé conservé
- * dans l'état — les plis précédents ne gardent que les cartes, pas qui les a
- * jouées. C'est déjà l'information la plus utile : elle porte sur le pli où
- * la décision se prend.
+ * déduction la plus rentable d'un jeu de plis, et elle est gratuite. Une
+ * renonce vue au premier pli reste vraie jusqu'à la fin de la manche — on
+ * parcourt donc tout le journal des plis achevés (`completedTricks`), pas
+ * seulement le dernier : s'arrêter à `lastTrick` faisait « oublier » un
+ * adversaire vide dès le pli suivant, et le bot entamait alors une couleur
+ * qu'il croyait sûre en pensant avoir déjà écarté cette menace.
  */
 function inferVoids(state: GameState): Map<string, Set<Suit>> {
   const voids = new Map<string, Set<Suit>>();
   const round = state.round;
   if (!round) return voids;
 
-  const record = (trick: Trick | CompletedTrick | null) => {
+  const record = (trick: Trick | CompletedTrick | null | undefined) => {
     if (!trick || trick.plays.length === 0) return;
     const led = trick.plays[0].card.suit;
     for (const play of trick.plays.slice(1)) {
@@ -386,7 +387,11 @@ function inferVoids(state: GameState): Map<string, Set<Suit>> {
       voids.set(play.playerId, set);
     }
   };
-  record(round.lastTrick);
+  // Parties reprises depuis avant l'ajout du journal : il n'existe pas encore,
+  // on retombe sur le seul `lastTrick` que l'état conservait alors — pas de
+  // régression, juste la mémoire courte d'avant.
+  const completed = round.completedTricks ?? (round.lastTrick ? [round.lastTrick] : []);
+  for (const trick of completed) record(trick);
   record(round.currentTrick);
   return voids;
 }

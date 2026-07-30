@@ -173,6 +173,18 @@ export interface RoundState {
    * les lectures défensives.
    */
   playedCards: Card[];
+  /**
+   * Journal des plis achevés de la manche, avec l'attribution joueur↔carte.
+   *
+   * `lastTrick` ne garde que le pli le plus récent : suffisant pour
+   * l'affichage, mais un joueur automatique qui veut se souvenir qu'un
+   * adversaire a renoncé à cœur au pli 1 perdait cette information dès le
+   * pli 3. Borné à 10 entrées — le plus grand nombre de plis d'une manche —
+   * donc sans risque de croissance de l'état. Absent des parties persistées
+   * avant cette version, d'où les lectures défensives (`?? []`), comme pour
+   * `playedCards`.
+   */
+  completedTricks?: CompletedTrick[];
   tricksWon: Record<string, number>;
   roundScores: Record<string, number> | null;
 }
