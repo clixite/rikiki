@@ -22,6 +22,7 @@ export default function Lobby({ view }: Props) {
   const [busy, setBusy] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const isHost = view.hostId === view.you;
+  const hostPseudo = view.players.find((p) => p.id === view.hostId)?.pseudo ?? null;
   // Résumé des trois réglages : ce qu'on vérifie d'un coup d'œil avant de lancer.
   const settingsSummary = [
     t.formatNames[view.format],
@@ -175,8 +176,11 @@ export default function Lobby({ view }: Props) {
             )}
           </>
         ) : (
+          // « Je ne sais pas lancer la session » : le message ne disait pas
+          // QUI devait le faire, et quand le rôle avait changé de mains,
+          // personne autour de la table ne savait plus après qui on attendait.
           <p className="rk-shimmer rounded-xl py-3 text-center text-sm text-paper-50/65">
-            {t.waitingForHost}
+            {hostPseudo ? t.waitingForHostNamed(hostPseudo) : t.waitingForHost}
           </p>
         )}
         <button

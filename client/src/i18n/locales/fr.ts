@@ -1,4 +1,23 @@
-import type { GameFormat, GamePace, ScoringVariant } from '@rikiki/shared';
+import type { GameFormat, GamePace, PhraseId, ScoringVariant } from '@rikiki/shared';
+
+/**
+ * Les petites phrases envoyables à la table.
+ *
+ * Typées sur `PhraseId` : ajouter une phrase au protocole partagé casse
+ * la compilation des vingt-quatre langues tant qu'elle n'est pas traduite.
+ */
+const FR_PHRASES: Record<PhraseId, string> = {
+  nice: 'Bien joué !',
+  oops: 'Aïe…',
+  yourTurn: 'À toi !',
+  hurry: 'On t’attend 🙂',
+  watchTrump: 'Attention à l’atout',
+  mine: 'Celui-là est pour moi',
+  sorry: 'Désolé !',
+  brb: 'Je reviens tout de suite',
+  goodGame: 'Belle partie !',
+  again: 'On en refait une ?',
+};
 
 export const fr = {
   appName: 'Rikiki',
@@ -31,6 +50,7 @@ export const fr = {
   host: 'Hôte',
   you: 'toi',
   waitingForHost: "En attente du lancement par l'hôte…",
+  waitingForHostNamed: (p: string) => `${p} lance la partie quand tout le monde est là`,
   needPlayers: (missing: number) =>
     missing === 1 ? 'Encore 1 joueur pour commencer' : `Encore ${missing} joueurs pour commencer`,
   startGame: 'Lancer la partie',
@@ -109,6 +129,9 @@ export const fr = {
     `${forbidden} est interdit : le total des annonces ne peut pas égaler ${cards} (règle du crochet).`,
   bid: 'Annonce',
   tricks: 'Plis',
+  lastTrick: 'Dernier pli',
+  spreadHand: 'Étaler mes cartes',
+  collapseHand: 'Regrouper mes cartes',
 
   // Récapitulatif des annonces de la manche
   bidsAnnounced: 'Annoncé',
@@ -151,6 +174,8 @@ export const fr = {
   reconnecting: 'Reconnexion…',
   playerDisconnected: (p: string) => `${p} est déconnecté·e`,
   playerReconnected: (p: string) => `${p} est de retour`,
+  playerPaused: (p: string) => `${p} fait une pause`,
+  playerResumed: (p: string) => `${p} reprend la partie`,
   playerJoined: (p: string) => `${p} a rejoint la partie`,
   playerLeft: (p: string) => `${p} a quitté la partie`,
   roomClosed: 'La partie a été fermée.',
@@ -186,6 +211,12 @@ export const fr = {
   cancel: 'Annuler',
   botTag: 'robot',
   emotes: 'Réactions',
+  phrases: 'Messages',
+  phraseTexts: FR_PHRASES,
+  pauseGame: 'Faire une pause',
+  resumePlay: 'Je reprends',
+  pausedTag: 'en pause',
+  pauseHint: 'Un robot tient ta place le temps de ta pause.',
   close: 'Fermer',
   leaveGame: 'Quitter la partie',
   leaveGameWarning:

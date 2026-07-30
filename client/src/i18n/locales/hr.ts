@@ -48,6 +48,7 @@ export const hr: Messages = {
   host: 'Domaćin',
   you: 'ti',
   waitingForHost: 'Čekamo da domaćin pokrene igru…',
+  waitingForHostNamed: (p: string) => `${p} započinje igru kad svi budu tu`,
   needPlayers: (missing: number) =>
     plural(
       missing,
@@ -131,6 +132,9 @@ export const hr: Messages = {
     `${forbidden} je zabranjen: zbroj najava ne smije biti jednak ${cards} (pravilo kuke).`,
   bid: 'Najava',
   tricks: 'Štihovi',
+  lastTrick: 'Zadnji štih',
+  spreadHand: 'Raširi karte',
+  collapseHand: 'Skupi karte',
 
   // Pregled najava runde
   bidsAnnounced: 'Najavljeno',
@@ -185,6 +189,8 @@ export const hr: Messages = {
   reconnecting: 'Ponovno spajanje…',
   playerDisconnected: (p: string) => `${p} — veza prekinuta`,
   playerReconnected: (p: string) => `${p} je opet tu`,
+  playerPaused: (p: string) => `${p} je na pauzi`,
+  playerResumed: (p: string) => `${p} se vraća u igru`,
   playerJoined: (p: string) => `${p} ulazi u igru`,
   playerLeft: (p: string) => `${p} napušta igru`,
   roomClosed: 'Igra je zatvorena.',
@@ -218,6 +224,23 @@ export const hr: Messages = {
   cancel: 'Odustani',
   botTag: 'bot',
   emotes: 'Reakcije',
+  phrases: 'Poruke',
+  phraseTexts: {
+    nice: 'Lijepo odigrano!',
+    oops: 'Ajoj…',
+    yourTurn: 'Ti si na redu!',
+    hurry: 'Čekamo te 🙂',
+    watchTrump: 'Pazi na adut',
+    mine: 'Ova je moja',
+    sorry: 'Oprosti!',
+    brb: 'Odmah se vraćam',
+    goodGame: 'Dobra igra!',
+    again: 'Još jednu?',
+  },
+  pauseGame: 'Uzmi pauzu',
+  resumePlay: 'Vratio sam se',
+  pausedTag: 'na pauzi',
+  pauseHint: 'Dok te nema, tvoje mjesto drži robot.',
   close: 'Zatvori',
   leaveGame: 'Napusti partiju',
   leaveGameWarning:

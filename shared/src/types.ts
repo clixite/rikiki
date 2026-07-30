@@ -125,6 +125,14 @@ export interface Player {
   photo?: string | null;
   seat: number;
   connected: boolean;
+  /**
+   * En pause : le robot tient le siège en attendant le retour du joueur.
+   *
+   * Distinct de `connected` — on peut être présent et vouloir souffler cinq
+   * minutes sans faire attendre toute la table, et l'affichage doit dire
+   * « en pause » plutôt que « hors ligne ».
+   */
+  paused?: boolean;
   totalScore: number;
 }
 
@@ -172,6 +180,16 @@ export interface RoundState {
 export interface GameState {
   code: string;
   hostId: string;
+  /**
+   * Créateur de la partie. Distinct de `hostId`, qui se transmet au premier
+   * venu quand l'organisateur se déconnecte : c'est en le comparant à celui-ci
+   * qu'on rend la barre à son propriétaire quand il revient.
+   *
+   * Persisté, sinon un redémarrage du serveur graverait une promotion de
+   * circonstance. Absent des parties créées avant la v1.3 : toute lecture
+   * retombe alors sur l'hôte du moment.
+   */
+  founderId?: string;
   phase: Phase;
   players: Player[];
   maxPlayers: number;

@@ -5,7 +5,15 @@ import { Room, type RoomCallbacks, type RoomOptions } from './Room';
 import { randomCode } from './roomCodes';
 
 const LOBBY_TTL_MS = 30 * 60_000;
-const ABANDONED_TTL_MS = 10 * 60_000;
+/**
+ * Délai avant de fermer une partie que plus personne n'a ouverte.
+ *
+ * Dix minutes se sont révélées bien trop courtes : quatre amis qui verrouillent
+ * leur téléphone le temps d'un plat perdaient la partie en cours. Une heure
+ * laisse passer une interruption normale sans garder indéfiniment des tables
+ * mortes en mémoire.
+ */
+const ABANDONED_TTL_MS = 60 * 60_000;
 const GAME_OVER_TTL_MS = 15 * 60_000;
 /**
  * Durée de vie d'une partie asynchrone.

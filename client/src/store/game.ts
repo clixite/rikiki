@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Card, CompletedTrick, EmoteId, GameView, TransientEvent } from '@rikiki/shared';
+import type { Card, CompletedTrick, EmoteId, GameView, PhraseId, TransientEvent } from '@rikiki/shared';
 import { playSound } from '../audio';
 import { vibrate } from '../haptics';
 import { t as tr } from '../i18n';
@@ -23,6 +23,8 @@ interface GameStore {
   optimistic: OptimisticState;
   /** Réactions reçues, affichées quelques secondes près de leur auteur. */
   emotes: { id: number; playerId: string; emote: EmoteId }[];
+  /** Petites phrases reçues, affichées comme des bulles au-dessus du siège. */
+  phrases: { id: number; playerId: string; phrase: PhraseId }[];
   setView: (view: GameView) => void;
   /** Applique un coup immédiatement à l'écran (sans attendre le serveur). */
   playOptimistic: (card: Card) => void;
@@ -34,6 +36,8 @@ interface GameStore {
   onEvent: (event: TransientEvent) => void;
   /** Retire une réaction dont l'affichage est terminé. */
   dismissEmote: (id: number) => void;
+  /** Retire une phrase dont l'affichage est terminé. */
+  dismissPhrase: (id: number) => void;
   setSocketConnected: (connected: boolean) => void;
   setClosed: (reason: string | null) => void;
   showToast: (message: string) => void;
@@ -42,6 +46,13 @@ interface GameStore {
 
 /** Durée d'affichage d'une réaction au-dessus de son auteur. */
 const EMOTE_VISIBLE_MS = 2600;
+/**
+ * Durée d'affichage d'une phrase.
+ *
+ * Plus longue que celle d'une réaction : un emoji se saisit d'un coup d'œil,
+ * une phrase se lit — et souvent alors qu'on regardait ses propres cartes.
+ */
+const PHRASE_VISIBLE_MS = 4200;
 let emoteSeq = 0;
 let freezeTimer: ReturnType<typeof setTimeout> | null = null;
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
@@ -63,6 +74,7 @@ export const useGame = create<GameStore>((set, get) => ({
   view: null,
   socketConnected: false,
   emotes: [],
+  phrases: [],
   frozenTrick: null,
   roundOutcome: null,
   celebrate: 0,
@@ -180,6 +192,22 @@ export const useGame = create<GameStore>((set, get) => ({
         setTimeout(() => get().dismissEmote(id), EMOTE_VISIBLE_MS);
         break;
       }
+      case 'phrase': {
+        const id = ++emoteSeq;
+        set((state) => ({ phrases: [...state.phrases, { id, playerId: event.playerId, phrase: event.phrase }] }));
+        playSound('bid');
+        setTimeout(() => get().dismissPhrase(id), PHRASE_VISIBLE_MS);
+        break;
+      }
+      case 'paused':
+        // Un joueur qui s'absente fait attendre tout le monde : on le dit, sinon
+        // les autres croient à une déconnexion et guettent un retour immédiat.
+        get().showToast(
+          event.paused
+            ? tr().playerPaused(pseudoOf(event.playerId))
+            : tr().playerResumed(pseudoOf(event.playerId)),
+        );
+        break;
       default:
         break;
     }
@@ -187,11 +215,13 @@ export const useGame = create<GameStore>((set, get) => ({
 
   dismissEmote: (id) => set((state) => ({ emotes: state.emotes.filter((e) => e.id !== id) })),
 
+  dismissPhrase: (id) => set((state) => ({ phrases: state.phrases.filter((p) => p.id !== id) })),
+
   setSocketConnected: (socketConnected) => set({ socketConnected }),
 
   setClosed: (reason) => {
     if (freezeTimer) clearTimeout(freezeTimer);
-    set({ closedReason: reason, view: null, frozenTrick: null, roundOutcome: null, optimistic: EMPTY_OPTIMISTIC, emotes: [] });
+    set({ closedReason: reason, view: null, frozenTrick: null, roundOutcome: null, optimistic: EMPTY_OPTIMISTIC, emotes: [], phrases: [] });
   },
 
   showToast: (message) => {
@@ -202,6 +232,6 @@ export const useGame = create<GameStore>((set, get) => ({
 
   reset: () => {
     if (freezeTimer) clearTimeout(freezeTimer);
-    set({ view: null, frozenTrick: null, roundOutcome: null, closedReason: null, toast: null, optimistic: EMPTY_OPTIMISTIC, emotes: [] });
+    set({ view: null, frozenTrick: null, roundOutcome: null, closedReason: null, toast: null, optimistic: EMPTY_OPTIMISTIC, emotes: [], phrases: [] });
   },
 }));

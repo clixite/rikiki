@@ -7,8 +7,6 @@ import {
   createGame,
   hashSeed,
   isBotId,
-  lowestLegalBid,
-  lowestLegalCard,
   mulberry32,
   nextBotProfile,
   type BotProfile,
@@ -75,6 +73,16 @@ export class Room {
   private dirty = false;
   /** Signature du tour déjà signalé, pour ne notifier qu'une fois par tour. */
   private lastTurnKey: string | null = null;
+  /**
+   * Celui qui a créé la table.
+   *
+   * Le rôle d'hôte se transmet quand il s'absente, sinon la partie se bloque.
+   * Mais il ne se PERD pas : mettre son téléphone en veille suffisait à couper
+   * le socket, et quatre-vingt-dix secondes plus tard l'organisateur découvrait
+   * au retour qu'un invité tenait la barre et qu'il ne pouvait plus lancer la
+   * partie. Le fondateur reprend donc la main dès qu'il revient.
+   */
+  private founderId: string;
   /** Minuteur du tour en cours, et son échéance diffusée aux clients. */
   private turnTimer: ReturnType<typeof setTimeout> | null = null;
   turnDeadline: number | null = null;
@@ -88,6 +96,7 @@ export class Room {
     private options: RoomOptions = {},
   ) {
     this.state = createGame(code, crypto.randomUUID(), Date.now(), host);
+    this.founderId = host.id;
   }
 
   /**
@@ -104,6 +113,10 @@ export class Room {
     const host = state.players.find((p) => p.id === state.hostId) ?? state.players[0];
     if (!host) return null;
     const room = new Room(io, state.code, host, callbacks, options);
+    // Le fondateur vient de l'état, pas de l'hôte du moment : redémarrer le
+    // serveur pendant l'absence de l'organisateur graverait sinon la promotion
+    // de secours, et il ne récupérerait plus jamais la barre.
+    room.founderId = state.founderId ?? host.id;
     room.state = state;
     room.lastActivity = lastActivity;
     room.resume();
@@ -274,7 +287,7 @@ export class Room {
     const seconds = this.options.turnSeconds ?? TURN_SECONDS;
     if (seconds <= 0) return;
     const current = s.players.find((p) => p.seat === s.round!.currentSeat);
-    if (!current || isBotId(current.id) || this.autoPlaySet.has(current.id)) return;
+    if (!current || isBotId(current.id) || this.autoPlaySet.has(current.id) || current.paused) return;
 
     this.turnDeadline = Date.now() + seconds * 1000;
     const timer = setTimeout(() => this.onTurnTimeout(current.id), seconds * 1000);
@@ -292,10 +305,11 @@ export class Room {
     // Il a joué entre-temps : le minuteur porte sur un tour révolu.
     if (!current || current.id !== playerId) return;
 
+    // Même principe qu'un joueur absent : on joue à sa place, mais bien.
     const action: GameAction =
       s.phase === 'bidding'
-        ? { type: 'BID', playerId, bid: lowestLegalBid(s, playerId) }
-        : { type: 'PLAY_CARD', playerId, cardId: lowestLegalCard(s, playerId) };
+        ? { type: 'BID', playerId, bid: botBid(s, playerId) }
+        : { type: 'PLAY_CARD', playerId, cardId: botCard(s, playerId) };
     const res = this.apply(action);
     if (!res.ok) return;
     this.emitEvent(
@@ -308,6 +322,40 @@ export class Room {
 
   isMember(userId: string): boolean {
     return this.state.players.some((p) => p.id === userId);
+  }
+
+  /**
+   * Met un joueur en pause, ou l'en sort.
+   *
+   * Une partie dure vingt minutes ; il arrive qu'on doive répondre au four ou
+   * à la porte. Sans issue prévue, on quittait la partie — définitivement — ou
+   * on faisait patienter cinq personnes. En pause, le robot tient le siège
+   * avec sa vraie stratégie, et le joueur retrouve exactement sa place.
+   */
+  setPaused(userId: string, paused: boolean): boolean {
+    if (!this.isMember(userId) || isBotId(userId)) return false;
+    const res = applyAction(this.state, { type: 'SET_PAUSED', playerId: userId, paused });
+    if (!res.ok) return false;
+    this.state = res.state;
+
+    if (paused) {
+      this.autoPlaySet.add(userId);
+    } else {
+      this.autoPlaySet.delete(userId);
+      // Le fondateur reprend aussi la barre s'il l'avait cédée en s'absentant.
+      if (userId === this.founderId && this.state.hostId !== userId) {
+        this.state = { ...this.state, hostId: userId };
+        this.emitEvent({ type: 'host-changed', hostId: userId });
+      }
+    }
+
+    this.lastActivity = Date.now();
+    this.schedulePersist();
+    this.emitEvent({ type: 'paused', playerId: userId, paused });
+    this.armTurnTimer();
+    this.broadcastViews();
+    this.scheduleAutoplay();
+    return true;
   }
 
   /** Attache (ou ré-attache) le socket d'un joueur et le déclare connecté. */
@@ -326,13 +374,26 @@ export class Room {
       clearTimeout(timer);
       this.graceTimers.delete(userId);
     }
-    this.autoPlaySet.delete(userId);
+    // Une pause est un choix : se reconnecter ne la lève pas, seul le joueur
+    // le fait. En revanche un simple aléa réseau rend bien la main.
+    if (!this.state.players.find((p) => p.id === userId)?.paused) this.autoPlaySet.delete(userId);
 
     const res = applyAction(this.state, { type: 'SET_CONNECTED', playerId: userId, connected: true });
     if (res.ok) this.state = res.state;
+
+    // Le fondateur récupère son rôle : il l'avait cédé le temps de son absence,
+    // pas abandonné.
+    if (userId === this.founderId && this.state.hostId !== userId && this.isMember(userId)) {
+      this.state = { ...this.state, hostId: userId };
+      this.emitEvent({ type: 'host-changed', hostId: userId });
+    }
+
     this.lastActivity = Date.now();
     this.schedulePersist();
+    this.armTurnTimer();
     this.broadcastViews();
+    // Il était peut-être attendu : son retour doit relancer la table.
+    this.scheduleAutoplay();
   }
 
   /** Déconnexion (volontaire ou non) : retrait en lobby, période de grâce en partie. */
@@ -342,14 +403,6 @@ export class Room {
     socket.data.roomCode = null;
     socket.leave(this.code);
 
-    // En temps réel, un joueur déconnecté du salon est un fantôme : la partie
-    // démarrerait avec un siège qui bloque son tour. En asynchrone, créer la
-    // table, envoyer le code et refermer l'application est le geste normal —
-    // le salon doit lui survivre.
-    if (this.state.phase === 'lobby' && !this.isAsync) {
-      this.removePlayer(userId);
-      return;
-    }
     const res = applyAction(this.state, { type: 'SET_CONNECTED', playerId: userId, connected: false });
     if (res.ok) {
       this.state = res.state;
@@ -360,7 +413,34 @@ export class Room {
     // En asynchrone, fermer l'application n'est pas un abandon : c'est la
     // façon normale de jouer. Son tour l'attendra aussi longtemps qu'il faut.
     if (this.isAsync) return;
-    const t = setTimeout(() => this.onGraceExpired(userId), GRACE_SECONDS * 1000);
+
+    /*
+     * Un joueur déconnecté du SALON était retiré sur-le-champ. Sur un
+     * téléphone, verrouiller l'écran trente secondes suffit à couper le
+     * socket : l'hôte revenait dans un salon qui n'existait plus — la room
+     * s'était fermée faute de joueur humain. Le salon accorde donc le même
+     * délai de grâce que la partie, et ce n'est qu'à son terme que le siège
+     * est libéré.
+     */
+    const expire =
+      this.state.phase === 'lobby'
+        ? () => {
+            this.graceTimers.delete(userId);
+            if (this.sockets.has(userId)) return;
+            // La partie a pu démarrer pendant l'absence : le moteur refuse
+            // alors de retirer le joueur (`BAD_PHASE`), et sans ce repli il
+            // n'entrait jamais en jeu automatique. Chacun de ses tours faisait
+            // attendre la table les quarante-cinq secondes du minuteur au lieu
+            // des huit cents millisecondes du robot.
+            if (this.state.phase !== 'lobby') {
+              this.onGraceExpired(userId);
+              return;
+            }
+            this.removePlayer(userId);
+          }
+        : () => this.onGraceExpired(userId);
+    const t = setTimeout(expire, GRACE_SECONDS * 1000);
+    t.unref?.();
     this.graceTimers.set(userId, t);
   }
 
@@ -376,9 +456,19 @@ export class Room {
   leave(userId: string, socket: Socket): void {
     const inGame = this.state.phase !== 'lobby' && this.isMember(userId);
     this.detach(userId, socket);
-    if (!inGame) return;
+
+    // Le délai de grâce protège des coupures subies ; un départ annoncé n'en a
+    // aucun besoin. On l'annule dans les deux cas.
     const timer = this.graceTimers.get(userId);
     if (timer) clearTimeout(timer);
+    this.graceTimers.delete(userId);
+
+    if (!inGame) {
+      // Quitter le salon libère le siège sur-le-champ : les autres doivent
+      // voir la place se rouvrir, pas attendre une minute et demie.
+      this.removePlayer(userId);
+      return;
+    }
     this.onGraceExpired(userId);
   }
 
@@ -484,15 +574,23 @@ export class Room {
       if (!current) return null;
       const isBot = isBotId(current.id);
       if (!isBot && !this.autoPlaySet.has(current.id)) return null;
+      /*
+       * Un joueur absent était remplacé par la plus petite enchère et la plus
+       * petite carte légales. C'est la pire façon de jouer : il annonçait zéro
+       * puis ramassait des plis par accident, sabotant son score et faussant la
+       * partie de tous les autres. Il hérite donc de la stratégie complète du
+       * robot — le temps d'une pause ou d'un tunnel, sa place est tenue
+       * correctement.
+       */
       if (s.phase === 'bidding') {
-        const bid = isBot ? botBid(s, current.id) : lowestLegalBid(s, current.id);
+        const bid = botBid(s, current.id);
         return {
           action: { type: 'BID', playerId: current.id, bid },
           event: { type: 'bid-placed', playerId: current.id, bid },
           isBot,
         };
       }
-      const cid = isBot ? botCard(s, current.id) : lowestLegalCard(s, current.id);
+      const cid = botCard(s, current.id);
       return {
         action: { type: 'PLAY_CARD', playerId: current.id, cardId: cid },
         event: { type: 'card-played', playerId: current.id, cardId: cid },
@@ -513,6 +611,14 @@ export class Room {
   private clearTimers(): void {
     for (const t of this.graceTimers.values()) clearTimeout(t);
     this.graceTimers.clear();
+    // Le minuteur du tour était oublié ici. Une room fermée le gardait armé
+    // jusqu'à quarante-cinq secondes : elle restait en mémoire, et surtout son
+    // échéance jouait encore un coup — ce qui réécrivait en base une partie que
+    // `RoomManager.remove()` venait d'effacer. Elle réapparaissait alors au
+    // redémarrage suivant, peuplée de joueurs partis depuis longtemps.
+    if (this.turnTimer) clearTimeout(this.turnTimer);
+    this.turnTimer = null;
+    this.turnDeadline = null;
     if (this.autoplayTimer) clearTimeout(this.autoplayTimer);
     this.autoplayTimer = null;
     if (this.persistTimer) clearTimeout(this.persistTimer);

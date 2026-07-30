@@ -37,6 +37,7 @@ export type GameAction =
   | { type: 'REMOVE_PLAYER'; playerId: string }
   | { type: 'UPDATE_PROFILE'; playerId: string; pseudo: string; avatar: string; photo?: string | null }
   | { type: 'SET_CONNECTED'; playerId: string; connected: boolean }
+  | { type: 'SET_PAUSED'; playerId: string; paused: boolean }
   | { type: 'SET_FORMAT'; playerId: string; format: GameFormat }
   | { type: 'SET_SCORING'; playerId: string; scoring: ScoringVariant }
   | { type: 'SET_PACE'; playerId: string; pace: GamePace }
@@ -62,6 +63,7 @@ export function createGame(
   return {
     code,
     hostId: host.id,
+    founderId: host.id,
     phase: 'lobby',
     players: [{ ...host, seat: 0, connected: true, totalScore: 0 }],
     maxPlayers: MAX_PLAYERS,
@@ -161,6 +163,13 @@ export function applyAction(prev: GameState, action: GameAction): EngineResult {
       const p = state.players.find((pl) => pl.id === action.playerId);
       if (!p) return err('PLAYER_NOT_FOUND');
       p.connected = action.connected;
+      return { ok: true, state };
+    }
+
+    case 'SET_PAUSED': {
+      const p = state.players.find((pl) => pl.id === action.playerId);
+      if (!p) return err('PLAYER_NOT_FOUND');
+      p.paused = action.paused;
       return { ok: true, state };
     }
 

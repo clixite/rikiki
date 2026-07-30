@@ -61,6 +61,8 @@ await alice.page.screenshot({ path: `${SHOTS}/02-lobby.png` });
 await alice.page.click('[data-testid="start-game"]');
 await Promise.all(phones.map((p) => p.page.waitForSelector('[data-testid^="bid-"]', { timeout: 8000 }).catch(() => null)));
 
+let lastTrickChecked = false;
+
 async function playOneRound(roundLabel, screenshotPrefix = null) {
   // Enchères : chacun clique la plus petite enchère légale quand son tour vient
   let emptyChecks = 0;
@@ -99,6 +101,23 @@ async function playOneRound(roundLabel, screenshotPrefix = null) {
       }
     }
     if (!played) await alice.page.waitForTimeout(400);
+
+    // « Revoir le dernier pli » : une seule fois dans toute la partie, dès
+    // qu'un pli est tombé. On l'ouvre et on la referme aussitôt — c'est une
+    // feuille plein écran, la laisser ouverte bloquerait les clics suivants.
+    if (!lastTrickChecked && (await alice.page.locator('[data-testid="open-last-trick"]').count()) > 0) {
+      lastTrickChecked = true;
+      await alice.page.click('[data-testid="open-last-trick"]');
+      await alice.page.waitForSelector('[data-testid="last-trick-sheet"]', { timeout: 5000 });
+      const cards = await alice.page.locator('[data-testid^="last-trick-play-"]').count();
+      if (cards === 0) throw new Error('dernier pli : feuille ouverte mais vide');
+      await alice.page.click('[data-testid="last-trick-close"]');
+      await alice.page.waitForSelector('[data-testid="last-trick-sheet"]', {
+        state: 'detached',
+        timeout: 5000,
+      });
+      console.log(`Dernier pli consultable (${cards} cartes)`);
+    }
   }
 
   // Récap de manche

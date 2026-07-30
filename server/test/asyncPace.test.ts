@@ -152,7 +152,9 @@ describe('balayage des parties inactives', () => {
 
   it('ferme une partie temps réel désertée', () => {
     const { manager, code } = managerWith('live');
-    manager.sweep(Date.now() + 60 * 60_000);
+    // Au-delà du délai d'abandon (une heure), une table que plus personne
+    // n'a ouverte est fermée.
+    manager.sweep(Date.now() + 3 * 60 * 60_000);
     expect(manager.get(code)).toBeUndefined();
     manager.stop();
   });

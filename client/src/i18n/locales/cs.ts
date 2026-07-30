@@ -47,6 +47,7 @@ export const cs: Messages = {
   host: 'Hostitel',
   you: 'ty',
   waitingForHost: 'Čekáme, až hostitel spustí hru…',
+  waitingForHostNamed: (p: string) => `${p} spustí hru, až budou všichni`,
   needPlayers: (missing: number) =>
     plural(
       missing,
@@ -130,6 +131,9 @@ export const cs: Messages = {
     `${forbidden} je zakázáno: součet hlášek se nesmí rovnat ${cards} (pravidlo háčku).`,
   bid: 'Hláška',
   tricks: 'Zdvihy',
+  lastTrick: 'Poslední zdvih',
+  spreadHand: 'Rozložit karty',
+  collapseHand: 'Složit karty',
 
   // Přehled hlášek kola
   bidsAnnounced: 'Nahlášeno',
@@ -183,6 +187,8 @@ export const cs: Messages = {
   reconnecting: 'Obnovuji spojení…',
   playerDisconnected: (p: string) => `${p} ztrácí spojení`,
   playerReconnected: (p: string) => `${p} je zpátky`,
+  playerPaused: (p: string) => `${p} si dává pauzu`,
+  playerResumed: (p: string) => `${p} se vrací do hry`,
   playerJoined: (p: string) => `${p} se připojuje ke hře`,
   playerLeft: (p: string) => `${p} opouští hru`,
   roomClosed: 'Hra byla ukončena.',
@@ -216,6 +222,23 @@ export const cs: Messages = {
   cancel: 'Zrušit',
   botTag: 'robot',
   emotes: 'Reakce',
+  phrases: 'Zprávy',
+  phraseTexts: {
+    nice: 'Pěkně zahráno!',
+    oops: 'Ajaj…',
+    yourTurn: 'Jsi na řadě!',
+    hurry: 'Čekáme 🙂',
+    watchTrump: 'Pozor na trumf',
+    mine: 'Tenhle je můj',
+    sorry: 'Promiň!',
+    brb: 'Hned se vrátím',
+    goodGame: 'Dobrá hra!',
+    again: 'Ještě jednu?',
+  },
+  pauseGame: 'Dát si pauzu',
+  resumePlay: 'Jsem zpátky',
+  pausedTag: 'pauza',
+  pauseHint: 'Po dobu pauzy drží tvoje místo robot.',
   close: 'Zavřít',
   leaveGame: 'Opustit hru',
   leaveGameWarning:

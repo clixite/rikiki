@@ -498,8 +498,69 @@ for (const profile of PROFILES) {
     await playPage.click('[data-testid="emote-clap"]');
     await playPage.waitForTimeout(600);
     check('JEU : réaction envoyée sans débordement', await noHorizontalOverflow(playPage));
-    await playPage.click('[data-testid="open-emotes"]');
+
+    // Petites phrases : même palette, second onglet. Elles se lisent, donc on
+    // vérifie qu'elles tiennent dans l'écran et qu'elles arrivent bien EN FACE
+    // — une bulle qui ne sort pas de son propre téléphone ne sert à rien.
+    const otherPage = playPage === host.page ? p2.page : host.page;
+    await playPage.click('[data-testid="tab-phrases"]');
     await playPage.waitForTimeout(300);
+    const phraseBox = await playPage.locator('[data-testid="phrase-nice"]').boundingBox();
+    check(
+      'JEU : phrases à cible confortable',
+      (phraseBox?.height ?? 0) >= MIN_TOUCH - 0.5,
+      JSON.stringify(phraseBox),
+    );
+    await playPage.click('[data-testid="phrase-nice"]');
+    await playPage.waitForTimeout(700);
+    check('JEU : phrase envoyée sans débordement', await noHorizontalOverflow(playPage));
+    check(
+      'JEU : la phrase arrive chez l’autre joueur',
+      (await otherPage.locator('[data-testid="seat-phrase-nice"]').count()) > 0,
+    );
+    check('JEU : phrase reçue sans débordement', await noHorizontalOverflow(otherPage));
+
+    // Dernier pli : la « photo » du pli précédent, sans quitter la table
+    if ((await playPage.locator('[data-testid="open-last-trick"]').count()) > 0) {
+      const lastTrickBox = await playPage.locator('[data-testid="open-last-trick"]').boundingBox();
+      check(
+        'JEU : dernier pli à cible confortable',
+        (lastTrickBox?.height ?? 0) >= MIN_TOUCH - 0.5,
+        JSON.stringify(lastTrickBox),
+      );
+      await playPage.click('[data-testid="open-last-trick"]');
+      await playPage.waitForSelector('[data-testid="last-trick-sheet"]', { timeout: 5000 });
+      await playPage.waitForTimeout(400);
+      check('JEU : dernier pli consultable', true);
+      check('JEU : dernier pli sans débordement', await noHorizontalOverflow(playPage));
+      await playPage.click('[data-testid="last-trick-close"]');
+      await playPage.waitForTimeout(400);
+      check(
+        'JEU : dernier pli refermé',
+        (await playPage.locator('[data-testid="last-trick-sheet"]').count()) === 0,
+      );
+    }
+
+    // Pause : le robot tient le siège, et le retour tient en un seul geste
+    await playPage.click('[data-testid="leave-game"]');
+    await playPage.waitForSelector('[data-testid="pause-game"]', { timeout: 5000 });
+    await playPage.waitForTimeout(400);
+    const pauseBox = await playPage.locator('[data-testid="pause-game"]').boundingBox();
+    check(
+      'JEU : pause à cible confortable',
+      (pauseBox?.height ?? 0) >= MIN_TOUCH - 0.5,
+      JSON.stringify(pauseBox),
+    );
+    await playPage.click('[data-testid="pause-game"]');
+    await playPage.waitForSelector('[data-testid="resume-play"]', { timeout: 5000 });
+    check('JEU : retour de pause en un seul geste', true);
+    check('JEU : en pause sans débordement', await noHorizontalOverflow(playPage));
+    await playPage.click('[data-testid="resume-play"]');
+    await playPage.waitForTimeout(600);
+    check(
+      'JEU : reprise effective',
+      (await playPage.locator('[data-testid="resume-play"]').count()) === 0,
+    );
   } else {
     check('JEU : phase de jeu atteinte', false, 'aucune carte jouable détectée');
   }

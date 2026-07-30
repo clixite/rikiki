@@ -1,6 +1,6 @@
 import type { Server, Socket } from 'socket.io';
 import type { ErrorCode, ProtocolError, PublicUser } from '@rikiki/shared';
-import { isBotId, isEmoteId, isGameFormat, isGamePace, isScoringVariant } from '@rikiki/shared';
+import { isBotId, isEmoteId, isGameFormat, isGamePace, isPhraseId, isScoringVariant } from '@rikiki/shared';
 import type { Config } from '../config';
 import type { UsersRepo } from '../db/users.repo';
 import type { GroupsRepo } from '../db/groups.repo';
@@ -305,6 +305,32 @@ export function registerSocketHandlers(
       if (!room) return ack(protoErr('PLAYER_NOT_FOUND'));
       if (!allowEmote()) return ack({ ok: true });
       room.emitEvent({ type: 'emote', playerId: user.id, emote });
+      ack({ ok: true });
+    });
+
+    /**
+     * Petite phrase envoyée à la table. Même liste fermée, même limitation de
+     * débit que les réactions : rien de tout cela ne doit pouvoir se
+     * transformer en tchat.
+     */
+    socket.on('game:phrase', (payload: unknown, ack: Ack) => {
+      if (typeof ack !== 'function') return;
+      const phrase = (payload as { phrase?: unknown } | null)?.phrase;
+      if (!isPhraseId(phrase)) return ack(protoErr('INVALID_PAYLOAD'));
+      const room = currentRoom();
+      if (!room) return ack(protoErr('PLAYER_NOT_FOUND'));
+      if (!allowEmote()) return ack({ ok: true });
+      room.emitEvent({ type: 'phrase', playerId: user.id, phrase });
+      ack({ ok: true });
+    });
+
+    socket.on('game:pause', (payload: unknown, ack: Ack) => {
+      if (typeof ack !== 'function') return;
+      const paused = (payload as { paused?: unknown } | null)?.paused;
+      if (typeof paused !== 'boolean') return ack(protoErr('INVALID_PAYLOAD'));
+      const room = currentRoom();
+      if (!room) return ack(protoErr('NOT_IN_ROOM'));
+      if (!room.setPaused(user.id, paused)) return ack(protoErr('PLAYER_NOT_FOUND'));
       ack({ ok: true });
     });
 

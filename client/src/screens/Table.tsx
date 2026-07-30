@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
 import { cardId } from '@rikiki/shared';
@@ -8,6 +8,7 @@ import LeaveGameButton from '../components/LeaveGameButton';
 import EmoteBar, { EMOTE_GLYPH } from '../components/EmoteBar';
 import { useSecondsLeft } from '../components/TurnCountdown';
 import HandFan from '../components/HandFan';
+import LastTrickSheet from '../components/LastTrickSheet';
 import PlayerSeats from '../components/PlayerSeats';
 import RoundRecap from '../components/RoundRecap';
 import ScoreDrawer from '../components/ScoreDrawer';
@@ -19,7 +20,7 @@ import { feltLayout, useElementSize } from '../components/tableLayout';
 import { vibrate } from '../haptics';
 import { useT } from '../i18n';
 
-import { placeBid, playCard } from '../socket';
+import { placeBid, playCard, setPaused } from '../socket';
 import { useGame } from '../store/game';
 import { applyOptimistic } from '../store/optimistic';
 
@@ -41,6 +42,8 @@ export default function Table({ view: serverView }: Props) {
   // Le coup local s'affiche sans attendre la réponse du serveur
   const view = applyOptimistic(serverView, optimistic);
   const [scoresOpen, setScoresOpen] = useState(false);
+  const [lastTrickOpen, setLastTrickOpen] = useState(false);
+  const hasLastTrick = serverView.round?.lastTrick != null;
   // La géométrie du tapis se déduit de sa taille réelle : à huit joueurs sur un
   // petit téléphone, aucune position écrite à l'avance ne tient.
   const [feltRef, felt] = useElementSize<HTMLDivElement>();
@@ -59,6 +62,16 @@ export default function Table({ view: serverView }: Props) {
   const contractBusted = myBid !== null && myTricks > myBid;
   const trickBusy = round.currentTrick.plays.length > 0 || frozenTrick !== null;
   const layout = feltLayout(view.players.length - 1, felt.width, felt.height);
+
+  /*
+   * Une nouvelle manche efface le dernier pli. Sans cette remise à zéro, la
+   * feuille laissée « ouverte » sur une manche terminée se rendait vide (donc
+   * invisible), puis resurgissait toute seule dès le premier pli de la manche
+   * suivante — par-dessus les cartes, sans que personne l'ait demandée.
+   */
+  useEffect(() => {
+    if (!hasLastTrick) setLastTrickOpen(false);
+  }, [hasLastTrick]);
 
   const onPlay = async (id: string) => {
     const card = round.myHand.find((c) => cardId(c) === id);
@@ -154,7 +167,7 @@ export default function Table({ view: serverView }: Props) {
 
         <TrickArea view={view} frozenTrick={frozenTrick} layout={layout} />
 
-        <MyEmotes />
+        <MyBubbles />
 
         {/* État de la table : qui l'on attend, ou qui vient de ramasser. Le
             « à toi de jouer » n'est PAS répété ici — le bandeau collé à la
@@ -171,6 +184,23 @@ export default function Table({ view: serverView }: Props) {
         >
           {statusText}
         </motion.p>
+
+        {/* Revoir le pli précédent, figé comme une photo.
+            Sa place est le coin opposé aux réactions : le texte d'état garde
+            ses `px-16` justement pour laisser les deux coins libres. Le bouton
+            n'apparaît qu'une fois un pli achevé — muet, il ressemblerait à une
+            fonction cassée pendant tout le premier pli. */}
+        {round.lastTrick && (
+          <button
+            type="button"
+            data-testid="open-last-trick"
+            onClick={() => setLastTrickOpen(true)}
+            aria-label={t.lastTrick}
+            className="absolute bottom-2 left-3 flex h-11 w-11 items-center justify-center rounded-full bg-felt-900/70 text-lg ring-1 ring-white/10 transition active:scale-90"
+          >
+            <span aria-hidden="true">🃏</span>
+          </button>
+        )}
 
         {/* Les réactions vivent dans le tapis, jamais par-dessus la main :
             un bouton posé sur les cartes se déclenche en voulant jouer. */}
@@ -193,11 +223,18 @@ export default function Table({ view: serverView }: Props) {
       <div className="shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
         {/* « C'est à moi » doit se voir sans lire : une barre pleine largeur
             au-dessus de la main, dans la couleur d'accent du jeu. */}
-        <MyTurnBanner
-          active={myTurn && !frozenTrick && view.phase === 'playing'}
-          label={t.yourTurn}
-          deadline={myTurn ? view.turnDeadline : null}
-        />
+        {/* En pause, le bandeau change de rôle : ce n'est plus « à toi de
+            jouer » — un robot joue pour moi — mais le seul chemin de retour.
+            Il occupe la même ligne, donc la main ne saute pas. */}
+        {me.paused ? (
+          <PausedBanner label={t.pausedTag} action={t.resumePlay} />
+        ) : (
+          <MyTurnBanner
+            active={myTurn && !frozenTrick && view.phase === 'playing'}
+            label={t.yourTurn}
+            deadline={myTurn ? view.turnDeadline : null}
+          />
+        )}
 
         {/* Le pseudo prend ce qui reste : les pastilles sont de largeur fixe, et
             c'est le nom qui était rogné jusqu'à devenir illisible. */}
@@ -246,43 +283,103 @@ export default function Table({ view: serverView }: Props) {
       </div>
 
       {showRecap && <RoundRecap view={view} />}
+      {/* Le récapitulatif de manche prime : les deux feuilles partagent le même
+          plan (z-30), et rouvrir le dernier pli d'une manche déjà comptée
+          n'apprendrait plus rien. */}
+      {lastTrickOpen && !showRecap && (
+        <LastTrickSheet view={view} onClose={() => setLastTrickOpen(false)} />
+      )}
       <ScoreDrawer view={view} open={scoresOpen} onClose={() => setScoresOpen(false)} />
     </div>
   );
 }
 
 /**
- * Mes propres réactions, au centre du tapis.
+ * Ce que j'envoie moi-même, au centre du tapis.
  *
- * Celles des autres s'affichent au-dessus de leur siège ; moi je n'ai pas de
- * siège, ma place est en bas de l'écran. Les faire apparaître au centre évite
- * de recouvrir la main tout en confirmant l'envoi.
+ * Les envois des autres s'affichent au-dessus de leur siège ; moi je n'ai pas
+ * de siège, ma place est en bas de l'écran. Les faire apparaître au centre
+ * évite de recouvrir la main tout en confirmant l'envoi.
  */
-function MyEmotes() {
+function MyBubbles() {
+  const t = useT();
   // Le sélecteur doit renvoyer une référence stable : filtrer à l'intérieur
   // fabriquerait un tableau neuf à chaque lecture, et zustand rerendrait sans
   // fin. On prend les valeurs telles quelles, on filtre au rendu.
   const emotes = useGame((s) => s.emotes);
+  const phrases = useGame((s) => s.phrases);
   const you = useGame((s) => s.view?.you);
   const mine = you ? emotes.filter((e) => e.playerId === you) : [];
+  const myPhrases = you ? phrases.filter((p) => p.playerId === you) : [];
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-1/2 flex justify-center gap-1">
+    <div className="pointer-events-none absolute inset-x-0 top-1/2 flex flex-col items-center gap-1">
       <AnimatePresence>
-        {mine.map((e) => (
+        {myPhrases.map((p) => (
           <motion.span
-            key={e.id}
-            initial={{ opacity: 0, scale: 0.4, y: 30 }}
-            animate={{ opacity: 1, scale: 1.2, y: -10 }}
-            exit={{ opacity: 0, scale: 0.8, y: -50 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 20 }}
-            className="text-4xl drop-shadow-lg"
-            aria-hidden="true"
+            key={`p${p.id}`}
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: -24 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 26 }}
+            className="max-w-64 rounded-xl bg-felt-950/90 px-3 py-1.5 text-center text-sm font-medium text-paper-50 ring-1 ring-white/10"
           >
-            {EMOTE_GLYPH[e.emote]}
+            {t.phraseTexts[p.phrase]}
           </motion.span>
         ))}
       </AnimatePresence>
+
+      <div className="flex gap-1">
+        <AnimatePresence>
+          {mine.map((e) => (
+            <motion.span
+              key={e.id}
+              initial={{ opacity: 0, scale: 0.4, y: 30 }}
+              animate={{ opacity: 1, scale: 1.2, y: -10 }}
+              exit={{ opacity: 0, scale: 0.8, y: -50 }}
+              transition={{ type: 'spring', stiffness: 420, damping: 20 }}
+              className="text-4xl drop-shadow-lg"
+              aria-hidden="true"
+            >
+              {EMOTE_GLYPH[e.emote]}
+            </motion.span>
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Bandeau « tu es en pause ».
+ *
+ * Le retour doit tenir en un geste, sans rouvrir de menu : quelqu'un qui
+ * revient à table veut rejouer tout de suite, et chaque écran de plus est un
+ * tour de plus joué par le robot à sa place.
+ */
+function PausedBanner({ label, action }: { label: string; action: string }) {
+  const [busy, setBusy] = useState(false);
+  const resume = async () => {
+    setBusy(true);
+    vibrate('select');
+    try {
+      await setPaused(false);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="mb-1.5 h-9 px-3">
+      <button
+        type="button"
+        data-testid="resume-play"
+        onClick={resume}
+        disabled={busy}
+        className="flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-felt-700 text-[15px] font-semibold text-paper-50 ring-1 ring-brass-300/40 transition active:scale-[0.98] disabled:opacity-50"
+      >
+        <span className="text-paper-50/60">⏸ {label}</span>
+        <span className="font-bold text-brass-300">{action}</span>
+      </button>
     </div>
   );
 }

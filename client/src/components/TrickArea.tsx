@@ -46,6 +46,18 @@ export default function TrickArea({ view, frozenTrick, layout }: Props) {
   const slotOf = (playerId: string) =>
     playerId === view.you ? layout.mySlot : (layout.slots[arcIndex(playerId)] ?? layout.centre);
 
+  /*
+   * L'entame — la première carte posée — fixe la couleur demandée, donc ce
+   * qu'on a le droit de jouer. C'est l'information qu'on cherche des yeux à
+   * chaque tour, et rien ne la distinguait : les cartes se posent à la place
+   * de leur joueur, pas dans l'ordre où elles tombent, si bien qu'on ne sait
+   * même pas laquelle est arrivée en premier.
+   *
+   * Une fois le pli remporté la question ne se pose plus : le repère s'efface
+   * pour laisser l'anneau doré du gagnant seul en scène.
+   */
+  const leadPlayerId = winnerId ? undefined : trick.plays[0]?.playerId;
+
   return (
     <div
       className="pointer-events-none absolute inset-0"
@@ -73,6 +85,7 @@ export default function TrickArea({ view, frozenTrick, layout }: Props) {
         {trick.plays.map(({ playerId, card }) => {
           const slot = slotOf(playerId);
           const isWinner = winnerId === playerId;
+          const isLead = leadPlayerId === playerId;
           return (
             <motion.div
               key={playerId}
@@ -81,6 +94,7 @@ export default function TrickArea({ view, frozenTrick, layout }: Props) {
               exit={{ opacity: 0, scale: 0.7, transition: { duration: 0.18 } }}
               transition={{ type: 'spring', stiffness: 320, damping: 26 }}
               data-testid={`trick-card-${playerId}`}
+              data-lead={isLead ? 'true' : undefined}
               className="absolute"
               style={{
                 left: slot.x - cardW / 2,
@@ -104,11 +118,25 @@ export default function TrickArea({ view, frozenTrick, layout }: Props) {
                   size={cardW >= 56 ? 'lg' : cardW >= 46 ? 'md' : 'sm'}
                 />
                 {/* Ma carte est décalée vers le bas au milieu des autres : sans
-                    repère, on la prend pour celle du joueur d'en face. */}
-                {playerId === view.you && !isWinner && (
+                    repère, on la prend pour celle du joueur d'en face. Quand
+                    c'est moi qui ai entamé, le liseré de l'entame prend sa
+                    place : deux anneaux collés l'un à l'autre ne se lisent
+                    plus, et la couleur demandée prime. */}
+                {playerId === view.you && !isWinner && !isLead && (
                   <span
                     aria-hidden="true"
                     className="pointer-events-none absolute -inset-0.5 rounded-lg ring-2 ring-paper-50/45"
+                  />
+                )}
+                {/* L'entame : liseré vert feutre et halo diffus. La teinte le
+                    sépare des deux autres repères — le blanc crème serré de ma
+                    carte, le doré du pli remporté — et le halo le rend
+                    repérable du coin de l'œil sans masquer l'index des
+                    voisines, qui doit rester lisible. */}
+                {isLead && (
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -inset-1 rounded-lg shadow-[0_0_8px_rgb(74_143_106/0.55)] ring-2 ring-felt-400"
                   />
                 )}
                 {isWinner && (

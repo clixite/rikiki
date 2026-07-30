@@ -39,6 +39,7 @@ export const el: Messages = {
   host: 'Αρχηγός',
   you: 'εσύ',
   waitingForHost: 'Περιμένουμε τον αρχηγό να ξεκινήσει…',
+  waitingForHostNamed: (p: string) => `${p} ξεκινά το παιχνίδι όταν έρθουν όλοι`,
   needPlayers: (missing: number) =>
     missing === 1
       ? 'Ακόμη 1 παίκτης για να ξεκινήσουμε'
@@ -119,6 +120,9 @@ export const el: Messages = {
     `Το ${forbidden} απαγορεύεται: το σύνολο των δηλώσεων δεν μπορεί να ισούται με ${cards} (κανόνας του άγκιστρου).`,
   bid: 'Δήλωση',
   tricks: 'Μπάζες',
+  lastTrick: 'Τελευταία μπάζα',
+  spreadHand: 'Άπλωσε τα φύλλα',
+  collapseHand: 'Μάζεψε τα φύλλα',
 
   // Σύνοψη δηλώσεων του γύρου
   bidsAnnounced: 'Δηλωμένες',
@@ -163,6 +167,8 @@ export const el: Messages = {
   reconnecting: 'Επανασύνδεση…',
   playerDisconnected: (p: string) => `${p} αποσυνδέθηκε`,
   playerReconnected: (p: string) => `${p} επέστρεψε`,
+  playerPaused: (p: string) => `${p} κάνει διάλειμμα`,
+  playerResumed: (p: string) => `${p} επέστρεψε στο παιχνίδι`,
   playerJoined: (p: string) => `${p} μπήκε στο παιχνίδι`,
   playerLeft: (p: string) => `${p} έφυγε από το παιχνίδι`,
   roomClosed: 'Το παιχνίδι έκλεισε.',
@@ -196,6 +202,23 @@ export const el: Messages = {
   cancel: 'Άκυρο',
   botTag: 'μποτ',
   emotes: 'Αντιδράσεις',
+  phrases: 'Μηνύματα',
+  phraseTexts: {
+    nice: 'Μπράβο!',
+    oops: 'Ωχ…',
+    yourTurn: 'Σειρά σου!',
+    hurry: 'Σε περιμένουμε 🙂',
+    watchTrump: 'Πρόσεχε τα ατού',
+    mine: 'Αυτή είναι δική μου',
+    sorry: 'Συγγνώμη!',
+    brb: 'Επιστρέφω αμέσως',
+    goodGame: 'Ωραία παρτίδα!',
+    again: 'Άλλη μία;',
+  },
+  pauseGame: 'Κάνε ένα διάλειμμα',
+  resumePlay: 'Επέστρεψα',
+  pausedTag: 'σε παύση',
+  pauseHint: 'Ένα ρομπότ κρατά τη θέση σου όσο λείπεις.',
   close: 'Κλείσιμο',
   leaveGame: 'Αποχώρηση από την παρτίδα',
   leaveGameWarning:

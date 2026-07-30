@@ -5,6 +5,7 @@ import type {
   ClientToServerEvents,
   GameFormat,
   GamePace,
+  PhraseId,
   ScoringVariant,
   ServerToClientEvents,
 } from '@rikiki/shared';
@@ -24,7 +25,23 @@ export function connectSocket(token: string): TypedSocket {
   socketToken = token;
   socket = API_BASE ? io(API_BASE, { auth: { token } }) : io({ auth: { token } });
 
-  socket.on('connect', () => useGame.getState().setSocketConnected(true));
+  /**
+   * Reconnexion.
+   *
+   * Socket.IO rétablit tout seul la connexion, mais avec un socket NEUF : côté
+   * serveur, le joueur reste détaché de sa partie. Il ne recevait donc plus
+   * aucune vue et se retrouvait spectateur de sa propre table — le « je me fais
+   * déconnecter et je ne peux plus revenir » constaté en partie réelle. Sur
+   * mobile, la moindre mise en veille suffit à déclencher ce cas.
+   *
+   * On réintègre donc la partie à chaque connexion, y compris la première : le
+   * serveur reconnaît le joueur à son identifiant et lui rend son siège.
+   */
+  socket.on('connect', () => {
+    useGame.getState().setSocketConnected(true);
+    const code = useSession.getState().roomCode;
+    if (code) void rejoinRoom(code);
+  });
   socket.on('disconnect', () => useGame.getState().setSocketConnected(false));
   socket.on('game:view', (view) => useGame.getState().setView(view));
   socket.on('game:event', (event) => {
@@ -40,6 +57,22 @@ export function connectSocket(token: string): TypedSocket {
   });
 
   return socket;
+}
+
+/**
+ * Reprend sa place dans une partie après une reconnexion.
+ *
+ * Discret par nature : ni écran de chargement, ni message. La seule issue qui
+ * mérite d'être signalée est la disparition de la partie — et encore, on ne
+ * l'efface qu'à ce moment-là, jamais sur un simple aléa réseau.
+ */
+async function rejoinRoom(code: string): Promise<void> {
+  const res = await emitAck<{ code: string }>('room:join', { code });
+  if (res.ok) return;
+  if (res.error.code === 'ROOM_NOT_FOUND') {
+    useSession.getState().setRoomCode(null);
+    useGame.getState().setClosed('expired');
+  }
 }
 
 export function getSocket(): TypedSocket | null {
@@ -93,6 +126,14 @@ export async function joinRoom(code: string): Promise<Ack<{ code: string }>> {
 export function sendEmote(emote: EmoteId): void {
   socket?.emit('game:emote', { emote }, () => undefined);
 }
+
+/** Envoie une petite phrase — même principe, même limitation de débit. */
+export function sendPhrase(phrase: PhraseId): void {
+  socket?.emit('game:phrase', { phrase }, () => undefined);
+}
+
+/** Se met en pause, ou en sort : le robot tient le siège pendant ce temps. */
+export const setPaused = (paused: boolean) => emitAck('game:pause', { paused });
 
 export async function leaveRoom(): Promise<void> {
   await emitAck('room:leave');

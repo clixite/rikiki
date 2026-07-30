@@ -32,7 +32,9 @@ export type TransientEvent =
   | { type: 'player-reconnected'; playerId: string }
   | { type: 'host-changed'; hostId: string }
   | { type: 'rematch'; code: string }
-  | { type: 'emote'; playerId: string; emote: EmoteId };
+  | { type: 'emote'; playerId: string; emote: EmoteId }
+  | { type: 'phrase'; playerId: string; phrase: PhraseId }
+  | { type: 'paused'; playerId: string; paused: boolean };
 
 /**
  * Réactions envoyables à la table.
@@ -46,6 +48,38 @@ export type EmoteId = (typeof EMOTES)[number];
 
 export function isEmoteId(value: unknown): value is EmoteId {
   return typeof value === 'string' && (EMOTES as readonly string[]).includes(value);
+}
+
+/**
+ * Petites phrases envoyables à la table.
+ *
+ * Les réactions ne disent pas tout : on veut prévenir qu'on s'absente, féliciter
+ * un joli coup, réclamer son tour. D'où une liste de phrases COURTES ET
+ * FERMÉES, traduites comme le reste du jeu.
+ *
+ * Le choix d'une liste fermée plutôt que d'un champ de saisie n'est pas de la
+ * paresse : du texte libre ferait de Rikiki une messagerie. Il faudrait alors
+ * filtrer, modérer sous 24 h, permettre de bloquer un joueur — tout ce
+ * qu'exige la règle 1.2 de l'App Store — pour un jeu qui se joue entre amis
+ * qu'on a soi-même invités. Une liste fermée dit l'essentiel sans rien de tout
+ * cela, et se traduit dans les vingt-quatre langues sans effort.
+ */
+export const PHRASES = [
+  'nice',       // « Bien joué ! »
+  'oops',       // « Aïe… »
+  'yourTurn',   // « À toi ! »
+  'hurry',      // « On t'attend 🙂 »
+  'watchTrump', // « Attention à l'atout »
+  'mine',       // « Celui-là est pour moi »
+  'sorry',      // « Désolé ! »
+  'brb',        // « Je reviens tout de suite »
+  'goodGame',   // « Belle partie ! »
+  'again',      // « On en refait une ? »
+] as const;
+export type PhraseId = (typeof PHRASES)[number];
+
+export function isPhraseId(value: unknown): value is PhraseId {
+  return typeof value === 'string' && (PHRASES as readonly string[]).includes(value);
 }
 
 export interface ClientToServerEvents {
@@ -76,6 +110,13 @@ export interface ClientToServerEvents {
   'profile:update': (payload: { pseudo: string; avatar: string }, ack: (res: Ack) => void) => void;
   /** Réaction envoyée à la table (limitée côté serveur). */
   'game:emote': (payload: { emote: EmoteId }, ack: (res: Ack) => void) => void;
+  /** Envoie une petite phrase à la table (même limitation de débit). */
+  'game:phrase': (payload: { phrase: PhraseId }, ack: (res: Ack) => void) => void;
+  /**
+   * Se met en pause, ou en sort. En pause, le robot tient le siège : la table
+   * n'attend pas, et le joueur retrouve sa place intacte à son retour.
+   */
+  'game:pause': (payload: { paused: boolean }, ack: (res: Ack) => void) => void;
 }
 
 export interface ServerToClientEvents {

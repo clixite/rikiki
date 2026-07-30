@@ -47,6 +47,7 @@ export const pl: Messages = {
   host: 'Gospodarz',
   you: 'ty',
   waitingForHost: 'Czekamy, aż gospodarz rozpocznie…',
+  waitingForHostNamed: (p: string) => `${p} zaczyna grę, gdy wszyscy będą na miejscu`,
   needPlayers: (missing: number) =>
     plural(
       missing,
@@ -130,6 +131,9 @@ export const pl: Messages = {
     `${forbidden} jest zakazane: suma deklaracji nie może równać się ${cards} (reguła haczyka).`,
   bid: 'Deklaracja',
   tricks: 'Lewy',
+  lastTrick: 'Ostatnia lewa',
+  spreadHand: 'Rozłóż karty',
+  collapseHand: 'Złóż karty',
 
   // Podsumowanie deklaracji rundy
   bidsAnnounced: 'Zadeklarowano',
@@ -184,6 +188,8 @@ export const pl: Messages = {
   reconnecting: 'Ponowne łączenie…',
   playerDisconnected: (p: string) => `${p} traci połączenie`,
   playerReconnected: (p: string) => `${p} wraca do gry`,
+  playerPaused: (p: string) => `${p} robi przerwę`,
+  playerResumed: (p: string) => `${p} wraca do gry`,
   playerJoined: (p: string) => `${p} dołącza do partii`,
   playerLeft: (p: string) => `${p} opuszcza partię`,
   roomClosed: 'Partia została zamknięta.',
@@ -217,6 +223,23 @@ export const pl: Messages = {
   cancel: 'Anuluj',
   botTag: 'bot',
   emotes: 'Reakcje',
+  phrases: 'Wiadomości',
+  phraseTexts: {
+    nice: 'Dobre zagranie!',
+    oops: 'Ojej…',
+    yourTurn: 'Twoja kolej!',
+    hurry: 'Czekamy 🙂',
+    watchTrump: 'Uwaga na atu',
+    mine: 'Ta jest moja',
+    sorry: 'Przepraszam!',
+    brb: 'Zaraz wracam',
+    goodGame: 'Dobra partia!',
+    again: 'Jeszcze jedna?',
+  },
+  pauseGame: 'Zrób przerwę',
+  resumePlay: 'Wracam do gry',
+  pausedTag: 'przerwa',
+  pauseHint: 'Robot trzyma twoje miejsce podczas przerwy.',
   close: 'Zamknij',
   leaveGame: 'Opuść rozgrywkę',
   leaveGameWarning:

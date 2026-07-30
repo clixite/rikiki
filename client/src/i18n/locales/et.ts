@@ -38,6 +38,7 @@ export const et: Messages = {
   host: 'Peremees',
   you: 'sina',
   waitingForHost: 'Ootame, kuni peremees alustab…',
+  waitingForHostNamed: (p: string) => `${p} alustab mängu, kui kõik on kohal`,
   needPlayers: (missing: number) =>
     missing === 1
       ? 'Alustamiseks veel 1 mängija'
@@ -118,6 +119,9 @@ export const et: Messages = {
     `${forbidden} on keelatud: pakkumiste summa ei tohi olla täpselt ${cards} (konksureegel).`,
   bid: 'Pakkumine',
   tricks: 'Tihid',
+  lastTrick: 'Viimane tihi',
+  spreadHand: 'Laota kaardid',
+  collapseHand: 'Koonda kaardid',
 
   // Vooru pakkumised
   bidsAnnounced: 'Lubatud',
@@ -160,6 +164,8 @@ export const et: Messages = {
   reconnecting: 'Taasühendan…',
   playerDisconnected: (p: string) => `${p} kaotas ühenduse`,
   playerReconnected: (p: string) => `${p} on tagasi`,
+  playerPaused: (p: string) => `${p} teeb pausi`,
+  playerResumed: (p: string) => `${p} on mängus tagasi`,
   playerJoined: (p: string) => `${p} liitus mänguga`,
   playerLeft: (p: string) => `${p} lahkus mängust`,
   roomClosed: 'Mäng on suletud.',
@@ -193,6 +199,23 @@ export const et: Messages = {
   cancel: 'Loobu',
   botTag: 'robot',
   emotes: 'Reaktsioonid',
+  phrases: 'Sõnumid',
+  phraseTexts: {
+    nice: 'Hästi mängitud!',
+    oops: 'Oih…',
+    yourTurn: 'Sinu kord!',
+    hurry: 'Ootame sind 🙂',
+    watchTrump: 'Hoia trumpi silmas',
+    mine: 'See on minu oma',
+    sorry: 'Vabandust!',
+    brb: 'Tulen kohe tagasi',
+    goodGame: 'Hea mäng!',
+    again: 'Veel üks?',
+  },
+  pauseGame: 'Tee paus',
+  resumePlay: 'Olen tagasi',
+  pausedTag: 'pausil',
+  pauseHint: 'Robot hoiab sinu kohta, kuni oled eemal.',
   close: 'Sulge',
   leaveGame: 'Lahku mängust',
   leaveGameWarning:

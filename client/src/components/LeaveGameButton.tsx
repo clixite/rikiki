@@ -3,23 +3,40 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useNav } from '../nav';
 import { useT } from '../i18n';
 import { vibrate } from '../haptics';
-import { leaveRoom } from '../socket';
+import { leaveRoom, setPaused } from '../socket';
+import { useGame } from '../store/game';
 
 /**
- * Sortie d'une partie en cours.
+ * Sortie d'une partie en cours — et sa version douce, la pause.
  *
  * Il n'existait aucun moyen de quitter une fois la partie lancée : il fallait
  * fermer l'application, ce qui laissait le joueur « déconnecté » aux yeux des
  * autres et bloquait la table jusqu'à l'expiration du délai de grâce.
  *
- * Confirmation obligatoire — c'est un geste irréversible qui affecte les
- * autres joueurs — mais une seule étape, sans friction inutile.
+ * Les deux gestes partagent la même feuille parce qu'ils répondent à la même
+ * envie — « je dois m'absenter » — et que presque personne ne veut vraiment
+ * partir. Voir la pause juste au-dessus de « quitter » évite les départs
+ * définitifs pour cinq minutes de cuisine. Quitter reste confirmé : c'est
+ * irréversible et cela coûte ses points.
  */
 export default function LeaveGameButton() {
   const t = useT();
   const navigate = useNav();
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
+  const view = useGame((s) => s.view);
+  const iAmPaused = view?.players.find((p) => p.id === view.you)?.paused === true;
+
+  const pause = async () => {
+    setBusy(true);
+    vibrate('select');
+    try {
+      await setPaused(!iAmPaused);
+      setConfirming(false);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const leave = async () => {
     setBusy(true);
@@ -63,6 +80,24 @@ export default function LeaveGameButton() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/15" />
+
+              {/* La pause d'abord : c'est ce que veulent neuf joueurs sur dix
+                  qui touchent ce bouton, et elle ne coûte rien. */}
+              <button
+                type="button"
+                data-testid="pause-game"
+                onClick={pause}
+                disabled={busy}
+                className="min-h-12 w-full rounded-xl bg-brass-400 text-sm font-bold text-felt-950 transition active:scale-[0.98] disabled:opacity-40"
+              >
+                {iAmPaused ? t.resumePlay : t.pauseGame}
+              </button>
+              <p className="mx-auto mt-1.5 max-w-xs text-center text-[13px] leading-snug text-paper-50/55">
+                {t.pauseHint}
+              </p>
+
+              <div className="my-4 h-px bg-white/10" />
+
               <h2 className="text-center text-lg font-bold">{t.leaveGame}</h2>
               <p className="mx-auto mt-1.5 max-w-xs text-center text-sm leading-snug text-paper-50/60">
                 {t.leaveGameWarning}
