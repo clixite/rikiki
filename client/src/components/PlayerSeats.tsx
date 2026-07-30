@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import type { GameView, PhraseId } from '@rikiki/shared';
 import { useT } from '../i18n';
 import PlayerAvatar from './PlayerAvatar';

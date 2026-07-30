@@ -313,6 +313,17 @@ export const mt: Messages = {
   // Ir-regoli tal-logħba
   rules: 'Ir-regoli',
   rulesTitle: 'Kif tilgħab',
+  demoTitle: 'Il-logħba f’minuta',
+  demoPlay: 'Ibda d-dimostrazzjoni',
+  demoPause: 'Waqqaf',
+  demoReplay: 'Erġa’ ara',
+  demoPrev: 'Pass ta’ qabel',
+  demoNext: 'Pass li jmiss',
+  demoDeal: 'Kulħadd jieħu l-karti tiegħu. L-aħħar waħda maqluba tiddetermina l-briskola: il-kulur tagħha jirbaħ lil kollha.',
+  demoBid: 'Kulħadd jgħid kemm idejn beħsiebu jieħu. Min iqassam jgħid l-aħħar, u ma jistax iħalli t-total joħroġ eżatt.',
+  demoFollow: 'Trid issegwi l-kulur mitlub jekk għandek. Biss inkella tilgħab li trid.',
+  demoTrump: 'Briskola, anke l-iżjed baxxa, tirbaħ l-id fuq il-kulur mitlub.',
+  demoScore: 'Ftehim miżmum: 10 punti flimkien ma’ 2 għal kull id. Mitluf: 2 punti inqas għal kull id ta’ differenza.',
   rulesSubtitle: "Ir-Rikiki f'2 minuti",
   rulesGoalTitle: 'Il-prinċipju',
   rulesGoalText:

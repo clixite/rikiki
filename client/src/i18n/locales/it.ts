@@ -277,6 +277,17 @@ export const it: Messages = {
   // Regole del gioco
   rules: 'Regole del gioco',
   rulesTitle: 'Come si gioca',
+  demoTitle: 'La partita in un minuto',
+  demoPlay: 'Avvia la dimostrazione',
+  demoPause: 'Metti in pausa',
+  demoReplay: 'Rivedi da capo',
+  demoPrev: 'Passo precedente',
+  demoNext: 'Passo successivo',
+  demoDeal: 'Ognuno riceve le sue carte. L’ultima scoperta fissa la briscola: il suo seme batte tutti gli altri.',
+  demoBid: 'Ognuno dichiara quante prese intende fare. Il mazziere dichiara per ultimo e non può far quadrare il totale.',
+  demoFollow: 'Si risponde al seme di uscita se lo si ha. Solo altrimenti si gioca ciò che si vuole.',
+  demoTrump: 'Una briscola, anche la più bassa, vince la presa sul seme di uscita.',
+  demoScore: 'Contratto rispettato: 10 punti più 2 a presa. Mancato: 2 punti in meno per ogni presa di scarto.',
   rulesSubtitle: 'Il Rikiki in 2 minuti',
   rulesGoalTitle: 'Il principio',
   rulesGoalText:

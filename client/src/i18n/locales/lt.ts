@@ -299,6 +299,17 @@ export const lt: Messages = {
   // Žaidimo taisyklės
   rules: 'Žaidimo taisyklės',
   rulesTitle: 'Kaip žaisti',
+  demoTitle: 'Žaidimas per minutę',
+  demoPlay: 'Paleisti demonstraciją',
+  demoPause: 'Pristabdyti',
+  demoReplay: 'Žiūrėti dar kartą',
+  demoPrev: 'Ankstesnis žingsnis',
+  demoNext: 'Kitas žingsnis',
+  demoDeal: 'Kiekvienas gauna savo kortas. Paskutinė atversta nustato kozirį: jo rūšis muša visas kitas.',
+  demoBid: 'Kiekvienas skelbia, kiek kirčių ketina paimti. Dalintojas skelbia paskutinis ir negali padaryti, kad suma sutaptų.',
+  demoFollow: 'Reikia dėti tos pačios rūšies kortą, jei ją turi. Tik kitaip žaidi ką nori.',
+  demoTrump: 'Kozeris, net ir žemiausias, paima kirtį iš išėjusios rūšies.',
+  demoScore: 'Įvykdyta: 10 taškų ir 2 už kirtį. Neįvykdyta: 2 taškai mažiau už kiekvieną kirčio skirtumą.',
   rulesSubtitle: 'Rikiki per dvi minutes',
   rulesGoalTitle: 'Esmė',
   rulesGoalText:

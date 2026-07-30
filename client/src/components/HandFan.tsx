@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { WheelEvent } from 'react';
-import { motion, useMotionValue } from 'motion/react';
+import { m as motion, useMotionValue } from 'motion/react';
 import type { Card, Suit } from '@rikiki/shared';
 import { cardId } from '@rikiki/shared';
 import CardFace from './CardFace';

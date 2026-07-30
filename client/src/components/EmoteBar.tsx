@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import { EMOTES, PHRASES, type EmoteId, type PhraseId } from '@rikiki/shared';
 import { vibrate } from '../haptics';
 import { useT } from '../i18n';

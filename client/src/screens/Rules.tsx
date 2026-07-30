@@ -1,7 +1,8 @@
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import { useNav } from '../nav';
 import { SCORING_VARIANTS, cardFromId } from '@rikiki/shared';
 import CardFace from '../components/CardFace';
+import RulesDemo from '../components/RulesDemo';
 import SoundToggle from '../components/SoundToggle';
 import { useT } from '../i18n';
 
@@ -60,6 +61,11 @@ export default function Rules() {
       <p className="mb-4 text-center text-sm text-paper-50/50">{t.rulesSubtitle}</p>
 
       <div className="rk-scroll min-h-0 flex-1 space-y-3 overflow-y-auto pb-4">
+        {/* La démonstration passe AVANT le texte : quelqu'un qui n'a jamais
+            joué n'a pas envie de lire six paragraphes, il veut voir une main
+            se jouer. Le texte reste dessous pour qui cherche le détail. */}
+        <RulesDemo />
+
         <Section step="1" title={t.rulesGoalTitle}>
           <p>{t.rulesGoalText}</p>
         </Section>

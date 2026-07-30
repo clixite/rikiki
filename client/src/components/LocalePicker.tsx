@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import { LOCALES, LOCALE_NAMES, setLocale, useLocale, useT, type Locale } from '../i18n';
 import { vibrate } from '../haptics';
 

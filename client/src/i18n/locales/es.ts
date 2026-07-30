@@ -277,6 +277,17 @@ export const es: Messages = {
   // Reglas del juego
   rules: 'Reglas del juego',
   rulesTitle: 'Cómo se juega',
+  demoTitle: 'La partida en un minuto',
+  demoPlay: 'Ver la demostración',
+  demoPause: 'Pausar',
+  demoReplay: 'Verla otra vez',
+  demoPrev: 'Paso anterior',
+  demoNext: 'Paso siguiente',
+  demoDeal: 'Cada uno recibe sus cartas. La última que se levanta marca el triunfo: su palo gana a todos los demás.',
+  demoBid: 'Cada uno anuncia cuántas bazas piensa ganar. El que reparte anuncia el último y no puede hacer que el total cuadre.',
+  demoFollow: 'Hay que servir el palo de salida si se tiene. Solo si no, se juega lo que se quiera.',
+  demoTrump: 'Un triunfo, aunque sea el más bajo, gana la baza al palo de salida.',
+  demoScore: 'Contrato cumplido: 10 puntos más 2 por baza. Fallado: 2 puntos menos por cada baza de diferencia.',
   rulesSubtitle: 'El Rikiki en 2 minutos',
   rulesGoalTitle: 'La idea',
   rulesGoalText:

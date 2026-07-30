@@ -319,6 +319,17 @@ export const sl: Messages = {
   // Pravila igre
   rules: 'Pravila igre',
   rulesTitle: 'Kako se igra',
+  demoTitle: 'Igra v eni minuti',
+  demoPlay: 'Predvajaj predstavitev',
+  demoPause: 'Premor',
+  demoReplay: 'Poglej znova',
+  demoPrev: 'Prejšnji korak',
+  demoNext: 'Naslednji korak',
+  demoDeal: 'Vsak dobi svoje karte. Zadnja obrnjena določi adut: njegova barva premaga vse druge.',
+  demoBid: 'Vsak napove, koliko štihov namerava vzeti. Delilec napove zadnji in ne sme pustiti, da bi se vsota izšla natanko.',
+  demoFollow: 'Klicano barvo je treba priznati, če jo imaš. Šele sicer igraš, kar hočeš.',
+  demoTrump: 'Adut, tudi najnižji, vzame štih pred klicano barvo.',
+  demoScore: 'Napoved izpolnjena: 10 točk in 2 na štih. Zgrešena: 2 točki manj za vsak štih razlike.',
   rulesSubtitle: 'Rikiki v 2 minutah',
   rulesGoalTitle: 'Bistvo igre',
   rulesGoalText:

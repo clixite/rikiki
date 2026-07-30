@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import { useNav } from '../nav';
 import type { GameView } from '@rikiki/shared';
 import { DEFAULT_PACE, DEFAULT_SCORING, MIN_PLAYERS, isBotId } from '@rikiki/shared';

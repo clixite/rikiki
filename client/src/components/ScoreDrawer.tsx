@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import type { GameHistoryEntry, GameView } from '@rikiki/shared';
 import { fetchHistory, readCachedHistory } from '../api';
 import { useT } from '../i18n';

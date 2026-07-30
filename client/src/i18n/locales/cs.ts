@@ -308,6 +308,17 @@ export const cs: Messages = {
   // Pravidla hry
   rules: 'Pravidla hry',
   rulesTitle: 'Jak se hraje',
+  demoTitle: 'Hra za minutu',
+  demoPlay: 'Přehrát ukázku',
+  demoPause: 'Pozastavit',
+  demoReplay: 'Přehrát znovu',
+  demoPrev: 'Předchozí krok',
+  demoNext: 'Další krok',
+  demoDeal: 'Každý dostane své karty. Poslední otočená určuje trumf: jeho barva bije všechny ostatní.',
+  demoBid: 'Každý hlásí, kolik zdvihů chce udělat. Rozdávající hlásí poslední a nesmí nechat součet vyjít přesně.',
+  demoFollow: 'Vynesenou barvu je nutné přiznat, pokud ji máte. Teprve jinak hrajete, co chcete.',
+  demoTrump: 'Trumf, i ten nejnižší, bere zdvih na vynesené barvě.',
+  demoScore: 'Splněný závazek: 10 bodů plus 2 za zdvih. Nesplněný: 2 body dolů za každý zdvih rozdílu.',
   rulesSubtitle: 'Rikiki za 2 minuty',
   rulesGoalTitle: 'O co jde',
   rulesGoalText:

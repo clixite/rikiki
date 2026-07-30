@@ -285,6 +285,17 @@ export const fr = {
   // Règles du jeu
   rules: 'Règles du jeu',
   rulesTitle: 'Comment jouer',
+  demoTitle: 'La partie en une minute',
+  demoPlay: 'Lancer la démonstration',
+  demoPause: 'Mettre en pause',
+  demoReplay: 'Revoir depuis le début',
+  demoPrev: 'Étape précédente',
+  demoNext: 'Étape suivante',
+  demoDeal: 'Chacun reçoit ses cartes. La dernière retournée fixe l’atout : sa couleur bat toutes les autres.',
+  demoBid: 'Chacun annonce combien de plis il compte remporter. Le donneur annonce en dernier, et ne peut pas faire tomber le total juste.',
+  demoFollow: 'On rejoue la couleur demandée si on en a. Sinon seulement, on met ce qu’on veut.',
+  demoTrump: 'Un atout, même le plus petit, remporte le pli sur la couleur demandée.',
+  demoScore: 'Contrat tenu : 10 points plus 2 par pli. Manqué : 2 points en moins par pli d’écart.',
   rulesSubtitle: 'Le Rikiki en 2 minutes',
   rulesGoalTitle: 'Le principe',
   rulesGoalText:

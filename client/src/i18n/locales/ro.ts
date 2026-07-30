@@ -306,6 +306,17 @@ export const ro: Messages = {
   // Regulile jocului
   rules: 'Regulile jocului',
   rulesTitle: 'Cum se joacă',
+  demoTitle: 'Jocul într-un minut',
+  demoPlay: 'Pornește demonstrația',
+  demoPause: 'Pauză',
+  demoReplay: 'Vezi din nou',
+  demoPrev: 'Pasul anterior',
+  demoNext: 'Pasul următor',
+  demoDeal: 'Fiecare își primește cărțile. Ultima întoarsă stabilește atuul: culoarea lui bate toate celelalte.',
+  demoBid: 'Fiecare anunță câte levate crede că face. Cel care împarte anunță ultimul și nu poate face totalul să iasă exact.',
+  demoFollow: 'Se răspunde la culoarea cerută dacă o ai. Doar altfel joci ce vrei.',
+  demoTrump: 'Un atu, chiar și cel mai mic, câștigă levata în fața culorii cerute.',
+  demoScore: 'Contract respectat: 10 puncte plus 2 pe levată. Ratat: 2 puncte în minus pentru fiecare levată diferență.',
   rulesSubtitle: 'Rikiki în 2 minute',
   rulesGoalTitle: 'Ideea',
   rulesGoalText:

@@ -280,6 +280,17 @@ export const hu: Messages = {
   // Játékszabályok
   rules: 'Játékszabályok',
   rulesTitle: 'Hogyan kell játszani',
+  demoTitle: 'A játék egy percben',
+  demoPlay: 'Bemutató indítása',
+  demoPause: 'Szünet',
+  demoReplay: 'Megnézem újra',
+  demoPrev: 'Előző lépés',
+  demoNext: 'Következő lépés',
+  demoDeal: 'Mindenki megkapja a lapjait. Az utoljára felfordított lap adja az adut: a színe minden mást üt.',
+  demoBid: 'Mindenki bemondja, hány ütést tervez. Az osztó mond utoljára, és nem hozhatja ki pontosan az összeget.',
+  demoFollow: 'A hívott színt követni kell, ha van belőle. Csak különben játszhatsz bármit.',
+  demoTrump: 'Egy adu — akár a legkisebb — elviszi az ütést a hívott szín elől.',
+  demoScore: 'Teljesített bemondás: 10 pont, plusz 2 ütésenként. Elhibázott: 2 pont mínusz minden eltérő ütésért.',
   rulesSubtitle: 'A Rikiki 2 perc alatt',
   rulesGoalTitle: 'A lényeg',
   rulesGoalText:

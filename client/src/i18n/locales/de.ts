@@ -277,6 +277,17 @@ export const de: Messages = {
   // Spielregeln
   rules: 'Spielregeln',
   rulesTitle: 'So wird gespielt',
+  demoTitle: 'Das Spiel in einer Minute',
+  demoPlay: 'Vorführung starten',
+  demoPause: 'Pausieren',
+  demoReplay: 'Noch einmal ansehen',
+  demoPrev: 'Vorheriger Schritt',
+  demoNext: 'Nächster Schritt',
+  demoDeal: 'Jeder bekommt seine Karten. Die letzte aufgedeckte bestimmt den Trumpf: seine Farbe schlägt alle anderen.',
+  demoBid: 'Jeder sagt an, wie viele Stiche er machen will. Der Geber sagt zuletzt an und darf die Summe nicht genau aufgehen lassen.',
+  demoFollow: 'Die angespielte Farbe muss bedient werden, wenn man sie hat. Nur sonst darf man frei spielen.',
+  demoTrump: 'Ein Trumpf schlägt die angespielte Farbe — auch der kleinste.',
+  demoScore: 'Ansage erfüllt: 10 Punkte plus 2 je Stich. Verfehlt: 2 Punkte Abzug je Stich Differenz.',
   rulesSubtitle: 'Rikiki in 2 Minuten',
   rulesGoalTitle: 'Das Prinzip',
   rulesGoalText:

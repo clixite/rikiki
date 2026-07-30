@@ -312,6 +312,17 @@ export const ga: Messages = {
   // Rialacha an chluiche
   rules: 'Rialacha',
   rulesTitle: 'Conas imirt',
+  demoTitle: 'An cluiche i nóiméad',
+  demoPlay: 'Seinn an taispeántas',
+  demoPause: 'Cuir ar sos',
+  demoReplay: 'Féach arís',
+  demoPrev: 'An chéim roimhe',
+  demoNext: 'An chéad chéim eile',
+  demoDeal: 'Faigheann gach duine a chuid cártaí. Socraíonn an ceann deireanach a iompaítear an mámh: buann a chulaith ar gach ceann eile.',
+  demoBid: 'Fógraíonn gach duine cé mhéad cleas a bhfuil sé ag súil leo. Fógraíonn an dáileoir ar deireadh, agus ní féidir leis an t-iomlán a fhágáil cothrom.',
+  demoFollow: 'Lean an chulaith a imríodh má tá sí agat. Mura bhfuil, imir cibé rud is mian leat.',
+  demoTrump: 'Buann mámh, fiú an ceann is ísle, ar an gculaith a imríodh.',
+  demoScore: 'Conradh comhlíonta: 10 bpointe móide 2 an cleas. Teipthe: 2 phointe as do gach cleas difríochta.',
   rulesSubtitle: 'Rikiki in 2 nóiméad',
   rulesGoalTitle: 'An prionsabal',
   rulesGoalText:

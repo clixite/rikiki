@@ -297,6 +297,17 @@ export const lv: Messages = {
   // Spēles noteikumi
   rules: 'Spēles noteikumi',
   rulesTitle: 'Kā spēlēt',
+  demoTitle: 'Spēle vienā minūtē',
+  demoPlay: 'Sākt demonstrāciju',
+  demoPause: 'Apturēt',
+  demoReplay: 'Skatīties vēlreiz',
+  demoPrev: 'Iepriekšējais solis',
+  demoNext: 'Nākamais solis',
+  demoDeal: 'Katrs saņem savas kārtis. Pēdējā atklātā nosaka trumpi: tā masts pārspēj visus pārējos.',
+  demoBid: 'Katrs pasaka, cik stiķus grasās ņemt. Dalītājs saka pēdējais un nedrīkst likt summai sanākt tieši.',
+  demoFollow: 'Izspēlētais masts jāpiemet, ja tāds ir. Tikai citādi spēlē, ko gribi.',
+  demoTrump: 'Trumpis, pat viszemākais, paņem stiķi no izspēlētā masta.',
+  demoScore: 'Solījums izpildīts: 10 punkti plus 2 par stiķi. Neizpildīts: 2 punkti nost par katru stiķa starpību.',
   rulesSubtitle: 'Rikiki divās minūtēs',
   rulesGoalTitle: 'Būtība',
   rulesGoalText:

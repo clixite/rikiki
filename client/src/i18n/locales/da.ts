@@ -276,6 +276,17 @@ export const da: Messages = {
   // Spilleregler
   rules: 'Spilleregler',
   rulesTitle: 'Sådan spiller du',
+  demoTitle: 'Spillet på ét minut',
+  demoPlay: 'Afspil gennemgangen',
+  demoPause: 'Sæt på pause',
+  demoReplay: 'Se igen',
+  demoPrev: 'Forrige trin',
+  demoNext: 'Næste trin',
+  demoDeal: 'Alle får deres kort. Det sidste, der vendes, bestemmer trumfen: den farve slår alle andre.',
+  demoBid: 'Alle melder, hvor mange stik de regner med at tage. Giveren melder til sidst og må ikke få totalen til at gå op.',
+  demoFollow: 'Følg den farve, der blev spillet ud, hvis du har den. Kun ellers må du spille, hvad du vil.',
+  demoTrump: 'En trumf tager stikket fra den udspillede farve — også den laveste.',
+  demoScore: 'Melding holdt: 10 point plus 2 pr. stik. Forfejlet: 2 point fra for hvert stiks forskel.',
   rulesSubtitle: 'Rikiki på 2 minutter',
   rulesGoalTitle: 'Idéen',
   rulesGoalText:

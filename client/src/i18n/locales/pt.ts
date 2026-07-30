@@ -277,6 +277,17 @@ export const pt: Messages = {
   // Regras do jogo
   rules: 'Regras do jogo',
   rulesTitle: 'Como se joga',
+  demoTitle: 'A partida num minuto',
+  demoPlay: 'Ver a demonstração',
+  demoPause: 'Pausar',
+  demoReplay: 'Ver outra vez',
+  demoPrev: 'Passo anterior',
+  demoNext: 'Passo seguinte',
+  demoDeal: 'Cada um recebe as suas cartas. A última virada define o trunfo: o seu naipe ganha a todos os outros.',
+  demoBid: 'Cada um anuncia quantas vazas conta fazer. Quem dá as cartas anuncia por último e não pode fazer o total bater certo.',
+  demoFollow: 'Serve-se o naipe de saída se o tivermos. Só se não, é que se joga o que se quiser.',
+  demoTrump: 'Um trunfo, mesmo o mais baixo, ganha a vaza ao naipe de saída.',
+  demoScore: 'Contrato cumprido: 10 pontos mais 2 por vaza. Falhado: menos 2 pontos por cada vaza de diferença.',
   rulesSubtitle: 'O Rikiki em 2 minutos',
   rulesGoalTitle: 'A ideia',
   rulesGoalText:

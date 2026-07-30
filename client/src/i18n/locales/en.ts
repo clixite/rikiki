@@ -277,6 +277,17 @@ export const en: Messages = {
   // Rules
   rules: 'Game rules',
   rulesTitle: 'How to play',
+  demoTitle: 'The game in one minute',
+  demoPlay: 'Play the walkthrough',
+  demoPause: 'Pause',
+  demoReplay: 'Watch again',
+  demoPrev: 'Previous step',
+  demoNext: 'Next step',
+  demoDeal: 'Everyone gets their cards. The last one turned over sets the trump: its suit beats every other.',
+  demoBid: 'Everyone announces how many tricks they intend to win. The dealer bids last, and cannot make the total add up exactly.',
+  demoFollow: 'Follow the suit that was led if you have it. Only if you do not can you play anything.',
+  demoTrump: 'A trump, even the lowest one, beats the suit that was led.',
+  demoScore: 'Contract kept: 10 points plus 2 per trick. Missed: 2 points off for each trick of difference.',
   rulesSubtitle: 'Rikiki in 2 minutes',
   rulesGoalTitle: 'The idea',
   rulesGoalText:

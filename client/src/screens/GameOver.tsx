@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import { useNav } from '../nav';
 import type { GameView } from '@rikiki/shared';
 import SoundToggle from '../components/SoundToggle';

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
 import CardFace, { suitSymbol, suitInkClass } from './CardFace';
 import PlayerAvatar from './PlayerAvatar';

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import type { CompletedTrick, GameView, Trick } from '@rikiki/shared';
 import { cardId } from '@rikiki/shared';
 import CardFace from './CardFace';

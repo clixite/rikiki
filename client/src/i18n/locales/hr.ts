@@ -312,6 +312,17 @@ export const hr: Messages = {
   // Pravila igre
   rules: 'Pravila igre',
   rulesTitle: 'Kako se igra',
+  demoTitle: 'Igra u jednoj minuti',
+  demoPlay: 'Pokreni prikaz',
+  demoPause: 'Pauza',
+  demoReplay: 'Pogledaj ponovno',
+  demoPrev: 'Prethodni korak',
+  demoNext: 'Sljedeći korak',
+  demoDeal: 'Svatko dobiva svoje karte. Posljednja okrenuta određuje adut: njegova boja tuče sve ostale.',
+  demoBid: 'Svatko najavi koliko štihova namjerava uzeti. Djelitelj najavljuje zadnji i ne smije dopustiti da zbroj izađe točno.',
+  demoFollow: 'Traženu boju treba poštovati ako je imaš. Tek inače igraš što želiš.',
+  demoTrump: 'Adut, čak i najniži, uzima štih pred traženom bojom.',
+  demoScore: 'Najava ispunjena: 10 bodova plus 2 po štihu. Promašena: 2 boda manje za svaki štih razlike.',
   rulesSubtitle: 'Rikiki u 2 minute',
   rulesGoalTitle: 'Bit igre',
   rulesGoalText:

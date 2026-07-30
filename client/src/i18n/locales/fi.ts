@@ -286,6 +286,17 @@ export const fi: Messages = {
   // Pelin säännöt
   rules: 'Pelin säännöt',
   rulesTitle: 'Näin pelataan',
+  demoTitle: 'Peli minuutissa',
+  demoPlay: 'Toista esittely',
+  demoPause: 'Keskeytä',
+  demoReplay: 'Katso uudelleen',
+  demoPrev: 'Edellinen vaihe',
+  demoNext: 'Seuraava vaihe',
+  demoDeal: 'Jokainen saa korttinsa. Viimeksi käännetty määrää valtin: sen maa voittaa kaikki muut.',
+  demoBid: 'Jokainen ilmoittaa, montako tikkiä aikoo ottaa. Jakaja ilmoittaa viimeisenä eikä saa saada summaa täsmäämään.',
+  demoFollow: 'Aloitusmaata on tunnustettava, jos sitä on. Vasta muuten saa pelata mitä haluaa.',
+  demoTrump: 'Valtti voittaa tikin aloitusmaalta — pieninkin.',
+  demoScore: 'Tilaus pitää: 10 pistettä ja 2 per tikki. Pieleen: 2 pistettä pois jokaisesta tikin erosta.',
   rulesSubtitle: 'Rikiki kahdessa minuutissa',
   rulesGoalTitle: 'Idea',
   rulesGoalText:

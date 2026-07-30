@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import { Navigate, useParams } from 'react-router-dom';
 import { useNav } from '../nav';
 import type { GroupDetail as GroupDetailData, GroupStanding } from '@rikiki/shared';

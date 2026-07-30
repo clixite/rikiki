@@ -307,6 +307,17 @@ export const sk: Messages = {
   // Pravidlá hry
   rules: 'Pravidlá hry',
   rulesTitle: 'Ako sa hrá',
+  demoTitle: 'Hra za minútu',
+  demoPlay: 'Prehrať ukážku',
+  demoPause: 'Pozastaviť',
+  demoReplay: 'Prehrať znova',
+  demoPrev: 'Predchádzajúci krok',
+  demoNext: 'Ďalší krok',
+  demoDeal: 'Každý dostane svoje karty. Posledná otočená určuje tromf: jeho farba bije všetky ostatné.',
+  demoBid: 'Každý hlási, koľko zdvihov chce urobiť. Rozdávajúci hlási posledný a nesmie nechať súčet vyjsť presne.',
+  demoFollow: 'Vynesenú farbu treba priznať, ak ju máte. Až inak hráte, čo chcete.',
+  demoTrump: 'Tromf, aj ten najnižší, berie zdvih na vynesenej farbe.',
+  demoScore: 'Splnený záväzok: 10 bodov plus 2 za zdvih. Nesplnený: 2 body dole za každý zdvih rozdielu.',
   rulesSubtitle: 'Rikiki za 2 minúty',
   rulesGoalTitle: 'O čo ide',
   rulesGoalText:

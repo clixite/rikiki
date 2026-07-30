@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import type { GameFormat, GamePace, GameView, ScoringVariant } from '@rikiki/shared';
 import {
   DEFAULT_PACE,

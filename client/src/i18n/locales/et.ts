@@ -284,6 +284,17 @@ export const et: Messages = {
   // Mängureeglid
   rules: 'Mängureeglid',
   rulesTitle: 'Kuidas mängida',
+  demoTitle: 'Mäng ühe minutiga',
+  demoPlay: 'Käivita tutvustus',
+  demoPause: 'Peata',
+  demoReplay: 'Vaata uuesti',
+  demoPrev: 'Eelmine samm',
+  demoNext: 'Järgmine samm',
+  demoDeal: 'Igaüks saab oma kaardid. Viimasena pööratud kaart määrab trumbi: selle mast lööb kõiki teisi.',
+  demoBid: 'Igaüks ütleb, mitu tihti ta kavatseb võtta. Jagaja ütleb viimasena ega tohi lasta summal täpselt klappida.',
+  demoFollow: 'Käidud masti tuleb tunnistada, kui see on käes. Alles muidu mängid, mida tahad.',
+  demoTrump: 'Trump, ka kõige madalam, võidab käidud masti.',
+  demoScore: 'Lubadus peetud: 10 punkti ja 2 iga tihi eest. Möödas: 2 punkti maha iga tihi vahe eest.',
   rulesSubtitle: 'Rikiki kahe minutiga',
   rulesGoalTitle: 'Mõte',
   rulesGoalText:

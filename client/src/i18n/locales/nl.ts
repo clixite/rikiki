@@ -277,6 +277,17 @@ export const nl: Messages = {
   // Spelregels
   rules: 'Spelregels',
   rulesTitle: 'Zo speel je',
+  demoTitle: 'Het spel in één minuut',
+  demoPlay: 'Uitleg afspelen',
+  demoPause: 'Pauzeren',
+  demoReplay: 'Opnieuw bekijken',
+  demoPrev: 'Vorige stap',
+  demoNext: 'Volgende stap',
+  demoDeal: 'Iedereen krijgt zijn kaarten. De laatste omgedraaide bepaalt de troef: die kleur wint van alle andere.',
+  demoBid: 'Iedereen zegt hoeveel slagen hij denkt te halen. De gever zegt als laatste en mag het totaal niet precies laten kloppen.',
+  demoFollow: 'Je bekent de gevraagde kleur als je die hebt. Alleen anders speel je wat je wilt.',
+  demoTrump: 'Een troef wint de slag van de gevraagde kleur — ook de laagste.',
+  demoScore: 'Contract gehaald: 10 punten plus 2 per slag. Gemist: 2 punten eraf per slag verschil.',
   rulesSubtitle: 'Rikiki in 2 minuten',
   rulesGoalTitle: 'Het idee',
   rulesGoalText:

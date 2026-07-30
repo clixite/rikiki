@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
 import { cardId } from '@rikiki/shared';
 import BidPicker from '../components/BidPicker';

@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import type { Card, Suit } from '@rikiki/shared';
 import { t } from '../i18n';
 

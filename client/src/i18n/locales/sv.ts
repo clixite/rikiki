@@ -277,6 +277,17 @@ export const sv: Messages = {
   // Spelregler
   rules: 'Spelregler',
   rulesTitle: 'Så spelar du',
+  demoTitle: 'Spelet på en minut',
+  demoPlay: 'Spela upp genomgången',
+  demoPause: 'Pausa',
+  demoReplay: 'Se om igen',
+  demoPrev: 'Föregående steg',
+  demoNext: 'Nästa steg',
+  demoDeal: 'Alla får sina kort. Det sista som vänds upp bestämmer trumfen: den färgen slår alla andra.',
+  demoBid: 'Alla säger hur många stick de tänker ta. Given säger sist och får inte låta summan gå jämnt ut.',
+  demoFollow: 'Följ färgen som spelades ut om du har den. Bara annars får du spela vad du vill.',
+  demoTrump: 'En trumf tar sticket från den utspelade färgen — även den lägsta.',
+  demoScore: 'Budet hållet: 10 poäng plus 2 per stick. Missat: 2 poäng av för varje stick i skillnad.',
   rulesSubtitle: 'Rikiki på 2 minuter',
   rulesGoalTitle: 'Idén',
   rulesGoalText:

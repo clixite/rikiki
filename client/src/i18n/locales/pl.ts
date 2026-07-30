@@ -310,6 +310,17 @@ export const pl: Messages = {
   // Zasady gry
   rules: 'Zasady gry',
   rulesTitle: 'Jak grać',
+  demoTitle: 'Gra w minutę',
+  demoPlay: 'Odtwórz pokaz',
+  demoPause: 'Wstrzymaj',
+  demoReplay: 'Obejrzyj jeszcze raz',
+  demoPrev: 'Poprzedni krok',
+  demoNext: 'Następny krok',
+  demoDeal: 'Każdy dostaje swoje karty. Ostatnia odkryta wyznacza atu: jego kolor bije wszystkie inne.',
+  demoBid: 'Każdy zapowiada, ile lew zamierza wziąć. Rozdający zapowiada ostatni i nie może sprawić, by suma się zgadzała.',
+  demoFollow: 'Do koloru wyjścia trzeba dołożyć, jeśli się go ma. Dopiero inaczej gra się, co się chce.',
+  demoTrump: 'Atu, nawet najniższy, bierze lewę na kolorze wyjścia.',
+  demoScore: 'Zapowiedź dotrzymana: 10 punktów plus 2 za lewę. Chybiona: 2 punkty mniej za każdą lewę różnicy.',
   rulesSubtitle: 'Rikiki w 2 minuty',
   rulesGoalTitle: 'O co chodzi',
   rulesGoalText:
