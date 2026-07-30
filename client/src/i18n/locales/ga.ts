@@ -386,6 +386,9 @@ export const ga: Messages = {
   colorblindMode: 'Dathanna ar leith',
   colorblindHint:
     'Dath ar leith do gach comhartha, chun ♥ ♦ ♠ ♣ a aithint gan brath ar an dearg',
+  leftHandedMode: 'Rialtáin ar chlé',
+  leftHandedHint: 'Bogann sé cnaipí an bhoird ón imeall deas go dtí an t-imeall clé.',
+  colorblindHintBanner: 'Dathdhall? Bain triail as dathanna ar leith i do phróifíl.',
   suitNames: { S: 'spéireata', H: 'hart', D: 'muileata', C: 'triuf' },
   rankNames: { 11: 'cuireata', 12: 'banríon', 13: 'rí', 14: 'aon' },
   cardOf: (rank: string, suit: string) => `${rank} ${suit}`,

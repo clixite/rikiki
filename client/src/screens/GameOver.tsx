@@ -64,7 +64,7 @@ export default function GameOver({ view }: Props) {
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           className="mb-6 text-center"
         >
-          <p className="text-xs uppercase tracking-widest text-paper-50/50">{t.gameOver}</p>
+          <p className="text-xs uppercase tracking-widest text-paper-50/55">{t.gameOver}</p>
           <motion.div
             initial={{ y: -10 }}
             animate={{ y: 0 }}
@@ -118,12 +118,12 @@ export default function GameOver({ view }: Props) {
               }`}
             >
               <span className="w-6 text-center text-base" aria-hidden="true">
-                {MEDALS[i] ?? <span className="text-xs text-paper-50/40">{i + 1}</span>}
+                {MEDALS[i] ?? <span className="text-xs text-paper-50/55">{i + 1}</span>}
               </span>
               <PlayerAvatar avatar={p.avatar} size={22} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium">
                 {p.pseudo}
-                {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({t.you})</span>}
+                {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/55">({t.you})</span>}
               </span>
               <span className="text-base font-bold tabular-nums text-brass-300">{p.totalScore}</span>
             </motion.li>

@@ -3,6 +3,7 @@ import { m as motion } from 'motion/react';
 import { Navigate } from 'react-router-dom';
 import { useNav } from '../nav';
 import type { ActiveGame, UserStats } from '@rikiki/shared';
+import { isColorblindMode } from '../a11y';
 import { fetchActiveGames, fetchMe } from '../api';
 import SoundToggle from '../components/SoundToggle';
 import { unlockAudio } from '../audio';
@@ -15,6 +16,9 @@ import { useSession } from '../store/session';
 /** Injectée à la compilation : permet d'identifier la version installée. */
 const APP_VERSION = __APP_VERSION__;
 
+/** Vu une fois, plus jamais : la suggestion ne doit pas devenir un tic. */
+const COLORBLIND_HINT_KEY = 'rikiki-colorblind-hint-seen';
+
 export default function Home() {
   const t = useT();
   const { user, roomCode } = useSession();
@@ -22,6 +26,24 @@ export default function Home() {
   const navigate = useNav();
   const [stats, setStats] = useState<UserStats | null>(null);
   const [busy, setBusy] = useState(false);
+  // Suggestion du mode daltonien : discrète, et montrée une seule fois — pas
+  // la peine d'insister auprès de qui l'a déjà vue, ou de qui l'a déjà activé.
+  const [showColorblindHint, setShowColorblindHint] = useState(() => {
+    if (isColorblindMode()) return false;
+    try {
+      return localStorage.getItem(COLORBLIND_HINT_KEY) !== '1';
+    } catch {
+      return false;
+    }
+  });
+  const dismissColorblindHint = () => {
+    setShowColorblindHint(false);
+    try {
+      localStorage.setItem(COLORBLIND_HINT_KEY, '1');
+    } catch {
+      // sans stockage, la suggestion reviendra à la prochaine visite : sans gravité
+    }
+  };
   // `null` = la liste n'a pas encore été obtenue du serveur (hors ligne, ou
   // premier rendu) ; on retombe alors sur la dernière partie mémorisée ici.
   const [games, setGames] = useState<ActiveGame[] | null>(null);
@@ -159,6 +181,46 @@ export default function Home() {
           <h1 className="font-display text-5xl font-bold tracking-tight text-brass-300">{t.appName}</h1>
           <p className="mx-auto mt-2 max-w-[16rem] text-sm leading-snug text-paper-50/55">{t.tagline}</p>
 
+          {/* Suggestion du mode daltonien : tout le jeu se lit par la couleur
+              des cartes (♥ ♦ rouges, ♠ ♣ noires), or un joueur sur douze
+              environ perçoit mal le rouge. Une ligne discrète, montrée une
+              seule fois, vaut mieux qu'un réglage enterré dans le profil que
+              personne ne va chercher — et beaucoup mieux qu'une modale. */}
+          {showColorblindHint && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              // Deux vraies cibles de 44 px : le bandeau reste visuellement
+              // discret (fond ténu, petit texte), mais un réglage
+              // d'accessibilité qu'on ne peut pas viser au pouce raterait
+              // précisément les gens qu'il vise.
+              className="mx-auto mt-3 flex max-w-[18rem] items-center gap-1 rounded-2xl bg-felt-900/40 pl-3 pr-1 ring-1 ring-white/8"
+              data-testid="colorblind-hint"
+            >
+              <button
+                type="button"
+                data-testid="colorblind-hint-cta"
+                onClick={() => {
+                  dismissColorblindHint();
+                  navigate('/profile');
+                }}
+                className="flex min-h-11 flex-1 items-center py-1.5 text-left text-[11px] leading-snug text-paper-50/70"
+              >
+                <span aria-hidden="true">🎨</span>&nbsp;{t.colorblindHintBanner}
+              </button>
+              <button
+                type="button"
+                data-testid="colorblind-hint-dismiss"
+                onClick={dismissColorblindHint}
+                aria-label={t.close}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-paper-50/55 transition active:scale-90"
+              >
+                <span aria-hidden="true">✕</span>
+              </button>
+            </motion.div>
+          )}
+
           {stats && stats.gamesPlayed > 0 && (
             <motion.button
               type="button"
@@ -192,7 +254,7 @@ export default function Home() {
 
         {games !== null && games.length > 0 && (
           <div data-testid="my-games">
-            <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-paper-50/50">{t.myGames}</p>
+            <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-paper-50/55">{t.myGames}</p>
             {/* Au-delà de trois parties, la liste défile plutôt que de pousser
                 les boutons principaux hors de l'écran. */}
             <ul className="rk-scroll max-h-44 space-y-1.5 overflow-y-auto">
@@ -210,7 +272,7 @@ export default function Home() {
                   >
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-bold tracking-widest text-brass-300">{g.code}</span>
-                      <span className="block truncate text-[11px] text-paper-50/50">
+                      <span className="block truncate text-[11px] text-paper-50/55">
                         {g.phase === 'lobby'
                           ? t.waitingToStart
                           : `${t.round} ${g.round}/${g.roundsTotal} · ${g.myScore} ${t.groupTotalPoints}`}
@@ -218,7 +280,7 @@ export default function Home() {
                     </span>
                     <span
                       className={`shrink-0 text-[11px] font-semibold ${
-                        g.myTurn ? 'text-brass-300' : 'text-paper-50/45'
+                        g.myTurn ? 'text-brass-300' : 'text-paper-50/55'
                       }`}
                     >
                       {g.myTurn ? t.yourTurn : g.waitingFor ? t.waitingForPlayer(g.waitingFor) : ''}
@@ -253,9 +315,9 @@ export default function Home() {
         </button>
 
         {!socketConnected && (
-          <p className="pt-1 text-center text-xs text-paper-50/40">{t.reconnecting}</p>
+          <p className="pt-1 text-center text-xs text-paper-50/55">{t.reconnecting}</p>
         )}
-        <p className="pt-0.5 text-center text-[10px] text-paper-50/25">
+        <p className="pt-0.5 text-center text-[10px] text-paper-50/55">
           {t.copyright} · {t.version(APP_VERSION)}
         </p>
       </div>

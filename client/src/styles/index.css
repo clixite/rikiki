@@ -5,6 +5,22 @@
  * Parti pris : un vrai tapis de jeu, pas une interface d'app générique.
  * Vert feutre profond et désaturé, laiton chaud en accent, papier crème pour
  * les cartes. Élévations douces multi-couches plutôt que bordures dures.
+ *
+ * Plancher de contraste pour `text-paper-50/<opacité>`.
+ * Le texte clair se pose sur trois fonds de feutre (felt-800, felt-900,
+ * felt-950) ; felt-800, le plus clair des trois, est le pire cas — c'est lui
+ * qui fixe le plancher. Ratios WCAG mesurés (luminance relative, alpha
+ * composité sur le fond réel) :
+ *   paper-50/50 sur felt-800 → 4.27:1  (sous l'exigence)
+ *   paper-50/55 sur felt-800 → 4.83:1  (AA texte normal, ≥ 4.5:1)
+ *   paper-50/40 sur felt-800 → 3.28:1  (AA texte large ≥ 18,66 px gras
+ *                                        ou ≥ 24 px, seuil 3:1)
+ * → tout texte SECONDAIRE MAIS PORTEUR D'INFORMATION (dates, codes, noms,
+ *   libellés, statuts…) reste au minimum à /55 en taille normale, /40 en
+ *   grande taille. En dessous, on tombe sous l'AA sur le fond le plus clair
+ *   du jeu. Les éléments purement décoratifs (séparateurs, chevrons « › »,
+ *   icônes `aria-hidden`) ne sont pas concernés : ils peuvent rester plus
+ *   discrets, la hiérarchie visuelle du tapis en dépend.
  */
 @theme {
   /* Tapis — vert désaturé, légèrement bleuté dans les ombres */

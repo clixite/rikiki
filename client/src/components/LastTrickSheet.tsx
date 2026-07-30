@@ -87,7 +87,7 @@ export default function LastTrickSheet({ view, onClose }: Props) {
       >
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
 
-        <h2 className="text-center text-[11px] font-semibold uppercase tracking-widest text-paper-50/45">
+        <h2 className="text-center text-[11px] font-semibold uppercase tracking-widest text-paper-50/55">
           {t.lastTrick}
         </h2>
 

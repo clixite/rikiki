@@ -41,7 +41,7 @@ const VerifyEmail = lazy(() => import('./screens/VerifyEmail'));
  */
 function ScreenLoading({ label }: { label: string }) {
   return (
-    <div className="flex h-dvh items-center justify-center text-sm text-paper-50/40" aria-busy="true">
+    <div className="flex h-dvh items-center justify-center text-sm text-paper-50/55" aria-busy="true">
       {label}
     </div>
   );

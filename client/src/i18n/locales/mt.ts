@@ -387,6 +387,9 @@ export const mt: Messages = {
   colorblindMode: 'Kuluri distinti',
   colorblindHint:
     'Tint għal kull kulur, biex tagħżel ♥ ♦ ♠ ♣ bla ma toqgħod fuq l-aħmar',
+  leftHandedMode: 'Kontrolli fuq ix-xellug',
+  leftHandedHint: 'Iċċaqlaq il-buttuni tal-mejda mit-tarf tal-lemin għat-tarf tax-xellug.',
+  colorblindHintBanner: 'Kulurdifett? Ipprova l-kuluri distinti fil-profil tiegħek.',
   suitNames: { S: 'spadi', H: 'koppi', D: 'kwart', C: 'bastuni' },
   rankNames: { 11: 'fanti', 12: 'reġina', 13: 're', 14: 'ass' },
   cardOf: (rank: string, suit: string) => `${rank} ta' ${suit}`,

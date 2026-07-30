@@ -94,15 +94,15 @@ export default function Groups() {
       </div>
 
       <h1 className="font-display mt-2 text-center text-2xl font-bold text-brass-300">{t.groupsTitle}</h1>
-      <p className="mx-auto mt-1 max-w-[18rem] text-center text-xs leading-snug text-paper-50/45">
+      <p className="mx-auto mt-1 max-w-[18rem] text-center text-xs leading-snug text-paper-50/55">
         {t.groupsSubtitle}
       </p>
 
       <div className="rk-scroll mt-4 min-h-0 flex-1 overflow-y-auto">
         {loading && !groups ? (
-          <p className="py-8 text-center text-sm text-paper-50/45">{t.loading}</p>
+          <p className="py-8 text-center text-sm text-paper-50/55">{t.loading}</p>
         ) : !groups || groups.length === 0 ? (
-          <p data-testid="groups-empty" className="py-8 text-center text-sm text-paper-50/45">
+          <p data-testid="groups-empty" className="py-8 text-center text-sm text-paper-50/55">
             {t.noGroups}
           </p>
         ) : (
@@ -125,7 +125,7 @@ export default function Groups() {
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-semibold">{g.name}</span>
-                    <span className="block text-[11px] text-paper-50/45">
+                    <span className="block text-[11px] text-paper-50/55">
                       {t.groupMembers(g.membersCount)} · {t.groupGames(g.gamesCount)}
                     </span>
                   </span>
@@ -156,7 +156,7 @@ export default function Groups() {
                 setError('');
               }}
               placeholder={t.groupNamePlaceholder}
-              className="h-11 w-full rounded-xl bg-black/25 px-3 text-sm outline-none ring-1 ring-white/10 placeholder:text-paper-50/25 focus:ring-brass-400"
+              className="h-11 w-full rounded-xl bg-black/25 px-3 text-sm outline-none ring-1 ring-white/10 placeholder:text-paper-50/55 focus:ring-brass-400"
             />
             <button
               type="button"
@@ -189,9 +189,9 @@ export default function Groups() {
                 setError('');
               }}
               placeholder={t.groupCodePlaceholder}
-              className="h-11 w-full rounded-xl bg-black/25 px-3 text-center font-mono text-lg tracking-[0.4em] outline-none ring-1 ring-white/10 placeholder:tracking-[0.4em] placeholder:text-paper-50/20 focus:ring-brass-400"
+              className="h-11 w-full rounded-xl bg-black/25 px-3 text-center font-mono text-lg tracking-[0.4em] outline-none ring-1 ring-white/10 placeholder:tracking-[0.4em] placeholder:text-paper-50/55 focus:ring-brass-400"
             />
-            <p className="mt-1 text-center text-[10px] text-paper-50/35">{t.groupCodeHint}</p>
+            <p className="mt-1 text-center text-[10px] text-paper-50/55">{t.groupCodeHint}</p>
             <button
               type="button"
               data-testid="group-join-submit"

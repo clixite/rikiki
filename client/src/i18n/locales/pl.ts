@@ -384,6 +384,9 @@ export const pl: Messages = {
   colorblindMode: 'Osobne odcienie',
   colorblindHint:
     'Inny odcień dla każdego koloru, by odróżniać ♥ ♦ ♠ ♣ bez polegania na czerwieni',
+  leftHandedMode: 'Sterowanie z lewej',
+  leftHandedHint: 'Przenosi przyciski stołu z prawej krawędzi na lewą.',
+  colorblindHintBanner: 'Daltonizm? Wypróbuj osobne odcienie w profilu.',
   // Mianownik dla ♠♦, dopełniacz mnogi dla ♥♣ : « as pik », « król kier »
   suitNames: { S: 'pik', H: 'kier', D: 'karo', C: 'trefl' } as Record<string, string>,
   rankNames: { 11: 'walet', 12: 'dama', 13: 'król', 14: 'as' } as Record<number, string>,

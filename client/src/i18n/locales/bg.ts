@@ -362,6 +362,9 @@ export const bg: Messages = {
   colorblindMode: 'Различими цветове',
   colorblindHint:
     'По един нюанс за всяка боя, за да различаваш ♥ ♦ ♠ ♣ без да разчиташ на червеното',
+  leftHandedMode: 'Управление отляво',
+  leftHandedHint: 'Премества бутоните на масата от десния към левия край.',
+  colorblindHintBanner: 'Далтонизъм? Пробвай различими цветове в профила си.',
   suitNames: { S: 'пика', H: 'купа', D: 'каро', C: 'спатия' },
   rankNames: { 11: 'вале', 12: 'дама', 13: 'поп', 14: 'асо' },
   cardOf: (rank: string, suit: string) => `${rank} ${suit}`,

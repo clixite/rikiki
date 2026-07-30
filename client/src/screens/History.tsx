@@ -69,7 +69,7 @@ export default function History() {
           ].map((s) => (
             <div key={s.label} className="rounded-xl bg-felt-900/45 py-2.5 text-center ring-1 ring-white/6">
               <p className="text-xl font-bold tabular-nums text-brass-300">{s.value}</p>
-              <p className="text-[10px] uppercase tracking-wide text-paper-50/45">{s.label}</p>
+              <p className="text-[10px] uppercase tracking-wide text-paper-50/55">{s.label}</p>
             </div>
           ))}
         </div>
@@ -77,9 +77,9 @@ export default function History() {
 
       <div className="rk-scroll mt-4 min-h-0 flex-1 overflow-y-auto">
         {loading && !games ? (
-          <p className="py-8 text-center text-sm text-paper-50/45">{t.loading}</p>
+          <p className="py-8 text-center text-sm text-paper-50/55">{t.loading}</p>
         ) : !games || games.length === 0 ? (
-          <p className="py-8 text-center text-sm text-paper-50/45">{t.noHistory}</p>
+          <p className="py-8 text-center text-sm text-paper-50/55">{t.noHistory}</p>
         ) : (
           <ul className="space-y-2">
             {games.map((g, i) => (
@@ -98,7 +98,7 @@ export default function History() {
                   >
                     {g.won ? t.wonBadge : `${g.myRank}ᵉ`}
                   </span>
-                  <span className="text-xs text-paper-50/45">{formatDate(g.playedAt)}</span>
+                  <span className="text-xs text-paper-50/55">{formatDate(g.playedAt)}</span>
                   <span className="flex-1" />
                   <span className="text-base font-bold tabular-nums text-brass-300">{g.myScore}</span>
                 </div>
@@ -111,7 +111,7 @@ export default function History() {
                     >
                       <PlayerAvatar avatar={s.avatar} size={16} />
                       <span className="max-w-16 truncate">{s.pseudo}</span>
-                      <span className="tabular-nums text-paper-50/35">{s.score}</span>
+                      <span className="tabular-nums text-paper-50/55">{s.score}</span>
                     </span>
                   ))}
                 </div>

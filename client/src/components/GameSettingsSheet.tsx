@@ -66,7 +66,7 @@ export default function GameSettingsSheet({ view, onClose }: Props) {
         <div className="shrink-0 px-5 pt-4">
           <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
           <h2 className="text-center text-lg font-bold">{t.gameSettings}</h2>
-          <p className="mt-0.5 text-center text-xs text-paper-50/50">
+          <p className="mt-0.5 text-center text-xs text-paper-50/55">
             {isHost ? t.gameSettingsHint : t.gameSettingsLocked}
           </p>
         </div>
@@ -142,11 +142,11 @@ function Group({
 }) {
   return (
     <section>
-      <p className="mb-2 text-xs font-medium uppercase tracking-wide text-paper-50/50">{title}</p>
+      <p className="mb-2 text-xs font-medium uppercase tracking-wide text-paper-50/55">{title}</p>
       {children}
       {/* La règle en toutes lettres, sous les choix : c'est elle qu'on vient
           vérifier, et un libellé de deux mots ne la remplace pas. */}
-      <p className="mt-1.5 text-[11px] leading-snug text-paper-50/50" data-testid={`${testid}-description`}>
+      <p className="mt-1.5 text-[11px] leading-snug text-paper-50/55" data-testid={`${testid}-description`}>
         {description}
       </p>
     </section>

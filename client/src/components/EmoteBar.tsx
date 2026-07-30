@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { AnimatePresence, m as motion } from 'motion/react';
 import { EMOTES, PHRASES, type EmoteId, type PhraseId } from '@rikiki/shared';
+import { isLeftHanded, subscribeLeftHanded } from '../a11y';
 import { vibrate } from '../haptics';
 import { useT } from '../i18n';
 import { sendEmote, sendPhrase } from '../socket';
@@ -38,6 +39,10 @@ export default function EmoteBar() {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<'emotes' | 'phrases'>('emotes');
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Réglage « commandes à gauche » : le bouton de réactions suit le même bord
+  // que le reste des commandes de la table, pour ne pas forcer un gaucher à
+  // traverser l'écran à chaque réaction.
+  const leftHanded = useSyncExternalStore(subscribeLeftHanded, isLeftHanded, isLeftHanded);
 
   useEffect(() => () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -61,7 +66,11 @@ export default function EmoteBar() {
   };
 
   return (
-    <div className="pointer-events-none absolute bottom-2 right-3 flex flex-col items-end gap-1.5">
+    <div
+      className={`pointer-events-none absolute bottom-2 flex flex-col gap-1.5 ${
+        leftHanded ? 'left-3 items-start' : 'right-3 items-end'
+      }`}
+    >
       <AnimatePresence>
         {open && (
           <motion.div

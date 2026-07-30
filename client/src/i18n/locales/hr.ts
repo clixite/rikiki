@@ -386,6 +386,9 @@ export const hr: Messages = {
   colorblindMode: 'Odvojene nijanse',
   colorblindHint:
     'Svaka boja ima svoju nijansu, da ♥ ♦ ♠ ♣ razlikuješ i bez oslanjanja na crvenu',
+  leftHandedMode: 'Upravljanje slijeva',
+  leftHandedHint: 'Premješta gumbe stola s desnog na lijevi rub.',
+  colorblindHintBanner: 'Daltonizam? Isprobaj odvojene nijanse u profilu.',
   // Genitiv, da „as herca” ili „kralj pika” zvuči ispravno
   suitNames: { S: 'pika', H: 'herca', D: 'kara', C: 'trefa' } as Record<string, string>,
   rankNames: { 11: 'dečko', 12: 'dama', 13: 'kralj', 14: 'as' } as Record<number, string>,

@@ -30,6 +30,7 @@ function apply(): void {
 /** À appeler au démarrage, avant le premier rendu. */
 export function initA11y(): void {
   apply();
+  applyHand();
 }
 
 export function isColorblindMode(): boolean {
@@ -50,4 +51,54 @@ export function setColorblindMode(next: boolean): void {
 export function subscribeA11y(cb: () => void): () => void {
   listeners.add(cb);
   return () => listeners.delete(cb);
+}
+
+/*
+ * Commandes à gauche.
+ *
+ * Rikiki se joue à une main, et les commandes de la table (réactions, etc.)
+ * sont posées par défaut sur le bord droit — naturel pour un droitier qui
+ * tient son téléphone de la main gauche et touche de la droite, mais qui
+ * oblige un gaucher à traverser l'écran à chaque geste. Même mécanique que le
+ * mode daltonien ci-dessus : un attribut sur `<html>`, que chaque composant
+ * concerné lit pour choisir son bord.
+ */
+const HAND_KEY = 'rikiki-left-handed';
+
+let leftHanded = false;
+const handListeners = new Set<() => void>();
+
+try {
+  leftHanded = localStorage.getItem(HAND_KEY) === '1';
+} catch {
+  leftHanded = false;
+}
+
+function applyHand(): void {
+  if (typeof document === 'undefined') return;
+  if (leftHanded) {
+    document.documentElement.setAttribute('data-left-handed', 'true');
+  } else {
+    document.documentElement.removeAttribute('data-left-handed');
+  }
+}
+
+export function isLeftHanded(): boolean {
+  return leftHanded;
+}
+
+export function setLeftHanded(next: boolean): void {
+  leftHanded = next;
+  try {
+    localStorage.setItem(HAND_KEY, next ? '1' : '0');
+  } catch {
+    // sans stockage, le réglage vaut pour la session
+  }
+  applyHand();
+  handListeners.forEach((cb) => cb());
+}
+
+export function subscribeLeftHanded(cb: () => void): () => void {
+  handListeners.add(cb);
+  return () => handListeners.delete(cb);
 }

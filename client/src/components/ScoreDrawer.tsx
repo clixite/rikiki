@@ -95,16 +95,16 @@ export default function ScoreDrawer({ view, open, onClose }: Props) {
                     i === 0 ? 'bg-brass-400/12 ring-1 ring-brass-400/25' : 'bg-felt-900/40'
                   }`}
                 >
-                  <span className="w-5 text-center text-xs font-semibold tabular-nums text-paper-50/40">
+                  <span className="w-5 text-center text-xs font-semibold tabular-nums text-paper-50/55">
                     {i + 1}
                   </span>
                   <PlayerAvatar playerId={p.id} avatar={p.avatar} photo={p.photo} size={22} />
                   <span className="min-w-0 flex-1 truncate text-sm font-medium">
                     {p.pseudo}
-                    {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({t.you})</span>}
+                    {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/55">({t.you})</span>}
                   </span>
                   {round && round.bids[p.id] !== null && (
-                    <span className="shrink-0 text-[11px] tabular-nums text-paper-50/50">
+                    <span className="shrink-0 text-[11px] tabular-nums text-paper-50/55">
                       {round.tricksWon[p.id] ?? 0}/{round.bids[p.id]}
                     </span>
                   )}
@@ -121,7 +121,7 @@ export default function ScoreDrawer({ view, open, onClose }: Props) {
                       }}
                       aria-label={t.reportPlayer}
                       title={t.reportPlayer}
-                      className="ml-1 flex h-11 w-8 shrink-0 items-center justify-center text-paper-50/35 transition active:scale-90"
+                      className="ml-1 flex h-11 w-8 shrink-0 items-center justify-center text-paper-50/45 transition active:scale-90"
                     >
                       <span aria-hidden="true">⚑</span>
                     </button>
@@ -154,10 +154,10 @@ function HistoryList({
   t: ReturnType<typeof useT>;
 }) {
   if (entries === null) {
-    return <p className="py-6 text-center text-sm text-paper-50/45">{t.verifying}</p>;
+    return <p className="py-6 text-center text-sm text-paper-50/55">{t.verifying}</p>;
   }
   if (entries.length === 0) {
-    return <p className="py-6 text-center text-sm text-paper-50/45">{t.noHistory}</p>;
+    return <p className="py-6 text-center text-sm text-paper-50/55">{t.noHistory}</p>;
   }
   return (
     <ul className="space-y-1.5" data-testid="drawer-history">
@@ -168,7 +168,7 @@ function HistoryList({
         >
           <span
             className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${
-              game.won ? 'bg-success/20 text-success' : 'bg-white/8 text-paper-50/50'
+              game.won ? 'bg-success/20 text-success' : 'bg-white/8 text-paper-50/55'
             }`}
           >
             {game.won ? t.wonBadge : t.lostBadge}

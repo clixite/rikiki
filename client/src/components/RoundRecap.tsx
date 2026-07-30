@@ -34,7 +34,7 @@ export default function RoundRecap({ view }: Props) {
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
 
         <h2 className="text-center text-xl font-bold">{t.roundRecap}</h2>
-        <p className="mt-0.5 text-center text-xs text-paper-50/50">
+        <p className="mt-0.5 text-center text-xs text-paper-50/55">
           {t.round} {round.roundIndex + 1}/{view.roundsSequence.length} · {t.cards(round.cardsCount)}
         </p>
 
@@ -87,7 +87,7 @@ export default function RoundRecap({ view }: Props) {
                 <PlayerAvatar avatar={p.avatar} size={22} />
                 <span className="min-w-0 flex-1 truncate text-sm font-medium">
                   {p.pseudo}
-                  {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/45">({t.you})</span>}
+                  {p.id === view.you && <span className="ml-1 text-[11px] text-paper-50/55">({t.you})</span>}
                 </span>
                 <span className="shrink-0 text-xs tabular-nums text-paper-50/60">
                   {tricks}/{bid}

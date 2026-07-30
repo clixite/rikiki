@@ -381,6 +381,9 @@ export const sk: Messages = {
   colorblindMode: 'Odlíšené farby',
   colorblindHint:
     'Vlastný odtieň pre každú farbu, aby si ♥ ♦ ♠ ♣ rozlíšil aj bez červenej',
+  leftHandedMode: 'Ovládanie vľavo',
+  leftHandedHint: 'Presunie tlačidlá stola z pravého okraja na ľavý.',
+  colorblindHintBanner: 'Farbosleposť? Vyskúšaj odlíšené farby v profile.',
   // Druhý pád, aby « eso sŕdc » alebo « kráľ pikov » dávalo zmysel
   suitNames: { S: 'pikov', H: 'sŕdc', D: 'kár', C: 'krížov' } as Record<string, string>,
   rankNames: { 11: 'dolník', 12: 'dáma', 13: 'kráľ', 14: 'eso' } as Record<number, string>,

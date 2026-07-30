@@ -354,6 +354,9 @@ export const hu: Messages = {
   colorblindMode: 'Külön árnyalatok',
   colorblindHint:
     'Színenként külön árnyalat, hogy a ♥ ♦ ♠ ♣ a piros nélkül is megkülönböztethető legyen',
+  leftHandedMode: 'Balkezes vezérlés',
+  leftHandedHint: 'Az asztal gombjait a jobb szélről a bal szélre helyezi.',
+  colorblindHintBanner: 'Színtévesztő vagy? Próbáld ki a külön árnyalatokat a profilodban.',
   // Magyarul a szín áll elöl: « kőr ász », « pikk király »
   suitNames: { S: 'pikk', H: 'kőr', D: 'káró', C: 'treff' } as Record<string, string>,
   rankNames: { 11: 'bubi', 12: 'dáma', 13: 'király', 14: 'ász' } as Record<number, string>,

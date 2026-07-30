@@ -110,7 +110,7 @@ export default function Profile() {
           autoComplete="nickname"
           enterKeyHint="done"
           onKeyDown={(e) => e.key === 'Enter' && submit()}
-          className="w-full rounded-xl bg-felt-900/50 px-4 py-3.5 text-lg outline-none ring-1 ring-white/10 transition placeholder:text-paper-50/25 focus:ring-2 focus:ring-brass-400"
+          className="w-full rounded-xl bg-felt-900/50 px-4 py-3.5 text-lg outline-none ring-1 ring-white/10 transition placeholder:text-paper-50/55 focus:ring-2 focus:ring-brass-400"
           placeholder="Marie, Karim, Léa…"
         />
 
@@ -218,7 +218,7 @@ function NotificationsSection() {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-medium text-paper-50/90">{t.notificationsTitle}</p>
-          <p className="mt-0.5 text-xs leading-snug text-paper-50/45">{t.notificationsHint}</p>
+          <p className="mt-0.5 text-xs leading-snug text-paper-50/55">{t.notificationsHint}</p>
         </div>
         <button
           type="button"
@@ -239,7 +239,7 @@ function NotificationsSection() {
           />
         </button>
       </div>
-      <p className={`mt-2 text-xs ${message ? 'text-danger' : 'text-paper-50/50'}`}>
+      <p className={`mt-2 text-xs ${message ? 'text-danger' : 'text-paper-50/55'}`}>
         {message ||
           blocked ||
           (availability === null
@@ -269,7 +269,7 @@ function AccountSection({ isGuest, email }: { isGuest: boolean; email: string | 
         <span aria-hidden="true">✓</span>
         <div className="min-w-0">
           <p className="text-sm font-medium text-success">{t.accountSaved}</p>
-          <p className="truncate text-xs text-paper-50/50">{email}</p>
+          <p className="truncate text-xs text-paper-50/55">{email}</p>
         </div>
       </div>
     );
@@ -296,7 +296,7 @@ function AccountSection({ isGuest, email }: { isGuest: boolean; email: string | 
   return (
     <div className="mt-6 rounded-xl bg-felt-900/40 p-3.5 ring-1 ring-white/6">
       <p className="text-sm font-medium text-paper-50/90">{t.saveAccount}</p>
-      <p className="mb-2.5 mt-0.5 text-xs leading-snug text-paper-50/45">{t.saveAccountHint}</p>
+      <p className="mb-2.5 mt-0.5 text-xs leading-snug text-paper-50/55">{t.saveAccountHint}</p>
       {!sent && (
         <div className="flex gap-2">
           <input
@@ -306,7 +306,7 @@ function AccountSection({ isGuest, email }: { isGuest: boolean; email: string | 
             placeholder={t.emailPlaceholder}
             autoComplete="email"
             inputMode="email"
-            className="min-w-0 flex-1 rounded-lg bg-felt-950/50 px-3 py-2.5 text-sm outline-none ring-1 ring-white/10 transition placeholder:text-paper-50/25 focus:ring-2 focus:ring-brass-400"
+            className="min-w-0 flex-1 rounded-lg bg-felt-950/50 px-3 py-2.5 text-sm outline-none ring-1 ring-white/10 transition placeholder:text-paper-50/55 focus:ring-2 focus:ring-brass-400"
           />
           <button
             type="button"
@@ -408,7 +408,7 @@ function DangerZone() {
           {error && <p className="mt-2 text-xs text-danger">{error}</p>}
         </div>
       )}
-      <p className="mt-1 text-xs leading-snug text-paper-50/35">{t.deleteAccountHint}</p>
+      <p className="mt-1 text-xs leading-snug text-paper-50/55">{t.deleteAccountHint}</p>
     </div>
   );
 }

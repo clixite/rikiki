@@ -58,7 +58,7 @@ export default function Rules() {
       <h1 className="font-display mb-1 mt-2 text-center text-3xl font-bold text-brass-300">
         {t.rulesTitle}
       </h1>
-      <p className="mb-4 text-center text-sm text-paper-50/50">{t.rulesSubtitle}</p>
+      <p className="mb-4 text-center text-sm text-paper-50/55">{t.rulesSubtitle}</p>
 
       <div className="rk-scroll min-h-0 flex-1 space-y-3 overflow-y-auto pb-4">
         {/* La démonstration passe AVANT le texte : quelqu'un qui n'a jamais
@@ -138,7 +138,7 @@ export default function Rules() {
           <p>{t.rulesEndText}</p>
         </Section>
 
-        <p className="px-2 pt-1 text-center text-xs leading-snug text-paper-50/40">{t.rulesTip}</p>
+        <p className="px-2 pt-1 text-center text-xs leading-snug text-paper-50/55">{t.rulesTip}</p>
       </div>
 
       <button

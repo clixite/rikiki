@@ -164,7 +164,7 @@ export default function PlayerSeats({ view, layout }: Props) {
                 {bidding ? bid : `${tricks}/${bid}`}
               </span>
             ) : (
-              <span className="mt-0.5 text-[11px] leading-tight text-paper-50/40">
+              <span className="mt-0.5 text-[11px] leading-tight text-paper-50/55">
                 {view.phase === 'bidding' ? t.thinking : '—'}
               </span>
             )}

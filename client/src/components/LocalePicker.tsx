@@ -51,7 +51,7 @@ export default function LocalePicker({ variant = 'row', className = '' }: Props)
                 : 'bg-felt-900/45 text-paper-50/80 ring-1 ring-white/6'
             }`}
           >
-            <span className="text-[10px] font-bold uppercase tracking-wide text-paper-50/40">{code}</span>
+            <span className="text-[10px] font-bold uppercase tracking-wide text-paper-50/55">{code}</span>
             <span className="min-w-0 flex-1 truncate">{LOCALE_NAMES[code]}</span>
             {selected && <span aria-hidden="true">✓</span>}
           </button>
@@ -78,7 +78,7 @@ export default function LocalePicker({ variant = 'row', className = '' }: Props)
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-medium text-paper-50/90">{t.language}</span>
-          <span className="block text-xs text-paper-50/45">{LOCALE_NAMES[locale]}</span>
+          <span className="block text-xs text-paper-50/55">{LOCALE_NAMES[locale]}</span>
         </span>
         <span className={`text-paper-50/40 transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden="true">
           ⌄

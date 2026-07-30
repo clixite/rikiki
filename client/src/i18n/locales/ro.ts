@@ -380,6 +380,9 @@ export const ro: Messages = {
   colorblindMode: 'Culori distincte',
   colorblindHint:
     'O nuanță pentru fiecare culoare, ca să deosebești ♥ ♦ ♠ ♣ fără să te bazezi pe roșu',
+  leftHandedMode: 'Comenzi în stânga',
+  leftHandedHint: 'Mută butoanele mesei din marginea dreaptă în stânga.',
+  colorblindHintBanner: 'Daltonist? Încearcă culorile distincte din profilul tău.',
   suitNames: { S: 'pică', H: 'cupă', D: 'caro', C: 'treflă' },
   rankNames: { 11: 'valet', 12: 'damă', 13: 'rege', 14: 'as' },
   cardOf: (rank: string, suit: string) => `${rank} de ${suit}`,

@@ -153,9 +153,9 @@ export default function GroupDetail() {
       </div>
 
       {loading && !data ? (
-        <p className="py-8 text-center text-sm text-paper-50/45">{t.loading}</p>
+        <p className="py-8 text-center text-sm text-paper-50/55">{t.loading}</p>
       ) : !data ? (
-        <p className="py-8 text-center text-sm text-paper-50/45">{t.groupNotFound}</p>
+        <p className="py-8 text-center text-sm text-paper-50/55">{t.groupNotFound}</p>
       ) : (
         <>
           <h1
@@ -164,7 +164,7 @@ export default function GroupDetail() {
           >
             {data.group.name}
           </h1>
-          <p className="mt-0.5 text-center text-xs text-paper-50/45">
+          <p className="mt-0.5 text-center text-xs text-paper-50/55">
             {t.groupMembers(data.group.membersCount)} · {t.groupGames(data.group.gamesCount)}
           </p>
 
@@ -176,11 +176,11 @@ export default function GroupDetail() {
             title={t.copyGroupCode}
             className="mx-auto mt-2.5 flex h-11 items-center gap-2 rounded-full bg-felt-900/45 px-4 ring-1 ring-white/8 transition active:scale-95"
           >
-            <span className="text-[10px] uppercase tracking-wide text-paper-50/40">{t.groupCode}</span>
+            <span className="text-[10px] uppercase tracking-wide text-paper-50/55">{t.groupCode}</span>
             <span className="font-mono text-base font-bold tracking-[0.25em] text-brass-300">
               {data.group.code}
             </span>
-            <span aria-hidden="true" className="text-sm text-paper-50/35">
+            <span aria-hidden="true" className="text-sm text-paper-50/45">
               ⧉
             </span>
           </button>
@@ -188,20 +188,20 @@ export default function GroupDetail() {
           <div className="rk-scroll mt-3 min-h-0 flex-1 overflow-y-auto">
             {data.group.gamesCount === 0 ? (
               <div className="py-6 text-center">
-                <p className="text-sm text-paper-50/45">{t.groupNoGames}</p>
-                <p className="mx-auto mt-1 max-w-[16rem] text-xs text-paper-50/30">{t.groupNoGamesHint}</p>
+                <p className="text-sm text-paper-50/55">{t.groupNoGames}</p>
+                <p className="mx-auto mt-1 max-w-[16rem] text-xs text-paper-50/55">{t.groupNoGamesHint}</p>
               </div>
             ) : (
               <Podium standings={data.standings} />
             )}
 
             {/* Classement cumulé complet */}
-            <h2 className="mt-4 text-xs font-semibold uppercase tracking-wide text-paper-50/45">
+            <h2 className="mt-4 text-xs font-semibold uppercase tracking-wide text-paper-50/55">
               {t.groupRanking}
             </h2>
             <table className="mt-1.5 w-full text-sm" data-testid="group-standings">
               <thead>
-                <tr className="text-[10px] uppercase tracking-wide text-paper-50/35">
+                <tr className="text-[10px] uppercase tracking-wide text-paper-50/55">
                   <th className="w-6 py-1 text-left font-medium">{t.groupRankHeader}</th>
                   <th className="py-1 text-left font-medium">{t.groupPlayerHeader}</th>
                   <th className="w-10 py-1 text-right font-medium">{t.groupPointsHeader}</th>
@@ -216,21 +216,21 @@ export default function GroupDetail() {
                     data-testid="group-standing-row"
                     className={`border-t border-white/6 ${s.userId === user.id ? 'text-brass-200' : ''}`}
                   >
-                    <td className="py-2 tabular-nums text-paper-50/40">{i + 1}</td>
+                    <td className="py-2 tabular-nums text-paper-50/55">{i + 1}</td>
                     <td className="py-2">
                       <span className="flex items-center gap-1.5">
                         <PlayerAvatar avatar={s.avatar} size={18} />
                         <span className="max-w-28 truncate">{s.pseudo}</span>
                         {s.userId === data.group.ownerId && (
-                          <span className="text-[9px] uppercase tracking-wide text-paper-50/30">
+                          <span className="text-[9px] uppercase tracking-wide text-paper-50/55">
                             {t.groupOwner}
                           </span>
                         )}
                       </span>
                     </td>
                     <td className="py-2 text-right font-bold tabular-nums text-brass-300">{s.totalPoints}</td>
-                    <td className="py-2 text-right tabular-nums text-paper-50/45">{s.gamesPlayed}</td>
-                    <td className="py-2 text-right tabular-nums text-paper-50/45">{s.gamesWon}</td>
+                    <td className="py-2 text-right tabular-nums text-paper-50/55">{s.gamesPlayed}</td>
+                    <td className="py-2 text-right tabular-nums text-paper-50/55">{s.gamesWon}</td>
                   </tr>
                 ))}
               </tbody>
@@ -239,7 +239,7 @@ export default function GroupDetail() {
             {/* Dernières parties du groupe */}
             {data.recentGames.length > 0 && (
               <>
-                <h2 className="mt-5 text-xs font-semibold uppercase tracking-wide text-paper-50/45">
+                <h2 className="mt-5 text-xs font-semibold uppercase tracking-wide text-paper-50/55">
                   {t.groupRecentGames}
                 </h2>
                 <ul className="mt-1.5 space-y-2" data-testid="group-recent-games">
@@ -249,9 +249,9 @@ export default function GroupDetail() {
                       className="rounded-xl bg-felt-900/45 p-3 ring-1 ring-white/6"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-paper-50/45">{formatDate(g.playedAt)}</span>
+                        <span className="text-xs text-paper-50/55">{formatDate(g.playedAt)}</span>
                         <span className="flex-1" />
-                        <span className="font-mono text-[11px] tracking-widest text-paper-50/30">{g.code}</span>
+                        <span className="font-mono text-[11px] tracking-widest text-paper-50/55">{g.code}</span>
                       </div>
                       <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
                         {g.results.map((r) => (
@@ -264,7 +264,7 @@ export default function GroupDetail() {
                           >
                             <PlayerAvatar avatar={r.avatar} size={16} />
                             <span className="max-w-16 truncate">{r.pseudo}</span>
-                            <span className="tabular-nums text-paper-50/35">{r.score}</span>
+                            <span className="tabular-nums text-paper-50/55">{r.score}</span>
                           </span>
                         ))}
                       </div>
@@ -287,7 +287,7 @@ export default function GroupDetail() {
                   >
                     {t.groupDelete}
                   </button>
-                  <p className="mt-1.5 text-center text-[10px] text-paper-50/30">{t.groupOwnerCannotLeave}</p>
+                  <p className="mt-1.5 text-center text-[10px] text-paper-50/55">{t.groupOwnerCannotLeave}</p>
                 </>
               ) : (
                 <button
@@ -295,7 +295,7 @@ export default function GroupDetail() {
                   data-testid="group-leave"
                   onClick={onLeave}
                   disabled={busy}
-                  className="h-11 w-full rounded-xl text-xs font-semibold text-paper-50/45 ring-1 ring-white/10 transition active:scale-[0.98] disabled:opacity-40"
+                  className="h-11 w-full rounded-xl text-xs font-semibold text-paper-50/55 ring-1 ring-white/10 transition active:scale-[0.98] disabled:opacity-40"
                 >
                   {t.groupLeave}
                 </button>

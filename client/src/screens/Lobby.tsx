@@ -72,7 +72,7 @@ export default function Lobby({ view }: Props) {
 
       {/* Code de la partie : l'information la plus importante de cet écran */}
       <div className="rk-fade-up text-center">
-        <p className="text-xs uppercase tracking-widest text-paper-50/50">{t.gameCode}</p>
+        <p className="text-xs uppercase tracking-widest text-paper-50/55">{t.gameCode}</p>
         <p
           data-testid="room-code"
           className="font-display my-1 text-[3.25rem] font-bold leading-none tracking-[0.22em] text-brass-300"
@@ -88,7 +88,7 @@ export default function Lobby({ view }: Props) {
 
       {/* Liste des joueurs */}
       <div className="rk-scroll min-h-0 flex-1 overflow-y-auto">
-        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-paper-50/50">
+        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-paper-50/55">
           {t.players} · {view.players.length}/{view.maxPlayers}
         </p>
         <ul className="space-y-1.5">
@@ -107,8 +107,8 @@ export default function Lobby({ view }: Props) {
                 <PlayerAvatar playerId={p.id} avatar={p.avatar} photo={p.photo} size={30} />
                 <span className="min-w-0 flex-1 truncate text-[15px] font-medium">
                   {p.pseudo}
-                  {p.id === view.you && <span className="ml-1.5 text-xs text-paper-50/45">({t.you})</span>}
-                  {bot && <span className="ml-1.5 text-xs text-paper-50/45">· {t.botTag}</span>}
+                  {p.id === view.you && <span className="ml-1.5 text-xs text-paper-50/55">({t.you})</span>}
+                  {bot && <span className="ml-1.5 text-xs text-paper-50/55">· {t.botTag}</span>}
                 </span>
                 {p.id === view.hostId && (
                   <span className="rounded-full bg-brass-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brass-300">
@@ -144,7 +144,7 @@ export default function Lobby({ view }: Props) {
             </span>
             <span className="min-w-0 flex-1">
               <span className="block text-[15px] font-medium text-paper-50/90">{t.addBot}</span>
-              <span className="block text-[11px] text-paper-50/45">{t.addBotHint}</span>
+              <span className="block text-[11px] text-paper-50/55">{t.addBotHint}</span>
             </span>
             <span className="text-lg text-paper-50/40">+</span>
           </button>
@@ -166,7 +166,7 @@ export default function Lobby({ view }: Props) {
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-[13px] font-medium text-paper-50/90">{t.gameSettings}</span>
-          <span className="block truncate text-[11px] text-paper-50/50">{settingsSummary}</span>
+          <span className="block truncate text-[11px] text-paper-50/55">{settingsSummary}</span>
         </span>
         <span className="shrink-0 text-lg text-paper-50/40">›</span>
       </button>
@@ -200,7 +200,7 @@ export default function Lobby({ view }: Props) {
         <button
           type="button"
           onClick={onLeave}
-          className="min-h-11 w-full text-sm text-paper-50/50 transition active:scale-95"
+          className="min-h-11 w-full text-sm text-paper-50/55 transition active:scale-95"
         >
           {t.leave}
         </button>

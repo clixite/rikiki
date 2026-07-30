@@ -393,6 +393,9 @@ export const sl: Messages = {
   colorblindMode: 'Ločeni odtenki',
   colorblindHint:
     'Vsaka barva ima svoj odtenek, da ♥ ♦ ♠ ♣ ločiš tudi brez rdeče',
+  leftHandedMode: 'Upravljanje levo',
+  leftHandedHint: 'Premakne gumbe mize z desnega roba na levega.',
+  colorblindHintBanner: 'Barvna slepota? Preizkusi ločene odtenke v profilu.',
   // Rodilnik množine, da »as src« ali »kralj pikov« zveni pravilno
   suitNames: { S: 'pikov', H: 'src', D: 'karov', C: 'križev' } as Record<string, string>,
   rankNames: { 11: 'fant', 12: 'dama', 13: 'kralj', 14: 'as' } as Record<number, string>,
