@@ -89,6 +89,14 @@ cd deploy && docker compose up -d --build
 Les parties en cours sont en mémoire : un redéploiement les interrompt.
 Préférez les heures creuses.
 
+`install.sh` (utilisé aussi bien à l'installation qu'aux mises à jour) tague
+l'image en service avant de reconstruire. Si le nouveau conteneur ne répond
+pas correctement à `/api/health` dans les 90 secondes, il est automatiquement
+annulé : l'ancienne image est restaurée et relancée, et le script se termine
+en indiquant clairement que l'ancienne version tourne de nouveau. Au tout
+premier déploiement, il n'existe encore aucune version précédente : le script
+l'indique et s'arrête, sans tenter de repli.
+
 ## Sauvegarde
 
 Le seul état persistant (comptes, stats) est le fichier SQLite `/opt/rikiki/data/rikiki.db` :

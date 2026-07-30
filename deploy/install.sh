@@ -30,6 +30,28 @@ diagnostics() {
   echo "==========================================="
 }
 
+# Image en service avant reconstruction, taguée "rikiki:previous" : permet un
+# repli automatique si le nouveau déploiement échoue sa sonde de santé (voir
+# rollback_and_fail plus bas). $compose_args doit être le même que celui
+# utilisé pour le "up --build" qui suit immédiatement.
+PREVIOUS_IMAGE_ID=""
+IMAGE_TAG=""
+
+prepare_rollback() {
+  local compose_args="$1"
+  local service="$2"
+  # shellcheck disable=SC2086
+  IMAGE_TAG="$(docker compose $compose_args config --images 2>/dev/null | head -1)"
+  # shellcheck disable=SC2086
+  PREVIOUS_IMAGE_ID="$(docker compose $compose_args images -q "$service" 2>/dev/null || true)"
+  if [ -n "$PREVIOUS_IMAGE_ID" ]; then
+    docker tag "$PREVIOUS_IMAGE_ID" rikiki:previous
+    echo "    version précédente conservée (rikiki:previous) → repli automatique possible en cas d'échec"
+  else
+    echo "    aucune version précédente détectée (premier déploiement) → pas de repli possible en cas d'échec"
+  fi
+}
+
 echo "=== Rikiki : installation sur ${DOMAIN} ==="
 export DEBIAN_FRONTEND=noninteractive
 
@@ -202,8 +224,10 @@ networks:
 EOF
   } > docker-compose.traefik.yml
 
-  docker compose -p rikiki -f docker-compose.traefik.yml up -d --build
   COMPOSE_ARGS="-p rikiki -f docker-compose.traefik.yml"
+  prepare_rollback "$COMPOSE_ARGS" rikiki
+  # shellcheck disable=SC2086
+  docker compose $COMPOSE_ARGS up -d --build
   HEALTH_CMD='docker exec rikiki node -e "fetch(\"http://127.0.0.1:3000/api/health\").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))" >/dev/null 2>&1'
 
   # Traefik n'a peut-être pas rejoint le réseau applicatif (il n'en avait pas besoin
@@ -252,31 +276,82 @@ EOF
     diagnostics
   fi
 else
-  docker compose up -d --build
   COMPOSE_ARGS=""
+  prepare_rollback "$COMPOSE_ARGS" rikiki
+  docker compose up -d --build
   HEALTH_CMD="curl -fsS http://127.0.0.1:${APP_PORT}/api/health >/dev/null 2>&1"
 fi
 
-fail_with_logs() {
-  echo "❌ $1"
+print_logs() {
   echo "--- journaux de l'application ---"
   # shellcheck disable=SC2086
   docker compose $COMPOSE_ARGS logs --tail 30 2>/dev/null | tail -30 || true
+}
+
+# Vrai si le conteneur du service "rikiki" (quel que soit son nom réel, qui
+# dépend du nom de projet Compose) tourne encore.
+container_running() {
+  local cid
+  # shellcheck disable=SC2086
+  cid="$(docker compose $COMPOSE_ARGS ps -q rikiki 2>/dev/null || true)"
+  [ -n "$cid" ] && [ "$(docker inspect -f '{{.State.Running}}' "$cid" 2>/dev/null)" = "true" ]
+}
+
+# Sonde /api/health jusqu'à "$1" tentatives (2 s entre chaque). Abandonne
+# immédiatement si le conteneur s'est arrêté : inutile d'attendre le quota.
+wait_healthy() {
+  local attempts="$1"
+  for _ in $(seq 1 "$attempts"); do
+    if eval "$HEALTH_CMD"; then return 0; fi
+    container_running || return 1
+    sleep 2
+  done
+  return 1
+}
+
+# Le nouveau déploiement ne passe pas la sonde de santé : on revient
+# automatiquement sur l'image précédente (taguée par prepare_rollback avant
+# la reconstruction) plutôt que de laisser le site cassé en production.
+rollback_and_fail() {
+  local reason="$1"
+  echo "❌ ${reason}"
+  print_logs
+
+  if [ -z "$PREVIOUS_IMAGE_ID" ] || [ -z "$IMAGE_TAG" ]; then
+    echo ""
+    echo "⚠️  Premier déploiement : aucune version précédente vers laquelle revenir."
+    echo "    Corrigez le problème ci-dessus (journaux) puis relancez ce script."
+    diagnostics
+    exit 1
+  fi
+
+  echo ""
+  echo "↩️  Rollback automatique : restauration de la version précédente…"
+  docker tag "$PREVIOUS_IMAGE_ID" "$IMAGE_TAG"
+  # shellcheck disable=SC2086
+  docker compose $COMPOSE_ARGS up -d
+
+  if wait_healthy 30; then
+    echo ""
+    echo "✅ Rollback effectué : l'ANCIENNE version est de nouveau en ligne et fonctionnelle."
+    echo "    Le nouveau déploiement a été ANNULÉ. Corrigez le problème puis relancez ce script pour réessayer."
+  else
+    echo ""
+    echo "❌ Le rollback vers la version précédente a lui aussi échoué : le site est probablement hors ligne."
+    print_logs
+    echo "    Intervention manuelle nécessaire."
+  fi
   diagnostics
   exit 1
 }
 
-HEALTHY=0
-for _ in $(seq 1 45); do
-  if eval "$HEALTH_CMD"; then HEALTHY=1; break; fi
-  # Inutile d'attendre si le conteneur s'est arrêté : on affiche l'erreur tout de suite
-  if [ "$(docker inspect -f '{{.State.Running}}' rikiki 2>/dev/null)" = "false" ]; then
-    fail_with_logs "Le conteneur s'est arrêté au démarrage."
-  fi
-  sleep 2
-done
-[ "$HEALTHY" = "1" ] || fail_with_logs "Le serveur ne répond pas."
-echo "    ✅ application démarrée et fonctionnelle"
+if wait_healthy 45; then
+  echo "    ✅ application démarrée et fonctionnelle"
+elif container_running; then
+  rollback_and_fail "Le serveur ne répond pas."
+else
+  rollback_and_fail "Le conteneur s'est arrêté au démarrage."
+fi
 
 # ---------------------------------------------------------------- sauvegarde quotidienne
 # La base contient comptes, statistiques, historiques et groupes : une copie

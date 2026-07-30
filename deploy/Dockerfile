@@ -27,4 +27,12 @@ COPY --from=build /app/client/dist/ client/dist/
 RUN mkdir -p /app/data && chown -R node:node /app/data
 EXPOSE 3000
 USER node
+# Sonde native Docker : interroge /api/health (qui vérifie réellement la base
+# et répond 503 si elle ne répond pas) avec Node lui-même, sans dépendance
+# supplémentaire (pas de curl dans l'image alpine). Sans cela, `docker ps` ne
+# peut jamais signaler "unhealthy" pour un serveur qui répond mais
+# dysfonctionne (base injoignable) — seul un process planté déclenche
+# aujourd'hui `restart: unless-stopped`.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 CMD ["node", "server/dist/index.js"]

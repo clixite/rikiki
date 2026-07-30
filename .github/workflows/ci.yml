@@ -76,6 +76,18 @@ jobs:
           mkdir -p /tmp/shots
           node scripts/ux-tests.mjs
 
+      # Deux manches suffisent : elles traversent déjà toute la boucle de jeu
+      # (annonces, plis, décompte, manche suivante, revue du dernier pli). Les
+      # dix-neuf manches d'une partie complète n'ajoutent que de la répétition
+      # — et transforment un test de non-régression en pari sur le temps
+      # d'exécution du runner. On la joue à la main avec FULL_GAME=1.
+      - name: Test de bout en bout (3 joueurs simulés)
+        timeout-minutes: 5
+        env:
+          BASE_URL: http://localhost:3111
+          SHOTS_DIR: /tmp/shots
+        run: node scripts/e2e.mjs
+
       - name: Conserver les captures en cas d'échec
         if: failure()
         uses: actions/upload-artifact@v4
