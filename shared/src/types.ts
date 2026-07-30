@@ -227,6 +227,16 @@ export interface GameState {
    * partie amicale non comptabilisée dans un classement de groupe.
    */
   groupId?: string | null;
+  /**
+   * Code de la revanche lancée depuis cette partie terminée.
+   *
+   * Un joueur déconnecté au moment de la revanche ne reçoit jamais
+   * l'événement qui l'annonce : à son retour, il vise encore l'ancien code.
+   * C'est ce champ qui permet de le rediriger vers la bonne table. Persisté,
+   * sinon un redémarrage du serveur dans les quinze minutes qui suivent
+   * rouvrirait le trou. Absent des parties d'avant cette version.
+   */
+  rematchCode?: string | null;
 }
 
 /** Manche telle que vue par UN joueur (anti-triche : pas les mains adverses). */

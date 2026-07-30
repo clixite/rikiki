@@ -131,20 +131,37 @@ export function registerSocketHandlers(
       if (!allowAction()) return ack(protoErr('ROOM_NOT_FOUND'));
       const code = normalizeCode(String(payload?.code ?? ''));
       if (!isValidCodeFormat(code)) return ack(protoErr('INVALID_PAYLOAD'));
-      const room = rooms.get(code);
+      let room = rooms.get(code);
       if (!room) return ack(protoErr('ROOM_NOT_FOUND'));
+
+      /*
+       * Revanche manquée : cette table a donné lieu à un `room:rematch`, mais
+       * ce joueur était déconnecté à l'instant de la diffusion — il n'a donc
+       * jamais reçu l'événement `rematch` (il n'était plus dans la room
+       * Socket.IO). Sans ce repli, il rejoint ici l'ancienne partie terminée,
+       * encore vivante GAME_OVER_TTL_MS, et rate silencieusement la suivante.
+       * On le redirige vers la nouvelle table — seulement s'il y est attendu,
+       * c'est-à-dire s'il faisait partie de la partie qui vient de finir.
+       */
+      if (room.rematchCode && room.isMember(user.id)) {
+        const next = rooms.get(room.rematchCode);
+        if (next) room = next;
+      }
+      const targetCode = room.code;
 
       if (room.isMember(user.id)) {
         // Reconnexion (ou déjà dans la room depuis un autre onglet)
-        leaveIfOther(code);
+        leaveIfOther(targetCode);
         const inGame = room.state.phase !== 'lobby';
         room.attach(user.id, socket);
         if (inGame) room.emitEvent({ type: 'player-reconnected', playerId: user.id });
-        return ack({ ok: true, code });
+        // Le client doit apprendre le code réellement rejoint : après une
+        // redirection de revanche, ce n'est plus celui qu'il a demandé.
+        return ack({ ok: true, code: targetCode });
       }
 
       if (room.state.phase !== 'lobby') return ack(protoErr('GAME_ALREADY_STARTED'));
-      leaveIfOther(code);
+      leaveIfOther(targetCode);
       const fresh = users.getById(user.id) ?? user;
       const res = room.apply({
         type: 'ADD_PLAYER',
@@ -153,7 +170,7 @@ export function registerSocketHandlers(
       if (!res.ok) return ack(protoErr(res.error));
       room.attach(user.id, socket);
       room.emitEvent({ type: 'player-joined', playerId: fresh.id, pseudo: fresh.pseudo });
-      ack({ ok: true, code });
+      ack({ ok: true, code: targetCode });
     });
 
     socket.on('room:leave', (ack: Ack) => {
@@ -257,6 +274,9 @@ export function registerSocketHandlers(
       if (room.state.phase !== 'game-over') return ack(protoErr('BAD_PHASE'));
       const fresh = users.getById(user.id) ?? user;
       const next = rooms.create({ id: fresh.id, pseudo: fresh.pseudo, avatar: fresh.avatar, photo: fresh.photo });
+      // Mémorisé AVANT la diffusion : un joueur déconnecté qui se reconnecte
+      // pile à cet instant doit systématiquement trouver le repli déjà armé.
+      room.rematchCode = next.code;
       room.emitEvent({ type: 'rematch', code: next.code });
       ack({ ok: true, code: next.code });
     });

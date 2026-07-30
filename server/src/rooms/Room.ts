@@ -37,7 +37,10 @@ const BOT_DELAY_SPREAD_MS = 700;
  * Les écritures en base sont groupées : une action déclenche souvent plusieurs
  * changements d'état rapprochés (carte jouée → pli remporté → manche scorée).
  * Un délai court garde la base quasiment à jour sans écrire à chaque micro-pas ;
- * `flush()` force l'écriture aux moments critiques (arrêt du serveur).
+ * `flush()` force l'écriture immédiate à l'arrêt du serveur, et — voir `apply()`
+ * — sur les transitions coûteuses à rejouer (fin de manche, fin de partie) :
+ * un `kill -9` dans cette fenêtre de 250 ms ferait sinon redémarrer la partie
+ * en arrière d'une action que le joueur a pourtant vue confirmée à l'écran.
  */
 const PERSIST_DEBOUNCE_MS = 250;
 
@@ -97,6 +100,25 @@ export class Room {
   private turnTimerKey: string | null = null;
   turnDeadline: number | null = null;
   lastActivity = Date.now();
+  /**
+   * Code de la partie de revanche lancée depuis cette table, une fois la
+   * partie terminée (`room:rematch`).
+   *
+   * L'événement transitoire `rematch` diffusé via `io.to(code)` n'atteint que
+   * les sockets encore dans la room : un joueur déconnecté à cet instant ne
+   * le reçoit jamais. À sa reconnexion, il vise pourtant toujours l'ANCIEN
+   * code (celui stocké côté client). Ce champ sert de repli dans
+   * `room:join` : on le redirige vers la nouvelle table plutôt que de le
+   * laisser rejoindre une partie déjà terminée.
+   */
+  get rematchCode(): string | null {
+    return this.state.rematchCode ?? null;
+  }
+
+  set rematchCode(code: string | null) {
+    this.state = { ...this.state, rematchCode: code };
+    this.schedulePersist();
+  }
 
   constructor(
     private io: Server,
@@ -244,6 +266,13 @@ export class Room {
         }
       }
       this.schedulePersist();
+      // Fin de manche ou fin de partie : le client voit déjà l'état confirmé,
+      // et rejouer ces actions depuis un point de reprise antérieur (crash
+      // dur pendant les 250 ms de debounce) coûte cher — on écrit donc tout
+      // de suite plutôt que d'attendre le prochain `flush()` groupé.
+      const criticalTransition =
+        (this.state.phase === 'round-scoring' || this.state.phase === 'game-over') && this.state.phase !== prevPhase;
+      if (criticalTransition) this.flush();
       this.armTurnTimer();
       this.broadcastViews();
       if (this.state.phase === 'game-over' && prevPhase !== 'game-over') {
@@ -549,6 +578,14 @@ export class Room {
       socket.data.roomCode = null;
       socket.leave(this.code);
       this.sockets.delete(userId);
+    }
+    // La cible peut déjà être déconnectée (délai de grâce en cours) : sans ce
+    // nettoyage, son minuteur restait armé pour rien et n'expirait que 90 s
+    // plus tard, sur un joueur déjà retiré de la partie.
+    const graceTimer = this.graceTimers.get(userId);
+    if (graceTimer) {
+      clearTimeout(graceTimer);
+      this.graceTimers.delete(userId);
     }
     this.removePlayer(userId);
   }

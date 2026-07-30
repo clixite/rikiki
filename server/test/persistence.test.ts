@@ -191,7 +191,11 @@ describe('persistance des parties en cours', () => {
     expect(aliceHand).toHaveLength(2);
 
     // L'écriture est groupée (debounce) : on attend qu'elle soit visible.
-    await waitFor(() => liveCodes().includes(code), 'partie écrite en base');
+    // On attend la phase précise, pas seulement la présence de la ligne : la
+    // fin de manche qui précède écrit désormais tout de suite (transition
+    // critique, voir `Room.apply()`), donc la ligne existe déjà avant que ce
+    // débounce-ci — celui de la manche 2 — n'ait eu le temps de la rattraper.
+    await waitFor(() => server.liveRooms.loadAll().find((r) => r.code === code)?.state.phase === 'bidding', 'partie écrite en base');
     const row = server.liveRooms.loadAll().find((r) => r.code === code)!;
     expect(row.state.phase).toBe('bidding');
     expect(row.state.hostId).toBe(alice.userId);
@@ -277,5 +281,89 @@ describe('persistance des parties en cours', () => {
     expect(liveCodes()).not.toContain('ZZZZ');
     // …tandis que la partie récente est toujours là.
     expect(server.rooms.get(code)).toBeDefined();
+  });
+});
+
+/*
+ * P1 — fenêtre de perte de 250 ms sur les transitions critiques.
+ *
+ * `PERSIST_DEBOUNCE_MS` groupe les écritures : une action est diffusée aux
+ * clients immédiatement, mais écrite en base 250 ms plus tard. Sur un crash
+ * dur (OOM, `kill -9`) dans cette fenêtre, l'état redémarre en arrière d'une
+ * action que le joueur a pourtant vue confirmée à l'écran. C'est
+ * particulièrement coûteux à rejouer pour une fin de manche ou une fin de
+ * partie — `Room.apply()` force donc un `flush()` synchrone sur ces deux
+ * transitions précises, et seulement elles.
+ */
+describe('écriture immédiate sur les transitions critiques (P1)', () => {
+  it('écrit round-scoring et game-over en base sans attendre le débounce', async () => {
+    const alice = await createUser('AliceFlushCrit');
+    const bob = await createUser('BobFlushCrit');
+    await Promise.all([alice.connect(), bob.connect()]);
+
+    const created = await alice.emit<{ ok: boolean; code: string }>('room:create');
+    const code = created.code;
+    expect((await bob.emit('room:join', { code })).ok).toBe(true);
+    expect((await alice.emit('room:addBot')).ok).toBe(true);
+    await alice.waitView((v) => v.players.length === 3, '3 joueurs');
+    expect((await alice.emit('game:start')).ok).toBe(true);
+    await Promise.all([alice, bob].map((c) => c.waitView((v) => v.phase === 'bidding', 'annonces')));
+
+    // Une seule manche d'une carte suffit pour atteindre round-scoring puis,
+    // via NEXT_ROUND, game-over — sans jouer toute la partie. On raccourcit
+    // la séquence des manches APRÈS le lancement (la manche 1, déjà distribuée
+    // à une carte, n'en est pas affectée) : un pur raccourci de préparation du
+    // test, aucune action de jeu n'est simulée par ce biais.
+    const live = server.rooms.get(code)!;
+    live.state = { ...live.state, roundsSequence: [1] };
+
+    await playUntilRoundScored([alice, bob]);
+
+    // Aucune attente : si l'écriture était encore groupée, la base
+    // afficherait ici l'ancienne phase (`bidding` ou `playing`) pendant 250 ms.
+    const afterRound = server.liveRooms.loadAll().find((r) => r.code === code)!;
+    expect(afterRound.state.phase).toBe('round-scoring');
+
+    expect((await alice.emit('game:nextRound')).ok).toBe(true);
+    const afterGame = server.liveRooms.loadAll().find((r) => r.code === code)!;
+    expect(afterGame.state.phase).toBe('game-over');
+
+    alice.socket.close();
+    bob.socket.close();
+  });
+
+  it('garde le débounce pour les actions ordinaires (une annonce n’écrit pas au disque à chaque coup)', async () => {
+    const alice = await createUser('AliceFlushOrdi');
+    const bob = await createUser('BobFlushOrdi');
+    await Promise.all([alice.connect(), bob.connect()]);
+
+    const created = await alice.emit<{ ok: boolean; code: string }>('room:create');
+    const code = created.code;
+    expect((await bob.emit('room:join', { code })).ok).toBe(true);
+    expect((await alice.emit('room:addBot')).ok).toBe(true);
+    await alice.waitView((v) => v.players.length === 3, '3 joueurs');
+    expect((await alice.emit('game:start')).ok).toBe(true);
+    await Promise.all([alice, bob].map((c) => c.waitView((v) => v.phase === 'bidding', 'annonces')));
+    await waitFor(() => liveCodes().includes(code), 'partie écrite en base');
+
+    const view = alice.view!;
+    const seat = view.round!.currentSeat;
+    const actor = [alice, bob].find((c) => c.userId === view.players.find((p) => p.seat === seat)!.id) ?? alice;
+    const bid = actor.view!.round!.legalBids![0];
+    expect((await actor.emit('game:bid', { bid })).ok).toBe(true);
+
+    // Juste après l'annonce : l'écriture est groupée, la base n'a pas encore
+    // bougé. Écrire à chaque carte jouée serait le sur-coût que le débounce
+    // évite précisément.
+    const immediate = server.liveRooms.loadAll().find((r) => r.code === code)!;
+    expect(immediate.state.round!.bids[actor.userId]).toBeNull();
+
+    await waitFor(
+      () => server.liveRooms.loadAll().find((r) => r.code === code)!.state.round!.bids[actor.userId] !== null,
+      'annonce écrite après le débounce',
+    );
+
+    alice.socket.close();
+    bob.socket.close();
   });
 });

@@ -588,6 +588,30 @@ describe('fuites de minuteurs', () => {
     manager.stop();
   });
 
+  /*
+   * P2 — Régression sous surveillance, corrigée, ce test la garde fermée.
+   *
+   * Si la cible de `kick()` est déjà déconnectée, un délai de grâce court
+   * pour elle. Sans nettoyage explicite, il restait armé pour rien après
+   * l'expulsion — inoffensif (il ne trouve plus le joueur à l'échéance), mais
+   * un minuteur orphelin de plus, à l'instar de celui du tour ci-dessus.
+   */
+  it('CORRIGÉ : kick nettoie le délai de grâce orphelin d’une cible déjà déconnectée', () => {
+    vi.useFakeTimers();
+    const room = lobbyRoom();
+    const sockets = attachAll(room);
+
+    room.detach(BOB.id, sockets.get(BOB.id)!);
+    expect(vi.getTimerCount()).toBeGreaterThan(0);
+
+    room.kick(BOB.id);
+
+    expect(room.state.players.some((p) => p.id === BOB.id)).toBe(false);
+    // Rien ne doit plus courir pour Bob : l'expulsion a nettoyé son délai de
+    // grâce, pas seulement retiré son siège de la partie.
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
   it('libère tout au `stop()` du gestionnaire', () => {
     vi.useFakeTimers();
     const manager = new RoomManager(fakeIo(), undefined, { botDelayMs: 0, turnSeconds: 0 });
@@ -898,4 +922,113 @@ describe('reconnexion de bout en bout', () => {
 
     for (const c of clients) c.socket.close();
   }, 30_000);
+});
+
+/* ------------------------------------------------------------------ */
+/* 7. Revanche manquée par un joueur déconnecté                         */
+/* ------------------------------------------------------------------ */
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+async function waitFor(pred: () => boolean, label: string, timeoutMs = 3000): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (pred()) return;
+    await sleep(20);
+  }
+  throw new Error(`timeout: ${label}`);
+}
+
+describe('revanche manquée (P1)', () => {
+  beforeAll(async () => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rikiki-revanche-'));
+    dbPath = path.join(tmpDir, 'rikiki.db');
+    await startServer();
+  });
+
+  afterAll(async () => {
+    await stopServer();
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  /*
+   * LE bug de l'audit. L'événement transitoire `rematch` est diffusé via
+   * `io.to(ancienCode)` : un joueur déconnecté à cet instant n'est plus dans
+   * la room Socket.IO et ne le reçoit JAMAIS. À sa reconnexion, il vise
+   * toujours l'ancien code — celui stocké côté client avant la coupure — et
+   * rejoignait silencieusement une partie déjà terminée (encore vivante
+   * GAME_OVER_TTL_MS), ratant totalement la revanche sans le moindre message.
+   */
+  it('redirige vers la revanche un joueur déconnecté au moment de `room:rematch`', async () => {
+    const alice = await createUser('AliceRematch');
+    const bob = await createUser('BobRematch');
+    const carol = await createUser('CarolRematch');
+    await Promise.all([alice.connect(), bob.connect(), carol.connect()]);
+
+    const created = await alice.emit<{ ok: boolean; code: string }>('room:create');
+    const oldCode = created.code;
+    expect((await bob.emit('room:join', { code: oldCode })).ok).toBe(true);
+    expect((await carol.emit('room:join', { code: oldCode })).ok).toBe(true);
+    await Promise.all([alice, bob, carol].map((c) => c.waitView((v) => v.players.length === 3, '3 joueurs')));
+
+    // Raccourci de préparation : on force la fin de partie plutôt que de
+    // jouer une partie complète — seul `room:rematch` est sous test ici, pas
+    // le moteur de jeu.
+    const oldRoom = server.rooms.get(oldCode)!;
+    oldRoom.state = { ...oldRoom.state, phase: 'game-over' };
+
+    // Bob perd sa connexion PILE avant la revanche : il ne recevra jamais
+    // l'événement `rematch`, diffusé uniquement aux sockets encore présents.
+    bob.socket.close();
+    await waitFor(() => !server.rooms.get(oldCode)!.sockets.has(bob.userId), 'bob déconnecté côté serveur');
+
+    const rematch = await alice.emit<{ ok: boolean; code: string }>('room:rematch');
+    expect(rematch.ok).toBe(true);
+    const newCode = rematch.code;
+    expect(newCode).not.toBe(oldCode);
+
+    // Bob revient plus tard, avec l'ANCIEN code stocké en session côté client.
+    const bobRetour = new TestClient('BobRematch', bob.token, bob.userId);
+    await bobRetour.connect();
+    const joined = await bobRetour.emit<{ ok: boolean; code: string }>('room:join', { code: oldCode });
+
+    // Il est redirigé : l'ack porte le NOUVEAU code, pas celui demandé — le
+    // client doit apprendre la partie qu'il a réellement rejointe.
+    expect(joined.ok).toBe(true);
+    expect(joined.code).toBe(newCode);
+    expect(server.rooms.get(newCode)!.isMember(bob.userId)).toBe(true);
+    // Son socket a bien rejoint la NOUVELLE table, pas l'ancienne — l'ancienne
+    // partie garde son historique de joueurs (elle est terminée, inutile de
+    // la retoucher), mais Bob n'y est plus attaché en pratique.
+    expect(server.rooms.get(newCode)!.sockets.has(bob.userId)).toBe(true);
+    expect(server.rooms.get(oldCode)!.sockets.has(bob.userId)).toBe(false);
+
+    alice.socket.close();
+    carol.socket.close();
+    bobRetour.socket.close();
+  });
+
+  it('ne redirige pas un joueur qui n’a jamais fait partie de la partie terminée', async () => {
+    const alice = await createUser('AliceRematch2');
+    const dave = await createUser('DaveRematch2');
+    await Promise.all([alice.connect(), dave.connect()]);
+
+    const created = await alice.emit<{ ok: boolean; code: string }>('room:create');
+    const oldCode = created.code;
+    await alice.waitView((v) => v.players.length === 1, 'salon créé');
+
+    const oldRoom = server.rooms.get(oldCode)!;
+    oldRoom.state = { ...oldRoom.state, phase: 'game-over' };
+    expect((await alice.emit('room:rematch')).ok).toBe(true);
+
+    // Dave n'a jamais fait partie de l'ancienne partie : la redirection de
+    // revanche — réservée aux joueurs attendus — ne le concerne pas ; il
+    // retombe sur le comportement normal d'une partie déjà terminée.
+    const joined = await dave.emit<{ ok: boolean; error?: { code: string } }>('room:join', { code: oldCode });
+    expect(joined.ok).toBe(false);
+    expect(joined.error?.code).toBe('GAME_ALREADY_STARTED');
+
+    alice.socket.close();
+    dave.socket.close();
+  });
 });
