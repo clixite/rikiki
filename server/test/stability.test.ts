@@ -609,6 +609,63 @@ describe('fuites de minuteurs', () => {
   });
 });
 
+describe('un joueur ne peut pas repousser sa propre échéance', () => {
+  /*
+   * Le compte à rebours du tour se réarmait sur N'IMPORTE quelle action valide.
+   * Un joueur dont c'était le tour pouvait donc marteler `profile:update` (ou
+   * basculer sa pause) pour remettre les 45 secondes à zéro indéfiniment, et
+   * n'être jamais joué à sa place — la table gelait. On vérifie ici que
+   * l'échéance ne bouge PAS tant que le tour n'a pas réellement changé.
+   */
+  it('une action hors-jeu ne remet pas le compte à rebours à zéro', () => {
+    vi.useFakeTimers();
+    const room = startedRoom({ turnSeconds: 45 });
+    attachAll(room);
+    const attendu = currentPlayer(room);
+    const deadline = room.turnDeadline;
+    expect(deadline).not.toBeNull();
+
+    // 30 s passent, puis le joueur attendu met à jour son profil.
+    vi.advanceTimersByTime(30_000);
+    room.apply({
+      type: 'UPDATE_PROFILE',
+      playerId: attendu.id,
+      pseudo: attendu.pseudo,
+      avatar: attendu.avatar,
+      photo: null,
+    });
+
+    // L'échéance n'a pas bougé : elle tombera bien 45 s après le début du tour,
+    // pas 45 s après la mise à jour du profil.
+    expect(room.turnDeadline).toBe(deadline);
+  });
+
+  it('joue bien le joueur à sa place malgré des actions répétées', () => {
+    vi.useFakeTimers();
+    const room = startedRoom({ turnSeconds: 45 });
+    attachAll(room);
+    const attendu = currentPlayer(room);
+
+    // Il tente de gagner du temps toutes les 10 s pendant 40 s.
+    for (let i = 0; i < 4; i++) {
+      vi.advanceTimersByTime(10_000);
+      room.apply({
+        type: 'UPDATE_PROFILE',
+        playerId: attendu.id,
+        pseudo: attendu.pseudo,
+        avatar: attendu.avatar,
+        photo: null,
+      });
+    }
+    // 40 s se sont écoulées : le tour n'a pas encore basculé.
+    expect(currentPlayer(room).id).toBe(attendu.id);
+
+    // Encore 10 s (50 s au total > 45 s) : l'échéance tombe, on joue pour lui.
+    vi.advanceTimersByTime(10_000);
+    expect(room.state.round!.bids[attendu.id]).not.toBeNull();
+  });
+});
+
 
 /* ------------------------------------------------------------------ */
 /* 6. De bout en bout : vrai serveur, vrais sockets                     */

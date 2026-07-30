@@ -257,6 +257,7 @@ export const hr: Messages = {
   gamesPlayed: 'igara',
   gamesWon: 'pobjeda',
   bestRound: 'najbolja runda',
+  contractsKept: 'Ispunjene najave',
   noHistory: 'Zasad nema odigranih igara.',
   historyTitle: 'Moje zadnje igre',
   wonBadge: 'Pobjeda',

@@ -225,6 +225,7 @@ export const de: Messages = {
   gamesPlayed: 'Spiele',
   gamesWon: 'Siege',
   bestRound: 'beste Runde',
+  contractsKept: 'Erfüllte Ansagen',
   noHistory: 'Noch kein Spiel zu Ende gespielt.',
   historyTitle: 'Meine letzten Spiele',
   wonBadge: 'Gewonnen',

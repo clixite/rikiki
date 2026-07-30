@@ -233,6 +233,7 @@ export const fr = {
   gamesPlayed: 'parties',
   gamesWon: 'victoires',
   bestRound: 'meilleure manche',
+  contractsKept: 'Contrats tenus',
   noHistory: "Aucune partie terminée pour l'instant.",
   historyTitle: 'Mes dernières parties',
   wonBadge: 'Gagné',

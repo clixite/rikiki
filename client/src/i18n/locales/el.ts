@@ -235,6 +235,7 @@ export const el: Messages = {
   gamesPlayed: 'παιχνίδια',
   gamesWon: 'νίκες',
   bestRound: 'καλύτερος γύρος',
+  contractsKept: 'Δηλώσεις που κρατήθηκαν',
   noHistory: 'Δεν έχεις ολοκληρώσει κανένα παιχνίδι ακόμη.',
   historyTitle: 'Τα τελευταία μου παιχνίδια',
   wonBadge: 'Νίκη',

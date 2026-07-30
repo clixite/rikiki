@@ -25,6 +25,15 @@ interface GameStore {
   emotes: { id: number; playerId: string; emote: EmoteId }[];
   /** Petites phrases reçues, affichées comme des bulles au-dessus du siège. */
   phrases: { id: number; playerId: string; phrase: PhraseId }[];
+  /**
+   * Mes manches de la partie en cours : contrat, plis faits, points marqués.
+   *
+   * Le serveur ne renvoie que la manche courante ; or l'écran de fin veut
+   * raconter la partie (« 4 contrats tenus sur 7, meilleure manche +16 ») —
+   * c'est ce qui donne envie d'en refaire une. On accumule donc au fil des
+   * décomptes, côté client, ce que le serveur a déjà calculé.
+   */
+  roundHistory: { bid: number | null; tricks: number; score: number }[];
   setView: (view: GameView) => void;
   /** Applique un coup immédiatement à l'écran (sans attendre le serveur). */
   playOptimistic: (card: Card) => void;
@@ -75,6 +84,7 @@ export const useGame = create<GameStore>((set, get) => ({
   socketConnected: false,
   emotes: [],
   phrases: [],
+  roundHistory: [],
   frozenTrick: null,
   roundOutcome: null,
   celebrate: 0,
@@ -127,7 +137,13 @@ export const useGame = create<GameStore>((set, get) => ({
       const success = bid !== null && bid === tricks;
       playSound(success ? 'contractSuccess' : 'contractFail');
       vibrate(success ? 'success' : 'failure');
-      set({ roundOutcome: success ? 'success' : 'fail', celebrate: get().celebrate + (success ? 1 : 0) });
+      // Une autre partie a pu passer par là : son historique ne nous concerne plus.
+      const history = prev?.code === view.code ? get().roundHistory : [];
+      set({
+        roundOutcome: success ? 'success' : 'fail',
+        celebrate: get().celebrate + (success ? 1 : 0),
+        roundHistory: [...history, { bid, tricks, score: view.round.roundScores?.[view.you] ?? 0 }],
+      });
     }
     if (view.phase !== 'round-scoring' && prev?.phase === 'round-scoring') {
       set({ roundOutcome: null });
@@ -140,13 +156,28 @@ export const useGame = create<GameStore>((set, get) => ({
       playSound('yourTurn');
     }
 
-    // Fin de partie : fanfare et confettis pour le vainqueur
+    // Fin de partie : fanfare pour le vainqueur — et une défaite GRADUÉE pour
+    // les autres. À six joueurs, servir le même son d'échec au 2ᵉ qu'au
+    // dernier punissait cinq personnes sur six, alors qu'un podium est déjà
+    // une belle partie. Seule la dernière place entend la vraie défaite.
     if (view.phase === 'game-over' && prev?.phase !== 'game-over') {
-      const best = Math.max(...view.players.map((p) => p.totalScore));
-      const iWon = view.players.find((p) => p.id === view.you)?.totalScore === best;
-      playSound(iWon ? 'victory' : 'defeat');
-      vibrate(iWon ? 'celebrate' : 'failure');
-      if (iWon) set({ celebrate: get().celebrate + 1 });
+      const sorted = [...view.players].sort((a, b) => b.totalScore - a.totalScore);
+      const rank = sorted.findIndex((p) => p.id === view.you);
+      if (rank === 0) {
+        playSound('victory');
+        vibrate('celebrate');
+        set({ celebrate: get().celebrate + 1 });
+      } else if (rank === sorted.length - 1) {
+        // Testé avant le podium : à trois joueurs, le dernier est aussi
+        // « troisième » — c'est bien la défaite qu'il doit entendre.
+        playSound('defeat');
+        vibrate('failure');
+      } else if (rank <= 2) {
+        playSound('trickWin');
+        vibrate('success');
+      } else {
+        playSound('trickLose');
+      }
     }
 
     // Coup d'envoi
@@ -221,7 +252,7 @@ export const useGame = create<GameStore>((set, get) => ({
 
   setClosed: (reason) => {
     if (freezeTimer) clearTimeout(freezeTimer);
-    set({ closedReason: reason, view: null, frozenTrick: null, roundOutcome: null, optimistic: EMPTY_OPTIMISTIC, emotes: [], phrases: [] });
+    set({ closedReason: reason, view: null, frozenTrick: null, roundOutcome: null, optimistic: EMPTY_OPTIMISTIC, emotes: [], phrases: [], roundHistory: [] });
   },
 
   showToast: (message) => {
@@ -232,6 +263,6 @@ export const useGame = create<GameStore>((set, get) => ({
 
   reset: () => {
     if (freezeTimer) clearTimeout(freezeTimer);
-    set({ view: null, frozenTrick: null, roundOutcome: null, closedReason: null, toast: null, optimistic: EMPTY_OPTIMISTIC, emotes: [], phrases: [] });
+    set({ view: null, frozenTrick: null, roundOutcome: null, closedReason: null, toast: null, optimistic: EMPTY_OPTIMISTIC, emotes: [], phrases: [], roundHistory: [] });
   },
 }));

@@ -254,6 +254,7 @@ export const ro: Messages = {
   gamesPlayed: 'partide',
   gamesWon: 'victorii',
   bestRound: 'cea mai bună rundă',
+  contractsKept: 'Contracte respectate',
   noHistory: 'Nicio partidă încheiată deocamdată.',
   historyTitle: 'Ultimele mele partide',
   wonBadge: 'Câștigat',

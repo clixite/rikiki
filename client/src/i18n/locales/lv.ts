@@ -244,6 +244,7 @@ export const lv: Messages = {
   gamesPlayed: 'spēles',
   gamesWon: 'uzvaras',
   bestRound: 'labākā kārta',
+  contractsKept: 'Izpildītie solījumi',
   noHistory: 'Pagaidām nav nevienas pabeigtas spēles.',
   historyTitle: 'Manas pēdējās spēles',
   wonBadge: 'Uzvara',

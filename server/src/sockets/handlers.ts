@@ -13,6 +13,19 @@ import { isValidCodeFormat, normalizeCode } from '../rooms/roomCodes';
 const EMOTE_BURST = 3;
 const EMOTE_WINDOW_MS = 5000;
 
+/**
+ * Débit maximal des événements « lourds » par connexion.
+ *
+ * Deux abus visés. Le brute-force du code de salon : quatre lettres, ~280 000
+ * combinaisons, qu'une boucle de `room:join` balaierait en quelques secondes.
+ * Et le blocage de partie : marteler `profile:update` ou `game:pause` faisait
+ * repousser le compte à rebours du tour (corrigé par ailleurs), mais rien ne
+ * limitait le flot lui-même. Trente actions ouvrées par cinq secondes laissent
+ * un jeu normal parfaitement fluide et coupent net l'automate.
+ */
+const ACTION_BURST = 30;
+const ACTION_WINDOW_MS = 5000;
+
 const MESSAGES: Record<ErrorCode, string> = {
   BAD_PHASE: 'Action impossible dans cette phase de jeu.',
   NOT_HOST: "Seul l'hôte peut faire ça.",
@@ -78,6 +91,23 @@ export function registerSocketHandlers(
       return true;
     };
 
+    /**
+     * Débit général de la connexion, tous événements confondus.
+     *
+     * Renvoie `false` quand le seuil est franchi ; l'appelant répond alors une
+     * erreur et n'exécute rien. Une seule fenêtre pour tout : un client
+     * légitime n'atteint jamais trente actions en cinq secondes, un automate
+     * les dépasse au premier balayage.
+     */
+    const actionTimes: number[] = [];
+    const allowAction = () => {
+      const now = Date.now();
+      while (actionTimes.length > 0 && now - actionTimes[0] > ACTION_WINDOW_MS) actionTimes.shift();
+      if (actionTimes.length >= ACTION_BURST) return false;
+      actionTimes.push(now);
+      return true;
+    };
+
     /** Quitte la room courante seulement si ce n'est pas celle visée. */
     const leaveIfOther = (targetCode: string) => {
       const room = currentRoom();
@@ -86,6 +116,7 @@ export function registerSocketHandlers(
 
     socket.on('room:create', (ack: Ack) => {
       if (typeof ack !== 'function') return;
+      if (!allowAction()) return ack(protoErr('INVALID_PAYLOAD'));
       leaveCurrent();
       const fresh = users.getById(user.id) ?? user;
       const room = rooms.create({ id: fresh.id, pseudo: fresh.pseudo, avatar: fresh.avatar, photo: fresh.photo });
@@ -95,6 +126,9 @@ export function registerSocketHandlers(
 
     socket.on('room:join', (payload: { code?: string } | undefined, ack: Ack) => {
       if (typeof ack !== 'function') return;
+      // Le plafond de débit s'applique AVANT de révéler si le code existe :
+      // sans quoi le balayage des ~280 000 codes resterait possible.
+      if (!allowAction()) return ack(protoErr('ROOM_NOT_FOUND'));
       const code = normalizeCode(String(payload?.code ?? ''));
       if (!isValidCodeFormat(code)) return ack(protoErr('INVALID_PAYLOAD'));
       const room = rooms.get(code);
@@ -272,6 +306,7 @@ export function registerSocketHandlers(
 
     socket.on('profile:update', (payload: unknown, ack: Ack) => {
       if (typeof ack !== 'function') return;
+      if (!allowAction()) return ack(protoErr('INVALID_PAYLOAD'));
       const parsed = profileSchema.safeParse(payload);
       if (!parsed.success) return ack(protoErr('INVALID_PAYLOAD'));
       users.updateProfile(user.id, parsed.data.pseudo, parsed.data.avatar);

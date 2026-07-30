@@ -260,6 +260,7 @@ export const ga: Messages = {
   gamesPlayed: 'cluichí',
   gamesWon: 'buanna',
   bestRound: 'an babhta is fearr',
+  contractsKept: 'Conarthaí comhlíonta',
   noHistory: 'Níl aon chluiche críochnaithe agat fós.',
   historyTitle: 'Mo chluichí is déanaí',
   wonBadge: 'Bua',

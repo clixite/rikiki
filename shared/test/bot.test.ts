@@ -199,6 +199,22 @@ describe('choix de carte du bot', () => {
       expect(chosen).toBe('C13');
     });
 
+    it('lâche un atout devenu maître sur un pli perdu plutôt que de le garder', () => {
+      // Atout pique. Le pli est déjà perdu (l'as d'atout, S14, l'a coupé) et le
+      // contrat est tenu. Le bot tient le roi d'atout (S13), désormais le plus
+      // fort atout restant : le garder le forcerait à remporter un pli plus
+      // tard et à casser son contrat. C'est le moment gratuit de s'en défaire.
+      const chosen = chooseCard({
+        legal: hand('C7', 'S13'),
+        trick: trickOf('D14', 'S14'),
+        trump: 'S',
+        bid: 1,
+        tricksWon: 1,
+        seen: hand('D14', 'S14'),
+      });
+      expect(chosen).toBe('S13');
+    });
+
     it('joue la plus petite quand il est obligé de dépasser', () => {
       const chosen = chooseCard({
         legal: hand('H9', 'H5'),

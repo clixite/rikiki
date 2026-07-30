@@ -224,6 +224,7 @@ export const da: Messages = {
   gamesPlayed: 'spil',
   gamesWon: 'sejre',
   bestRound: 'bedste runde',
+  contractsKept: 'Holdte meldinger',
   noHistory: 'Ingen færdigspillede spil endnu.',
   historyTitle: 'Mine seneste spil',
   wonBadge: 'Vundet',

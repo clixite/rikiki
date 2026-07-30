@@ -232,6 +232,7 @@ export const et: Messages = {
   gamesPlayed: 'mängu',
   gamesWon: 'võitu',
   bestRound: 'parim voor',
+  contractsKept: 'Peetud lubadused',
   noHistory: 'Ühtegi lõpetatud mängu veel pole.',
   historyTitle: 'Minu viimased mängud',
   wonBadge: 'Võit',

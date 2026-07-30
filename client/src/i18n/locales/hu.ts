@@ -228,6 +228,7 @@ export const hu: Messages = {
   gamesPlayed: 'játék',
   gamesWon: 'győzelem',
   bestRound: 'legjobb kör',
+  contractsKept: 'Teljesített bemondások',
   noHistory: 'Még nincs befejezett játékod.',
   historyTitle: 'Legutóbbi játékaim',
   wonBadge: 'Nyert',

@@ -8,6 +8,7 @@ import LeaveGameButton from '../components/LeaveGameButton';
 import EmoteBar, { EMOTE_GLYPH } from '../components/EmoteBar';
 import { useSecondsLeft } from '../components/TurnCountdown';
 import HandFan from '../components/HandFan';
+import HelpSheet from '../components/HelpSheet';
 import LastTrickSheet from '../components/LastTrickSheet';
 import PlayerSeats from '../components/PlayerSeats';
 import RoundRecap from '../components/RoundRecap';
@@ -43,6 +44,7 @@ export default function Table({ view: serverView }: Props) {
   const view = applyOptimistic(serverView, optimistic);
   const [scoresOpen, setScoresOpen] = useState(false);
   const [lastTrickOpen, setLastTrickOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const hasLastTrick = serverView.round?.lastTrick != null;
   // La géométrie du tapis se déduit de sa taille réelle : à huit joueurs sur un
   // petit téléphone, aucune position écrite à l'avance ne tient.
@@ -122,6 +124,19 @@ export default function Table({ view: serverView }: Props) {
         <TrumpBadge trumpCard={round.trumpCard} />
 
         <SoundToggle />
+
+        {/* L'aide vit dans la partie, pas derrière « quitter » : un débutant
+            bloqué pendant les annonces doit pouvoir comprendre sans payer ses
+            points pour ça. */}
+        <button
+          type="button"
+          data-testid="open-help"
+          onClick={() => setHelpOpen(true)}
+          aria-label={t.rules}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/55 text-lg ring-1 ring-white/10 transition active:scale-90"
+        >
+          <span aria-hidden="true">?</span>
+        </button>
 
         <button
           type="button"
@@ -289,6 +304,7 @@ export default function Table({ view: serverView }: Props) {
       {lastTrickOpen && !showRecap && (
         <LastTrickSheet view={view} onClose={() => setLastTrickOpen(false)} />
       )}
+      {helpOpen && <HelpSheet onClose={() => setHelpOpen(false)} />}
       <ScoreDrawer view={view} open={scoresOpen} onClose={() => setScoresOpen(false)} />
     </div>
   );

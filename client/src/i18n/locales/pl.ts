@@ -256,6 +256,7 @@ export const pl: Messages = {
   gamesPlayed: 'partie',
   gamesWon: 'wygrane',
   bestRound: 'najlepsza runda',
+  contractsKept: 'Dotrzymane zapowiedzi',
   noHistory: 'Nie masz jeszcze zakończonych partii.',
   historyTitle: 'Moje ostatnie partie',
   wonBadge: 'Wygrana',

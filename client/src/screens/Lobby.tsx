@@ -52,7 +52,21 @@ export default function Lobby({ view }: Props) {
 
   return (
     <div className="mx-auto flex h-dvh w-full max-w-md flex-col px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-end gap-2">
+        {/* L'invité qui arrive par un lien WhatsApp atterrit ICI sans être
+            jamais passé par l'accueil : ce bouton est sa seule chance de voir
+            les règles — et leur démonstration animée — avant de devoir
+            annoncer un contrat dont il ignore tout. */}
+        <button
+          type="button"
+          data-testid="lobby-rules"
+          onClick={() => navigate('/rules')}
+          aria-label={t.rules}
+          title={t.rules}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/45 text-lg ring-1 ring-white/8 transition active:scale-90"
+        >
+          <span aria-hidden="true">📖</span>
+        </button>
         <SoundToggle />
       </div>
 

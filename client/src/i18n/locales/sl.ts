@@ -262,6 +262,7 @@ export const sl: Messages = {
   gamesPlayed: 'iger',
   gamesWon: 'zmag',
   bestRound: 'najboljši krog',
+  contractsKept: 'Izpolnjene napovedi',
   noHistory: 'Zaenkrat še nobene končane igre.',
   historyTitle: 'Moje zadnje igre',
   wonBadge: 'Zmaga',

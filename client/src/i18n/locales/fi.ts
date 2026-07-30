@@ -234,6 +234,7 @@ export const fi: Messages = {
   gamesPlayed: 'peliä',
   gamesWon: 'voittoa',
   bestRound: 'paras kierros',
+  contractsKept: 'Pidetyt tilaukset',
   noHistory: 'Ei vielä pelattuja pelejä.',
   historyTitle: 'Viimeisimmät pelini',
   wonBadge: 'Voitto',

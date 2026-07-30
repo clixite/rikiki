@@ -225,6 +225,7 @@ export const sv: Messages = {
   gamesPlayed: 'partier',
   gamesWon: 'vinster',
   bestRound: 'bästa rundan',
+  contractsKept: 'Hållna bud',
   noHistory: 'Inga färdigspelade partier än.',
   historyTitle: 'Mina senaste partier',
   wonBadge: 'Vunnet',

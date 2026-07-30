@@ -236,6 +236,7 @@ export const bg: Messages = {
   gamesPlayed: 'игри',
   gamesWon: 'победи',
   bestRound: 'най-добър рунд',
+  contractsKept: 'Изпълнени обявки',
   noHistory: 'Още няма завършени игри.',
   historyTitle: 'Последните ми игри',
   wonBadge: 'Победа',

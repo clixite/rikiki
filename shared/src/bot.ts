@@ -58,11 +58,6 @@ function cost(card: Card, trump: Suit | null): number {
   return (isTrump(card, trump) ? 100 : 0) + card.rank;
 }
 
-/** Valeur de défausse : on jette en priorité une grosse carte hors atout. */
-function dumpValue(card: Card, trump: Suit | null): number {
-  return isTrump(card, trump) ? card.rank : 100 + card.rank;
-}
-
 /**
  * Force d'entame quand le bot cherche des plis : les gros atouts passent
  * devant l'as sec d'une couleur ordinaire, qui passe devant les petits atouts.
@@ -333,9 +328,15 @@ export function chooseCard(input: BotCardInput): CardId {
 
   // ---- Contrat atteint : on évite de prendre
   if (losers.length > 0) {
-    // On profite du pli perdu pour se débarrasser d'une carte encombrante :
-    // la plus haute qui ne peut plus rien prendre.
-    return cardId(pick(losers, (c) => dumpValue(c, trump)));
+    // Le pli est perdu, tant mieux : c'est l'occasion GRATUITE de lâcher la
+    // carte qui, gardée, nous forcerait à remporter un pli plus tard et à
+    // casser un contrat déjà tenu. La plus dangereuse est celle qui a le plus
+    // de chances de dominer un futur pli — au premier chef un atout devenu
+    // maître. On la mesure par `dominanceOdds` plutôt que par un forfait qui
+    // classait aveuglément tout atout derrière n'importe quelle carte
+    // ordinaire, et gardait donc les atouts encombrants jusqu'au bout.
+    const danger = (c: Card) => dominanceOdds(c, seen, hand, opponentCards) * 100 + c.rank;
+    return cardId(pick(losers, danger));
   }
   // Obligé de dépasser : la plus petite, pour laisser les suivants repasser.
   return cardId(pick(legal, (c) => -cost(c, trump)));
@@ -408,10 +409,13 @@ export function botCard(state: GameState, playerId: string): CardId {
       voids: voids.get(p.id) ?? new Set<Suit>(),
     }));
 
-  // Cartes encore en main chez les autres : sert à estimer si une carte
-  // supérieure dort dans le talon ou menace vraiment.
+  // Cartes qui peuvent ENCORE contester le pli : celles des adversaires qui
+  // n'ont pas encore joué dans ce pli. Compter aussi ceux qui ont déjà posé
+  // gonflait le risque perçu et poussait le bot à garder ses maîtresses par
+  // excès de prudence — au dernier à parler, plus personne ne peut le coiffer.
+  const played = new Set(round.currentTrick.plays.map((p) => p.playerId));
   const opponentCards = state.players
-    .filter((p) => p.id !== playerId)
+    .filter((p) => p.id !== playerId && !played.has(p.id))
     .reduce((sum, p) => sum + (round.hands[p.id]?.length ?? 0), 0);
 
   return chooseCard({

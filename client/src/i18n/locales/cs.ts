@@ -255,6 +255,7 @@ export const cs: Messages = {
   gamesPlayed: 'her',
   gamesWon: 'výher',
   bestRound: 'nejlepší kolo',
+  contractsKept: 'Splněné závazky',
   noHistory: 'Zatím žádná dohraná hra.',
   historyTitle: 'Moje poslední hry',
   wonBadge: 'Výhra',

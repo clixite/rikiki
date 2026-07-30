@@ -69,7 +69,18 @@ export function createApp(config: Config, overrides: { mailer?: Mailer; pushSend
   });
 
   app.get('/api/health', (_req, res) => {
-    res.json({ ok: true });
+    // Le déploiement (`install.sh`) et l'intégration continue s'en servent
+    // comme feu vert : il doit donc dire la vérité. Renvoyer « ok » sans
+    // toucher la base laissait passer un serveur qui répond mais dont le disque
+    // est plein ou la base en lecture seule — exactement la panne qu'un
+    // contrôle de santé est censé attraper. Une lecture triviale suffit à
+    // prouver que la couche de données répond.
+    try {
+      db.prepare('SELECT 1').get();
+      res.json({ ok: true });
+    } catch {
+      res.status(503).json({ ok: false });
+    }
   });
 
   /**
@@ -116,36 +127,43 @@ export function createApp(config: Config, overrides: { mailer?: Mailer; pushSend
 
       // Les joueurs automatiques n'ont pas de compte : ni stats ni historique.
       const humans = state.players.filter((pl) => !isBotId(pl.id));
-      for (const p of humans) {
-        const won = p.totalScore === maxScore;
-        users.recordGameResult(p.id, p.totalScore, won, bestRounds[p.id] ?? 0);
-        users.addHistoryEntry({
-          userId: p.id,
-          code: state.code,
-          playedAt,
-          playersCount: state.players.length,
-          myScore: p.totalScore,
-          myRank: ranked.findIndex((r) => r.id === p.id) + 1,
-          won,
-          standings,
-        });
-      }
 
-      // Partie rattachée à un groupe par l'hôte : on alimente son classement
-      // cumulé (le repo ignore les non-membres, donc jamais les robots).
-      if (state.groupId) {
-        groups.recordGameResults(
-          state.groupId,
-          state.code,
-          playedAt,
-          humans.map((p) => ({
+      // Tout ou rien : stats, historique et classement de groupe partagent une
+      // seule transaction. Sans elle, un arrêt brutal au milieu de la boucle
+      // laissait certains joueurs avec des stats mises à jour mais pas leur
+      // historique — ou une partie enregistrée pour trois joueurs sur cinq.
+      db.transaction(() => {
+        for (const p of humans) {
+          const won = p.totalScore === maxScore;
+          users.recordGameResult(p.id, p.totalScore, won, bestRounds[p.id] ?? 0);
+          users.addHistoryEntry({
             userId: p.id,
-            score: p.totalScore,
-            rank: ranked.findIndex((r) => r.id === p.id) + 1,
-            won: p.totalScore === maxScore,
-          })),
-        );
-      }
+            code: state.code,
+            playedAt,
+            playersCount: state.players.length,
+            myScore: p.totalScore,
+            myRank: ranked.findIndex((r) => r.id === p.id) + 1,
+            won,
+            standings,
+          });
+        }
+
+        // Partie rattachée à un groupe par l'hôte : on alimente son classement
+        // cumulé (le repo ignore les non-membres, donc jamais les robots).
+        if (state.groupId) {
+          groups.recordGameResults(
+            state.groupId,
+            state.code,
+            playedAt,
+            humans.map((p) => ({
+              userId: p.id,
+              score: p.totalScore,
+              rank: ranked.findIndex((r) => r.id === p.id) + 1,
+              won: p.totalScore === maxScore,
+            })),
+          );
+        }
+      })();
     },
     {
       botDelayMs: config.BOT_DELAY_MS,
@@ -154,7 +172,12 @@ export function createApp(config: Config, overrides: { mailer?: Mailer; pushSend
       onTurn: (room, playerId) => {
         if (!shouldNotifyTurn(playerId, room.sockets.has(playerId))) return;
         const phase = room.state.phase === 'bidding' ? 'bidding' : 'playing';
-        push.notifyTurn(playerId, { code: room.code, phase }).catch(() => undefined);
+        // Un échec d'envoi ne doit pas casser le tour, mais rester muet cachait
+        // un fournisseur VAPID en panne — et l'expérience asynchrone repose sur
+        // ces notifications. On journalise comme pour l'e-mail.
+        push.notifyTurn(playerId, { code: room.code, phase }).catch((err) => {
+          console.error('[push] échec notification de tour:', err);
+        });
       },
     },
     // Les parties en cours sont persistées : elles survivent à un redémarrage.

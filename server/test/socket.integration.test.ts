@@ -449,3 +449,112 @@ describe('format de partie', () => {
     60_000,
   );
 });
+
+describe('réactions, phrases, pause et réglages (câblage socket)', () => {
+  let host: TestClient, guest: TestClient;
+  let code: string;
+
+  it('met en place une partie à deux humains et deux bots', async () => {
+    host = await createUser('HostWire');
+    guest = await createUser('GuestWire');
+    await Promise.all([host.connect(), guest.connect()]);
+    code = (await host.emit<{ ok: boolean; code: string }>('room:create')).code;
+    expect((await guest.emit('room:join', { code })).ok).toBe(true);
+    expect((await host.emit('room:addBot')).ok).toBe(true);
+    expect((await host.emit('room:addBot')).ok).toBe(true);
+    await host.waitView((v) => v.players.length === 4, 'table complète');
+  });
+
+  it('rejette un réglage de barème par un non-hôte, accepte de l’hôte', async () => {
+    const bad = await guest.emit<{ ok: boolean; error?: { code: string } }>('room:setScoring', {
+      scoring: 'gentle',
+    });
+    expect(bad.ok).toBe(false);
+    expect(bad.error!.code).toBe('NOT_HOST');
+    expect((await host.emit('room:setScoring', { scoring: 'gentle' })).ok).toBe(true);
+    await host.waitView((v) => v.scoring === 'gentle', 'barème doux');
+  });
+
+  it('rejette une réaction hors de la liste fermée', async () => {
+    const bad = await guest.emit<{ ok: boolean; error?: { code: string } }>('game:emote', {
+      emote: 'not-an-emote',
+    });
+    expect(bad.ok).toBe(false);
+    expect(bad.error!.code).toBe('INVALID_PAYLOAD');
+  });
+
+  it('diffuse une petite phrase à toute la table', async () => {
+    const received = new Promise<{ playerId: string; phrase: string }>((resolve) => {
+      host.socket.on('game:event', (e: { type: string; playerId: string; phrase: string }) => {
+        if (e.type === 'phrase') resolve(e);
+      });
+    });
+    expect((await guest.emit('game:phrase', { phrase: 'nice' })).ok).toBe(true);
+    const evt = await received;
+    expect(evt.phrase).toBe('nice');
+    expect(evt.playerId).toBe(guest.userId);
+  });
+
+  it('rejette une phrase inconnue', async () => {
+    const bad = await guest.emit<{ ok: boolean; error?: { code: string } }>('game:phrase', {
+      phrase: 'liberté-de-parole',
+    });
+    expect(bad.ok).toBe(false);
+    expect(bad.error!.code).toBe('INVALID_PAYLOAD');
+  });
+
+  it('rejette un payload de pause non booléen', async () => {
+    const bad = await guest.emit<{ ok: boolean; error?: { code: string } }>('game:pause', {
+      paused: 'oui',
+    });
+    expect(bad.ok).toBe(false);
+    expect(bad.error!.code).toBe('INVALID_PAYLOAD');
+  });
+
+  it('met un joueur en pause puis le fait revenir', async () => {
+    expect((await host.emit('game:start')).ok).toBe(true);
+    await host.waitView((v) => v.phase === 'bidding', 'partie lancée');
+
+    expect((await guest.emit('game:pause', { paused: true })).ok).toBe(true);
+    await host.waitView(
+      (v) => v.players.find((p) => p.id === guest.userId)?.paused === true,
+      'invité en pause',
+    );
+
+    expect((await guest.emit('game:pause', { paused: false })).ok).toBe(true);
+    await host.waitView(
+      (v) => v.players.find((p) => p.id === guest.userId)?.paused !== true,
+      'invité de retour',
+    );
+
+    host.socket.close();
+    guest.socket.close();
+  });
+});
+
+describe('limitation de débit', () => {
+  it('coupe un flot de room:join avant qu’il ne balaye les codes', async () => {
+    const attacker = await createUser('Bruteforce');
+    await attacker.connect();
+
+    // Bien au-delà du seuil (30 / 5 s) : au moins un join doit être refusé
+    // sans révéler si le code existe.
+    // Codes de format VALIDE (4 lettres de l'alphabet des salons, jamais un
+    // vrai salon) : un refus ne peut donc venir que du limiteur, pas du format.
+    const abc = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+    const codeFor = (i: number) =>
+      abc[(i * 7) % abc.length] + abc[(i * 13) % abc.length] + abc[(i * 17) % abc.length] + 'Z';
+    const results = await Promise.all(
+      Array.from({ length: 60 }, (_, i) =>
+        attacker.emit<{ ok: boolean; error?: { code: string } }>('room:join', { code: codeFor(i) }),
+      ),
+    );
+    const refused = results.filter((r) => !r.ok);
+    expect(refused.length).toBeGreaterThan(0);
+    // Tous les refus renvoient ROOM_NOT_FOUND : le limiteur ne se distingue pas
+    // d'un code inexistant, donc ne fuit aucune information exploitable.
+    expect(refused.every((r) => r.error!.code === 'ROOM_NOT_FOUND')).toBe(true);
+
+    attacker.socket.close();
+  });
+});

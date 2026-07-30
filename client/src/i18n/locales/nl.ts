@@ -225,6 +225,7 @@ export const nl: Messages = {
   gamesPlayed: 'spellen',
   gamesWon: 'gewonnen',
   bestRound: 'beste ronde',
+  contractsKept: 'Contracten gehaald',
   noHistory: 'Nog geen enkel spel uitgespeeld.',
   historyTitle: 'Mijn laatste spellen',
   wonBadge: 'Gewonnen',

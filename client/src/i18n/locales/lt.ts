@@ -246,6 +246,7 @@ export const lt: Messages = {
   gamesPlayed: 'partijos',
   gamesWon: 'pergalės',
   bestRound: 'geriausias ratas',
+  contractsKept: 'Įvykdyti užsakymai',
   noHistory: 'Kol kas nėra baigtų partijų.',
   historyTitle: 'Paskutinės mano partijos',
   wonBadge: 'Laimėta',

@@ -254,6 +254,7 @@ export const sk: Messages = {
   gamesPlayed: 'hier',
   gamesWon: 'výhier',
   bestRound: 'najlepšie kolo',
+  contractsKept: 'Splnené záväzky',
   noHistory: 'Zatiaľ žiadna dohraná hra.',
   historyTitle: 'Moje posledné hry',
   wonBadge: 'Výhra',

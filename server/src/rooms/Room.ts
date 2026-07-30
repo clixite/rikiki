@@ -85,6 +85,16 @@ export class Room {
   private founderId: string;
   /** Minuteur du tour en cours, et son échéance diffusée aux clients. */
   private turnTimer: ReturnType<typeof setTimeout> | null = null;
+  /**
+   * Signature du tour sur lequel le minuteur court actuellement.
+   *
+   * Sans elle, toute action valide — y compris `profile:update` ou une
+   * bascule de pause du joueur DONT c'est le tour — repoussait l'échéance de
+   * quarante-cinq secondes. Un joueur pouvait ainsi ne jamais être joué à sa
+   * place et bloquer la table à l'infini. On ne réarme donc que si le tour a
+   * vraiment changé.
+   */
+  private turnTimerKey: string | null = null;
   turnDeadline: number | null = null;
   lastActivity = Date.now();
 
@@ -118,7 +128,15 @@ export class Room {
     // de secours, et il ne récupérerait plus jamais la barre.
     room.founderId = state.founderId ?? host.id;
     room.state = state;
-    room.lastActivity = lastActivity;
+    // Le compteur d'inactivité repart de MAINTENANT, pas de l'ancien
+    // horodatage : une partie inactive depuis 59 minutes au moment d'un
+    // redéploiement rouvre avec un délai de grâce de reconnexion (90 s), mais
+    // si `lastActivity` restait à l'ancien temps, le premier balayage la
+    // supprimait aussitôt — et le joueur qui se reconnectait tombait sur une
+    // partie déjà détruite. `lastActivity` sert de repère au balayage ; le
+    // seuil de restauration, lui, a déjà été jugé sur `updatedAt` en amont.
+    void lastActivity;
+    room.lastActivity = Date.now();
     room.resume();
     return room;
   }
@@ -274,25 +292,47 @@ export class Room {
    * repousserait l'échéance et le minuteur ne tomberait jamais.
    */
   private armTurnTimer(): void {
+    const s = this.state;
+    const seconds = this.options.turnSeconds ?? TURN_SECONDS;
+
+    // À qui le tour, et sur quel « moment » exact. La signature inclut le pli
+    // et le nombre de cartes posées : elle change à chaque coup, jamais sur une
+    // simple rediffusion de vue ou un changement de profil.
+    const inTurn = (s.phase === 'bidding' || s.phase === 'playing') && s.round !== null;
+    const current = inTurn ? s.players.find((p) => p.seat === s.round!.currentSeat) : undefined;
+    const countdownDue =
+      inTurn &&
+      !this.isAsync &&
+      seconds > 0 &&
+      current !== undefined &&
+      !isBotId(current.id) &&
+      !this.autoPlaySet.has(current.id) &&
+      !current.paused;
+
+    if (countdownDue) {
+      const r = s.round!;
+      const key = `${s.phase}:${r.roundIndex}:${r.currentSeat}:${r.currentTrick.plays.length}`;
+      // Même tour qu'avant, minuteur déjà en route : on le laisse courir. C'est
+      // tout l'intérêt — un joueur ne peut pas repousser sa propre échéance.
+      if (key === this.turnTimerKey && this.turnTimer) return;
+
+      if (this.turnTimer) clearTimeout(this.turnTimer);
+      this.turnTimerKey = key;
+      this.turnDeadline = Date.now() + seconds * 1000;
+      const timer = setTimeout(() => this.onTurnTimeout(current!.id), seconds * 1000);
+      timer.unref?.();
+      this.turnTimer = timer;
+      return;
+    }
+
+    // Plus de tour à minuter (fin de manche, robot, pause, asynchrone) : on
+    // désarme, et on oublie la signature pour que le prochain vrai tour réarme.
     if (this.turnTimer) {
       clearTimeout(this.turnTimer);
       this.turnTimer = null;
     }
+    this.turnTimerKey = null;
     this.turnDeadline = null;
-
-    const s = this.state;
-    if ((s.phase !== 'bidding' && s.phase !== 'playing') || !s.round) return;
-    // En asynchrone, personne ne fait attendre personne : pas de compte à rebours.
-    if (this.isAsync) return;
-    const seconds = this.options.turnSeconds ?? TURN_SECONDS;
-    if (seconds <= 0) return;
-    const current = s.players.find((p) => p.seat === s.round!.currentSeat);
-    if (!current || isBotId(current.id) || this.autoPlaySet.has(current.id) || current.paused) return;
-
-    this.turnDeadline = Date.now() + seconds * 1000;
-    const timer = setTimeout(() => this.onTurnTimeout(current.id), seconds * 1000);
-    timer.unref?.();
-    this.turnTimer = timer;
   }
 
   /** Le joueur n'a pas joué à temps : on joue au plus prudent à sa place. */
@@ -362,6 +402,10 @@ export class Room {
   attach(userId: string, socket: Socket): void {
     const prev = this.sockets.get(userId);
     if (prev && prev.id !== socket.id) {
+      // Même joueur, nouvel onglet ou nouvel appareil : l'ancien socket cesse
+      // de recevoir les vues. Sans un mot, il resterait affiché sur une table
+      // gelée en croyant y jouer encore ; on le renvoie donc à l'accueil.
+      prev.emit('room:closed', { reason: 'replaced' });
       prev.data.roomCode = null;
       prev.leave(this.code);
     }

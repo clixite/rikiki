@@ -24,6 +24,17 @@ export default function GameOver({ view }: Props) {
   const winner = sorted[0];
   const iWon = winner.id === view.you;
 
+  /*
+   * Ma partie en deux chiffres. Le classement dit qui a gagné ; il ne dit pas
+   * COMMENT on a joué — et c'est ce « 5 contrats sur 7 » qui donne envie de
+   * faire mieux à la prochaine. L'historique est accumulé côté client au fil
+   * des manches : quelqu'un qui rejoint la table à la toute fin n'en a pas,
+   * et le bandeau disparaît alors plutôt que d'afficher des zéros faux.
+   */
+  const roundHistory = useGame((s) => s.roundHistory);
+  const kept = roundHistory.filter((r) => r.bid !== null && r.bid === r.tricks).length;
+  const bestRound = roundHistory.length ? Math.max(...roundHistory.map((r) => r.score)) : 0;
+
   const onRematch = async () => {
     const res = await rematch();
     if (!res.ok) useGame.getState().showToast(res.error.message);
@@ -67,6 +78,33 @@ export default function GameOver({ view }: Props) {
             {winner.totalScore} points {iWon ? '· bravo !' : ''}
           </p>
         </motion.div>
+
+        {roundHistory.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mb-3 flex gap-2"
+            data-testid="game-recap"
+          >
+            <div className="flex-1 rounded-xl bg-felt-900/45 p-2.5 text-center ring-1 ring-white/6">
+              <p className="text-[11px] leading-tight text-paper-50/55">{t.contractsKept}</p>
+              <p className="mt-0.5 text-lg font-bold tabular-nums text-brass-300">
+                {kept}/{roundHistory.length}
+              </p>
+            </div>
+            <div className="flex-1 rounded-xl bg-felt-900/45 p-2.5 text-center ring-1 ring-white/6">
+              <p className="text-[11px] leading-tight text-paper-50/55">{t.bestRound}</p>
+              <p
+                className={`mt-0.5 text-lg font-bold tabular-nums ${
+                  bestRound > 0 ? 'text-success' : 'text-paper-50/70'
+                }`}
+              >
+                {bestRound > 0 ? `+${bestRound}` : bestRound}
+              </p>
+            </div>
+          </motion.div>
+        )}
 
         <ul className="space-y-1.5">
           {sorted.map((p, i) => (

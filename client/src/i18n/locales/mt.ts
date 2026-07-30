@@ -261,6 +261,7 @@ export const mt: Messages = {
   gamesPlayed: 'logħbiet',
   gamesWon: 'rebħiet',
   bestRound: 'l-aħjar rawnd',
+  contractsKept: 'Ftehimiet miżmuma',
   noHistory: 'Għadek ma temmejt l-ebda logħba.',
   historyTitle: 'L-aħħar logħbiet tiegħi',
   wonBadge: 'Rebħa',
