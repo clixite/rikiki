@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { AnimatePresence, m as motion } from 'motion/react';
 import { EMOTES, PHRASES, type EmoteId, type PhraseId } from '@rikiki/shared';
 import { isLeftHanded, subscribeLeftHanded } from '../a11y';
+import Icon, { type IconName } from './Icon';
 import { vibrate } from '../haptics';
 import { useT } from '../i18n';
 import { sendEmote, sendPhrase } from '../socket';
@@ -90,14 +91,14 @@ export default function EmoteBar() {
                 active={tab === 'emotes'}
                 onClick={() => setTab('emotes')}
                 label={t.emotes}
-                glyph="😀"
+                icon="smile"
                 testId="tab-emotes"
               />
               <TabButton
                 active={tab === 'phrases'}
                 onClick={() => setTab('phrases')}
                 label={t.phrases}
-                glyph="💬"
+                icon="message"
                 testId="tab-phrases"
               />
             </div>
@@ -146,7 +147,7 @@ export default function EmoteBar() {
         aria-expanded={open}
         className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-felt-900/70 text-xl ring-1 ring-white/10 transition active:scale-90"
       >
-        <span aria-hidden="true">{open ? '✕' : '😀'}</span>
+        <Icon name={open ? 'close' : 'smile'} />
       </button>
     </div>
   );
@@ -157,13 +158,13 @@ function TabButton({
   active,
   onClick,
   label,
-  glyph,
+  icon,
   testId,
 }: {
   active: boolean;
   onClick: () => void;
   label: string;
-  glyph: string;
+  icon: IconName;
   testId: string;
 }) {
   return (
@@ -173,11 +174,11 @@ function TabButton({
       onClick={onClick}
       aria-label={label}
       aria-pressed={active}
-      className={`min-h-9 flex-1 rounded-lg text-lg transition ${
+      className={`flex min-h-9 flex-1 items-center justify-center rounded-lg transition ${
         active ? 'bg-white/12' : 'opacity-55'
       }`}
     >
-      <span aria-hidden="true">{glyph}</span>
+      <Icon name={icon} size={18} />
     </button>
   );
 }

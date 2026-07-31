@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AnimatePresence, m as motion } from 'motion/react';
 import { useNav } from '../nav';
+import Icon from './Icon';
 import { useT } from '../i18n';
 import { vibrate } from '../haptics';
 import { leaveRoom, setPaused } from '../socket';
@@ -57,7 +58,7 @@ export default function LeaveGameButton() {
         aria-label={t.leaveGame}
         className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/55 text-lg ring-1 ring-white/10 transition active:scale-90"
       >
-        <span aria-hidden="true">←</span>
+        <Icon name="back" />
       </button>
 
       <AnimatePresence>

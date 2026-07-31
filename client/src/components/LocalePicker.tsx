@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AnimatePresence, m as motion } from 'motion/react';
 import { LOCALES, LOCALE_NAMES, setLocale, useLocale, useT, type Locale } from '../i18n';
+import Icon from './Icon';
 import { vibrate } from '../haptics';
 
 interface Props {
@@ -53,7 +54,7 @@ export default function LocalePicker({ variant = 'row', className = '' }: Props)
           >
             <span className="text-[10px] font-bold uppercase tracking-wide text-paper-50/55">{code}</span>
             <span className="min-w-0 flex-1 truncate">{LOCALE_NAMES[code]}</span>
-            {selected && <span aria-hidden="true">✓</span>}
+            {selected && <Icon name="check" size={16} />}
           </button>
         );
       })}
@@ -73,16 +74,12 @@ export default function LocalePicker({ variant = 'row', className = '' }: Props)
         aria-expanded={open}
         className="flex min-h-11 w-full items-center gap-3 text-left"
       >
-        <span aria-hidden="true" className="text-lg">
-          🌍
-        </span>
+        <Icon name="globe" size={20} className="shrink-0 text-paper-50/70" />
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-medium text-paper-50/90">{t.language}</span>
           <span className="block text-xs text-paper-50/55">{LOCALE_NAMES[locale]}</span>
         </span>
-        <span className={`text-paper-50/40 transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden="true">
-          ⌄
-        </span>
+        <Icon name="chevronDown" size={18} className="shrink-0 text-paper-50/50" />
       </button>
 
       <AnimatePresence initial={false}>

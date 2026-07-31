@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { m as motion } from 'motion/react';
 import { useNav } from '../nav';
+import Icon from '../components/Icon';
 import { createGuestAccount, deleteAccount, requestMagicLink, updatePhoto, updateProfile } from '../api';
 import Avatar, { AVATAR_IDS, DEFAULT_AVATAR_ID } from '../components/Avatar';
 import PlayerAvatar from '../components/PlayerAvatar';
@@ -273,7 +274,7 @@ function AccountSection({ isGuest, email }: { isGuest: boolean; email: string | 
   if (!isGuest && email) {
     return (
       <div className="mt-6 flex items-center gap-2 rounded-xl bg-success/10 px-3.5 py-3 ring-1 ring-success/20">
-        <span aria-hidden="true">✓</span>
+        <Icon name="check" size={16} />
         <div className="min-w-0">
           <p className="text-sm font-medium text-success">{t.accountSaved}</p>
           <p className="truncate text-xs text-paper-50/55">{email}</p>
@@ -486,7 +487,7 @@ function PhotoPicker({
             busy ? 'opacity-40' : ''
           }`}
         >
-          <span aria-hidden="true">📷</span>
+          <Icon name="photo" size={18} />
           {t.takePhoto}
           <input
             type="file"

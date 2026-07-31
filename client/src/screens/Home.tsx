@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { m as motion } from 'motion/react';
 import { Navigate } from 'react-router-dom';
 import { useNav } from '../nav';
+import Icon from '../components/Icon';
 import type { ActiveGame, UserStats } from '@rikiki/shared';
 import { isColorblindMode } from '../a11y';
 import { fetchActiveGames, fetchMe } from '../api';
@@ -139,7 +140,7 @@ export default function Home() {
           title={t.groups}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/45 text-lg ring-1 ring-white/8 transition active:scale-90"
         >
-          <span aria-hidden="true">👥</span>
+          <Icon name="users" />
         </button>
         <button
           type="button"
@@ -149,7 +150,7 @@ export default function Home() {
           title={t.rules}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/45 text-lg ring-1 ring-white/8 transition active:scale-90"
         >
-          <span aria-hidden="true">📖</span>
+          <Icon name="rules" />
         </button>
         <SoundToggle />
       </div>

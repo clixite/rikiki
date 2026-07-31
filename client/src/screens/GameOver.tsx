@@ -1,5 +1,6 @@
 import { m as motion } from 'motion/react';
 import { useNav } from '../nav';
+import Icon from '../components/Icon';
 import type { GameView } from '@rikiki/shared';
 import SoundToggle from '../components/SoundToggle';
 import { useT } from '../i18n';
@@ -150,7 +151,7 @@ export default function GameOver({ view }: Props) {
             onClick={onShare}
             className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-white/10 py-3 text-base font-semibold transition hover:bg-white/15 active:scale-[0.98]"
           >
-            <span aria-hidden="true">📤</span>
+            <Icon name="share" size={18} />
             {t.shareResult}
           </button>
           <button

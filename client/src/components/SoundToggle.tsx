@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { isMuted, setMuted, unlockAudio } from '../audio';
+import Icon from './Icon';
 import { useT } from '../i18n';
 
 
@@ -36,7 +37,7 @@ export default function SoundToggle({ className = '' }: { className?: string }) 
       }}
       className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/55 text-lg ring-1 ring-white/10 transition active:scale-90 ${className}`}
     >
-      <span aria-hidden="true">{muted ? '🔇' : '🔊'}</span>
+      <Icon name={muted ? 'soundOff' : 'sound'} />
     </button>
   );
 }

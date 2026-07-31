@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { m as motion } from 'motion/react';
 import { Navigate, useParams } from 'react-router-dom';
 import { useNav } from '../nav';
+import Icon from '../components/Icon';
 import type { GroupDetail as GroupDetailData, GroupStanding } from '@rikiki/shared';
 import { deleteGroup, fetchGroupDetail, leaveGroup, readCachedGroupDetail } from '../api';
 import SoundToggle from '../components/SoundToggle';
@@ -180,9 +181,7 @@ export default function GroupDetail() {
             <span className="font-mono text-base font-bold tracking-[0.25em] text-brass-300">
               {data.group.code}
             </span>
-            <span aria-hidden="true" className="text-sm text-paper-50/45">
-              ⧉
-            </span>
+            <Icon name="copy" size={18} />
           </button>
 
           <div className="rk-scroll mt-3 min-h-0 flex-1 overflow-y-auto">

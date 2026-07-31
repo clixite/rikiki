@@ -3,6 +3,7 @@ import { AnimatePresence, m as motion } from 'motion/react';
 import type { GameView } from '@rikiki/shared';
 import { cardId } from '@rikiki/shared';
 import BidPicker from '../components/BidPicker';
+import Icon from '../components/Icon';
 import BidsSummary from '../components/BidsSummary';
 import LeaveGameButton from '../components/LeaveGameButton';
 import EmoteBar, { EMOTE_GLYPH } from '../components/EmoteBar';
@@ -137,7 +138,7 @@ export default function Table({ view: serverView }: Props) {
           aria-label={t.rules}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/55 text-lg ring-1 ring-white/10 transition active:scale-90"
         >
-          <span aria-hidden="true">?</span>
+          <Icon name="help" />
         </button>
 
         <button
@@ -147,7 +148,7 @@ export default function Table({ view: serverView }: Props) {
           aria-label={t.scoreboard}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/55 text-lg ring-1 ring-white/10 transition active:scale-90"
         >
-          <span aria-hidden="true">🏆</span>
+          <Icon name="trophy" />
         </button>
       </header>
 
@@ -215,7 +216,7 @@ export default function Table({ view: serverView }: Props) {
             aria-label={t.lastTrick}
             className="absolute bottom-2 left-3 flex h-11 w-11 items-center justify-center rounded-full bg-felt-900/70 text-lg ring-1 ring-white/10 transition active:scale-90"
           >
-            <span aria-hidden="true">🃏</span>
+            <Icon name="cards" />
           </button>
         )}
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { m as motion } from 'motion/react';
 import { useNav } from '../nav';
+import Icon from '../components/Icon';
 import type { GameView } from '@rikiki/shared';
 import { DEFAULT_PACE, DEFAULT_SCORING, MIN_PLAYERS, isBotId } from '@rikiki/shared';
 import GameSettingsSheet from '../components/GameSettingsSheet';
@@ -65,7 +66,7 @@ export default function Lobby({ view }: Props) {
           title={t.rules}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-felt-900/45 text-lg ring-1 ring-white/8 transition active:scale-90"
         >
-          <span aria-hidden="true">📖</span>
+          <Icon name="rules" />
         </button>
         <SoundToggle />
       </div>
@@ -161,9 +162,7 @@ export default function Lobby({ view }: Props) {
         onClick={() => setSettingsOpen(true)}
         className="mt-3 flex w-full items-center gap-3 rounded-xl bg-felt-900/45 px-3 py-2.5 text-left ring-1 ring-white/6 transition active:scale-[0.98]"
       >
-        <span className="text-lg leading-none" aria-hidden="true">
-          ⚙️
-        </span>
+        <Icon name="settings" size={22} className="shrink-0 text-paper-50/70" />
         <span className="min-w-0 flex-1">
           <span className="block text-[13px] font-medium text-paper-50/90">{t.gameSettings}</span>
           <span className="block truncate text-[11px] text-paper-50/55">{settingsSummary}</span>
