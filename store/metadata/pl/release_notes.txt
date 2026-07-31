@@ -1,0 +1,9 @@
+Pierwsza wersja Rikiki.
+
+Gra w lewy dla 3 do 8 graczy, każdy na swoim telefonie. Utwórz rozgrywkę, podaj czteroliterowy kod i grajcie — przy jednym stole albo na odległość.
+
+• Trzy formaty: błyskawiczny, klasyczny lub rosnący
+• Tryb „we własnym tempie”: każdy gra, kiedy może
+• Trzy punktacje
+• Gracze automatyczni, gdy jest was za mało
+• Bez reklam, bez zakupów w aplikacji, bez abonamentu

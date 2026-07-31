@@ -1,0 +1,9 @@
+Første version af Rikiki.
+
+Et stikspil for 3 til 8 spillere, hver på sin telefon. Opret et spil, send den firebogstavs kode, og spil — omkring bordet eller på afstand.
+
+• Tre formater: lyn, klassisk eller stigende
+• Tilstanden “i eget tempo”: hver spiller, når de kan
+• Tre pointsystemer
+• Automatiske spillere, når I er for få
+• Ingen reklamer, ingen køb i appen, intet abonnement

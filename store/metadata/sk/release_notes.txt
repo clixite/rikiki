@@ -1,0 +1,9 @@
+Prvá verzia Rikiki.
+
+Hra o zdvihy pre 3 až 8 hráčov, každý na svojom telefóne. Vytvorte hru, pošlite štvorpísmenový kód a hrajte — pri jednom stole alebo na diaľku.
+
+• Tri formáty: blesk, klasický alebo stúpajúci
+• Režim „vlastným tempom“: každý hrá, keď môže
+• Tri spôsoby bodovania
+• Automatickí hráči, keď vás je málo
+• Bez reklám, bez nákupov v aplikácii, bez predplatného

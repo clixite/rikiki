@@ -1,0 +1,9 @@
+Primera versión de Rikiki.
+
+Un juego de bazas para 3 a 8 jugadores, cada uno en su móvil. Crea una partida, comparte el código de cuatro letras y juega — en la misma mesa o a distancia.
+
+• Tres formatos: relámpago, clásico o ascendente
+• Modo «a tu ritmo»: cada uno juega cuando puede
+• Tres sistemas de puntuación
+• Jugadores automáticos cuando sois pocos
+• Sin anuncios, sin compras integradas, sin suscripción

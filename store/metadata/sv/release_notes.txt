@@ -1,0 +1,9 @@
+Första versionen av Rikiki.
+
+Ett stickspel för 3 till 8 spelare, var och en på sin egen telefon. Skapa ett parti, dela koden på fyra bokstäver och spela — vid samma bord eller på distans.
+
+• Tre format: blixt, klassiskt eller stigande
+• Läget ”i egen takt”: var och en spelar när det passar
+• Tre poängräkningar
+• Automatiska spelare när ni är för få
+• Inga annonser, inga köp i appen, ingen prenumeration

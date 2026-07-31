@@ -1,0 +1,9 @@
+Prima versiune Rikiki.
+
+Un joc de levate pentru 3 până la 8 jucători, fiecare pe telefonul lui. Creați un joc, trimiteți codul din patru litere și jucați — la aceeași masă sau de la distanță.
+
+• Trei formate: fulger, clasic sau ascendent
+• Modul „în ritmul tău”: fiecare joacă atunci când poate
+• Trei sisteme de punctaj
+• Jucători automați când sunteți prea puțini
+• Fără reclame, fără achiziții în aplicație, fără abonament

@@ -1,0 +1,9 @@
+Première version de Rikiki.
+
+Un jeu de plis de 3 à 8 joueurs, chacun sur son téléphone. Créez une partie, partagez le code à quatre lettres, et jouez — autour de la même table ou à distance.
+
+• Trois formats : éclair, classique ou montante
+• Mode « au rythme de chacun » : chacun joue quand il peut
+• Trois barèmes de score
+• Joueurs automatiques quand vous n’êtes pas assez nombreux
+• Aucune publicité, aucun achat intégré, aucun abonnement

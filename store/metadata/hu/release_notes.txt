@@ -1,0 +1,9 @@
+A Rikiki első változata.
+
+Ütésvivő kártyajáték 3–8 játékosnak, mindenki a saját telefonján. Hozzon létre játékot, ossza meg a négybetűs kódot, és játsszanak — egy asztal körül vagy távolról.
+
+• Három formátum: villám, klasszikus vagy emelkedő
+• „Saját tempóban” mód: mindenki akkor játszik, amikor tud
+• Három pontozás
+• Automatikus játékosok, ha kevesen vannak
+• Nincs reklám, nincs alkalmazáson belüli vásárlás, nincs előfizetés

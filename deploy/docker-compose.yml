@@ -1,0 +1,15 @@
+services:
+  rikiki:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${APP_PORT:-3000}:3000'
+    env_file:
+      - ../.env
+    environment:
+      - NODE_ENV=production
+      - DB_PATH=/app/data/rikiki.db
+    volumes:
+      - ../data:/app/data

@@ -1,0 +1,9 @@
+Erste Version von Rikiki.
+
+Ein Stichspiel für 3 bis 8 Spieler, jeder am eigenen Telefon. Partie erstellen, den vierstelligen Code teilen, losspielen — am selben Tisch oder aus der Ferne.
+
+• Drei Formate: Blitz, klassisch oder aufsteigend
+• Modus „Im eigenen Tempo“: jeder spielt, wann er kann
+• Drei Wertungen
+• Automatische Mitspieler, wenn ihr zu wenige seid
+• Keine Werbung, keine In-App-Käufe, kein Abo

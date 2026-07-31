@@ -1,0 +1,9 @@
+Rikikin ensimmäinen versio.
+
+Tikkipeli 3–8 pelaajalle, kukin omalla puhelimellaan. Luo peli, jaa nelikirjaiminen koodi ja pelaa — saman pöydän ääressä tai etänä.
+
+• Kolme muotoa: salama, klassinen tai nouseva
+• ”Omaan tahtiin” -tila: kukin pelaa kun ehtii
+• Kolme pisteytystä
+• Automaattipelaajat, kun väkeä on liian vähän
+• Ei mainoksia, ei sovelluksen sisäisiä ostoja, ei tilausta

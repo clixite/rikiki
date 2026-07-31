@@ -1,0 +1,9 @@
+Prva verzija Rikikija.
+
+Igra štihova za 3 do 8 igrača, svatko na svom telefonu. Stvorite igru, podijelite četveroslovni kod i igrajte — za istim stolom ili na daljinu.
+
+• Tri formata: munjeviti, klasični ili rastući
+• Način „vlastitim ritmom”: svatko igra kad može
+• Tri načina bodovanja
+• Automatski igrači kad vas je premalo
+• Bez oglasa, bez kupnji u aplikaciji, bez pretplate
