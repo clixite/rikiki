@@ -40,7 +40,7 @@ export const mt: Messages = {
 
   // Il-bidu
   createGame: 'Oħloq logħba',
-  joinGame: "Idħol f'logħba",
+  joinGame: 'Idħol f’logħba',
   resumeGame: 'Kompli l-logħba',
   myGames: 'Il-logħbiet tiegħi',
 
@@ -155,10 +155,10 @@ export const mt: Messages = {
   bidsBalanced: (cards: number) => `Total eżatt: ${daqqiet(cards)} imħabbra`,
   bidsOver: (n: number) =>
     n === 1
-      ? "Daqqa waħda żejda: xi ħadd se jaqa'"
-      : `${daqqiet(n)} żejda: xi ħadd se jaqa'`,
+      ? 'Daqqa waħda żejda: xi ħadd se jaqa’'
+      : `${daqqiet(n)} żejda: xi ħadd se jaqa’`,
   bidsUnder: (n: number) =>
-    n === 1 ? "Daqqa waħda ħielsa x'tinġabar" : `${daqqiet(n)} ħielsa x'jinġabru`,
+    n === 1 ? 'Daqqa waħda ħielsa x’tinġabar' : `${daqqiet(n)} ħielsa x’jinġabru`,
   noBidYet: 'Għadu ma ħabbarx',
   tricksOfContract: (tricks: number, bid: number) => `${tricks}/${bid} daqqiet`,
   yourTurn: 'Imissek int',
@@ -182,7 +182,7 @@ export const mt: Messages = {
   shareResult: 'Aqsam ir-riżultat',
   shareTitle: 'Il-logħba Rikiki spiċċat 🃏',
   shareSaved: 'Ritratt salvat',
-  playAgain: "Erġa' ilgħab",
+  playAgain: 'Erġa’ ilgħab',
   backHome: 'Il-bidu',
 
   // Ħoss
@@ -191,8 +191,8 @@ export const mt: Messages = {
 
   // Netwerk
   reconnecting: 'Qed nerġgħu ningħaqdu…',
-  playerDisconnected: (p: string) => `${p} qata' l-konnessjoni`,
-  playerReconnected: (p: string) => `${p} reġa' daħal`,
+  playerDisconnected: (p: string) => `${p} qata’ l-konnessjoni`,
+  playerReconnected: (p: string) => `${p} reġa’ daħal`,
   playerPaused: (p: string) => `${p} qed jieħu waqfa`,
   playerResumed: (p: string) => `${p} reġa’ daħal fil-logħba`,
   playerJoined: (p: string) => `${p} ingħaqad mal-logħba`,
@@ -210,7 +210,7 @@ export const mt: Messages = {
 
   // Kont
   saveAccount: 'Aħżen il-progress tiegħi',
-  saveAccountHint: "Tirċievi link bl-email — l-ebda password x'tiftakar",
+  saveAccountHint: 'Tirċievi link bl-email — l-ebda password x’tiftakar',
   emailPlaceholder: 'inti@email.mt',
   sendMagicLink: 'Ibgħatli l-link',
   magicLinkSent: 'Email mibgħut! Iftaħ il-link biex tikkonferma.',
@@ -248,7 +248,7 @@ export const mt: Messages = {
   close: 'Agħlaq',
   leaveGame: 'Oħroġ mil-logħba',
   leaveGameWarning:
-    'Il-logħba tkompli mingħajrek u l-punti tiegħek ta\' din il-logħba jintilfu.',
+    'Il-logħba tkompli mingħajrek u l-punti tiegħek ta’ din il-logħba jintilfu.',
   leaveGameAction: 'Iva, oħroġ',
   takePhoto: 'Ħu ritratt',
   removePhoto: 'Neħħi r-ritratt',
@@ -272,7 +272,7 @@ export const mt: Messages = {
   groups: 'Il-gruppi tiegħi',
   groupsTitle: 'Il-gruppi tiegħi',
   groupsSubtitle: 'Klassifika kumulattiva għal min dejjem jilgħab flimkien',
-  noGroups: "Bħalissa m'intix f'ebda grupp.",
+  noGroups: 'Bħalissa m’intix f’ebda grupp.',
   createGroup: 'Oħloq grupp',
   createGroupCta: 'Oħloq il-grupp',
   groupNamePlaceholder: 'Il-ħbieb tat-Tlieta',
@@ -292,18 +292,18 @@ export const mt: Messages = {
   groupRanking: 'Klassifika kumulattiva',
   groupRecentGames: 'L-aħħar logħbiet tal-grupp',
   groupNoGames: 'Għadha ma ntlagħbet l-ebda logħba fil-grupp.',
-  groupNoGamesHint: "Ibda logħba ma' dan il-grupp: ir-riżultati jidhru hawn.",
-  groupPlay: "Ilgħab ma' dan il-grupp",
+  groupNoGamesHint: 'Ibda logħba ma’ dan il-grupp: ir-riżultati jidhru hawn.',
+  groupPlay: 'Ilgħab ma’ dan il-grupp',
   groupOwner: 'Fundatur',
   groupLeave: 'Oħroġ mill-grupp',
   groupLeaveConfirm: 'Toħroġ minn dan il-grupp? Il-logħbiet li lgħabt jibqgħu fil-klassifika.',
   groupDelete: 'Ħassar il-grupp',
   groupDeleteConfirm: 'Tħassar dan il-grupp u l-klassifika kollha tiegħu? Dan huwa finali.',
-  groupOwnerCannotLeave: "Int ħloqt dan il-grupp: tista' biss tħassru.",
+  groupOwnerCannotLeave: 'Int ħloqt dan il-grupp: tista’ biss tħassru.',
   groupNotFound: 'Grupp ma nstabx.',
   groupJoined: (name: string) => `Dħalt fi ‘${name}’!`,
   groupCreated: (name: string) => `Il-grupp ‘${name}’ inħoloq!`,
-  groupAttached: (name: string) => `Logħba marbuta ma' ‘${name}’`,
+  groupAttached: (name: string) => `Logħba marbuta ma’ ‘${name}’`,
   groupTotalPoints: 'punti',
   groupRankHeader: '#',
   groupPlayerHeader: 'Plejer',
@@ -325,25 +325,25 @@ export const mt: Messages = {
   demoFollow: 'Trid issegwi l-kulur mitlub jekk għandek. Biss inkella tilgħab li trid.',
   demoTrump: 'Briskola, anke l-iżjed baxxa, tirbaħ l-id fuq il-kulur mitlub.',
   demoScore: 'Ftehim miżmum: 10 punti flimkien ma’ 2 għal kull id. Mitluf: 2 punti inqas għal kull id ta’ differenza.',
-  rulesSubtitle: "Ir-Rikiki f'2 minuti",
+  rulesSubtitle: 'Ir-Rikiki f’2 minuti',
   rulesGoalTitle: 'Il-prinċipju',
   rulesGoalText:
     'Qabel kull rawnd, tħabbru kemm-il daqqa taħsbu li se tirbħu. Il-kwistjoni kollha hi li tolqtu eżatt: la aktar u lanqas inqas. Ma jiswa xejn tirbaħ ħafna daqqiet jekk ħabbart ftit.',
   rulesDealTitle: 'It-tqassim',
   rulesDealText:
-    "Il-logħba tintlagħab f'diversi rawnds. Fl-ewwel wieħed titqassam karta waħda biss lil kull plejer, imbagħad tnejn, imbagħad tlieta… qabel ma terġa' tinżel. F'kull rawnd kulħadd jieħu l-istess numru ta' karti.",
+    'Il-logħba tintlagħab f’diversi rawnds. Fl-ewwel wieħed titqassam karta waħda biss lil kull plejer, imbagħad tnejn, imbagħad tlieta… qabel ma terġa’ tinżel. F’kull rawnd kulħadd jieħu l-istess numru ta’ karti.',
   rulesTrumpText: 'Tinqaleb karta: il-kulur tagħha huwa l-briscla tar-rawnd.',
   rulesBidTitle: 'It-tħabbira',
   rulesBidText:
-    "Wieħed wara l-ieħor, tħabbru kemm-il daqqa qed timmiraw — minn 0 san-numru ta' karti f'idejkom. Tara l-karti tiegħek u l-briscla qabel tiddeċiedi.",
+    'Wieħed wara l-ieħor, tħabbru kemm-il daqqa qed timmiraw — minn 0 san-numru ta’ karti f’idejkom. Tara l-karti tiegħek u l-briscla qabel tiddeċiedi.',
   rulesHookTitle: 'Ir-regola tal-ganċ',
   rulesHookText:
-    "L-aħħar wieħed li jħabbar (il-qassiem) ma jistax jagħżel in-numru li jġib it-total tat-tħabbiriet eżatt daqs in-numru ta' daqqiet tar-rawnd. Riżultat: xi ħadd żgur se jibqa' diżappuntat. In-numru pprojbit jinqata' awtomatikament.",
+    'L-aħħar wieħed li jħabbar (il-qassiem) ma jistax jagħżel in-numru li jġib it-total tat-tħabbiriet eżatt daqs in-numru ta’ daqqiet tar-rawnd. Riżultat: xi ħadd żgur se jibqa’ diżappuntat. In-numru pprojbit jinqata’ awtomatikament.',
   rulesPlayTitle: 'Il-logħob tad-daqqiet',
   rulesPlayText:
-    "Il-plejer fuq ix-xellug tal-qassiem jibda. Kulħadd ipoġġi karta, u l-iqwa waħda tirbaħ id-daqqa. Ir-rebbieħ jiftaħ id-daqqa ta' wara.",
+    'Il-plejer fuq ix-xellug tal-qassiem jibda. Kulħadd ipoġġi karta, u l-iqwa waħda tirbaħ id-daqqa. Ir-rebbieħ jiftaħ id-daqqa ta’ wara.',
   rulesFollowSuit: 'Trid issegwi l-kulur mitlub jekk għandek wieħed.',
-  rulesNoSuit: "Inkella tilgħab li trid: taqta' bil-briscla jew tarmi karta.",
+  rulesNoSuit: 'Inkella tilgħab li trid: taqta’ bil-briscla jew tarmi karta.',
   rulesWinTrick: 'L-ogħla briscla tirbaħ; bla briscla, l-ogħla karta tal-kulur mitlub.',
   rulesScoreTitle: 'Il-punti',
   rulesScoreOk: 'Kuntratt milħuq',
@@ -370,11 +370,11 @@ export const mt: Messages = {
   notificationsChecking: 'Qed niċċekkjaw…',
   notificationsUnsupported: 'Il-browser tiegħek ma jimmaniġġjax notifiki.',
   notificationsNeedsInstall:
-    "Fuq iPhone u iPad, l-ewwel żid ir-Rikiki mal-iskrin tal-bidu (Aqsam → ‘Fuq l-Iskrin tal-Bidu’), imbagħad erġa' ejja hawn.",
+    'Fuq iPhone u iPad, l-ewwel żid ir-Rikiki mal-iskrin tal-bidu (Aqsam → ‘Fuq l-Iskrin tal-Bidu’), imbagħad erġa’ ejja hawn.',
   notificationsDenied:
-    "In-notifiki huma mblukkati għal dan is-sit. Erġa' ixgħelhom mis-settings tal-browser.",
+    'In-notifiki huma mblukkati għal dan is-sit. Erġa’ ixgħelhom mis-settings tal-browser.',
   notificationsNoServiceWorker:
-    "In-notifiki mhumiex disponibbli hawn (installa l-app jew erġa' agħbba l-paġna).",
+    'In-notifiki mhumiex disponibbli hawn (installa l-app jew erġa’ agħbba l-paġna).',
   notificationsServerOff: 'In-notifiki mhumiex ikkonfigurati fuq is-server.',
   notificationsError: 'Ma nistgħux nibdlu n-notifiki.',
 
@@ -392,7 +392,7 @@ export const mt: Messages = {
   colorblindHintBanner: 'Kulurdifett? Ipprova l-kuluri distinti fil-profil tiegħek.',
   suitNames: { S: 'spadi', H: 'koppi', D: 'kwart', C: 'bastuni' },
   rankNames: { 11: 'fanti', 12: 'reġina', 13: 're', 14: 'ass' },
-  cardOf: (rank: string, suit: string) => `${rank} ta' ${suit}`,
+  cardOf: (rank: string, suit: string) => `${rank} ta’ ${suit}`,
   handOf: (n: number) => `Il-karti tiegħek: ${karti(n)}`,
 
   language: 'Lingwa',

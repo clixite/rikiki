@@ -32,10 +32,10 @@ export const fr = {
   // Profil
   yourPseudo: 'Ton pseudo',
   pickAvatar: 'Choisis ton avatar',
-  letsGo: "C'est parti !",
+  letsGo: 'C’est parti !',
   save: 'Enregistrer',
   editProfile: 'Mon profil',
-  changeAvatar: "Changer d'avatar",
+  changeAvatar: 'Changer d’avatar',
 
   // Rejoindre
   enterCode: 'Code de la partie',
@@ -49,7 +49,7 @@ export const fr = {
   players: 'Joueurs',
   host: 'Hôte',
   you: 'toi',
-  waitingForHost: "En attente du lancement par l'hôte…",
+  waitingForHost: 'En attente du lancement par l’hôte…',
   waitingForHostNamed: (p: string) => `${p} lance la partie quand tout le monde est là`,
   needPlayers: (missing: number) =>
     missing === 1 ? 'Encore 1 joueur pour commencer' : `Encore ${missing} joueurs pour commencer`,
@@ -156,7 +156,7 @@ export const fr = {
   points: 'Points',
   nextRound: 'Manche suivante',
   seeResults: 'Voir les résultats',
-  waitingNextRound: "L'hôte va lancer la manche suivante…",
+  waitingNextRound: 'L’hôte va lancer la manche suivante…',
 
   // Fin de partie
   gameOver: 'Partie terminée',
@@ -234,7 +234,7 @@ export const fr = {
   gamesWon: 'victoires',
   bestRound: 'meilleure manche',
   contractsKept: 'Contrats tenus',
-  noHistory: "Aucune partie terminée pour l'instant.",
+  noHistory: 'Aucune partie terminée pour l’instant.',
   historyTitle: 'Mes dernières parties',
   wonBadge: 'Gagné',
   lostBadge: 'Perdu',
@@ -244,7 +244,7 @@ export const fr = {
   groups: 'Mes groupes',
   groupsTitle: 'Mes groupes',
   groupsSubtitle: 'Un classement cumulé avec ceux qui jouent toujours ensemble',
-  noGroups: "Tu ne fais partie d'aucun groupe pour l'instant.",
+  noGroups: 'Tu ne fais partie d’aucun groupe pour l’instant.',
   createGroup: 'Créer un groupe',
   createGroupCta: 'Créer le groupe',
   groupNamePlaceholder: 'Les copains du mardi',
@@ -263,7 +263,7 @@ export const fr = {
   groupGames: (n: number) => (n > 1 ? `${n} parties` : n === 1 ? '1 partie' : 'aucune partie'),
   groupRanking: 'Classement cumulé',
   groupRecentGames: 'Dernières parties du groupe',
-  groupNoGames: "Aucune partie jouée en groupe pour l'instant.",
+  groupNoGames: 'Aucune partie jouée en groupe pour l’instant.',
   groupNoGamesHint: 'Lance une partie avec ce groupe : les résultats arriveront ici.',
   groupPlay: 'Jouer avec ce groupe',
   groupOwner: 'Créateur',
@@ -300,23 +300,23 @@ export const fr = {
   rulesSubtitle: 'Le Rikiki en 2 minutes',
   rulesGoalTitle: 'Le principe',
   rulesGoalText:
-    "Avant chaque manche, vous annoncez combien de plis vous pensez remporter. Tout l'enjeu est de tomber juste : ni plus, ni moins. Faire beaucoup de plis ne sert à rien si vous en aviez annoncé peu.",
+    'Avant chaque manche, vous annoncez combien de plis vous pensez remporter. Tout l’enjeu est de tomber juste : ni plus, ni moins. Faire beaucoup de plis ne sert à rien si vous en aviez annoncé peu.',
   rulesDealTitle: 'La donne',
   rulesDealText:
-    "La partie se joue en plusieurs manches. La première ne distribue qu'une carte par joueur, puis deux, puis trois… avant de redescendre. À chaque manche, tout le monde reçoit le même nombre de cartes.",
+    'La partie se joue en plusieurs manches. La première ne distribue qu’une carte par joueur, puis deux, puis trois… avant de redescendre. À chaque manche, tout le monde reçoit le même nombre de cartes.',
   rulesTrumpText: 'Une carte est retournée : sa couleur est l’atout de la manche.',
-  rulesBidTitle: "L'annonce",
+  rulesBidTitle: 'L’annonce',
   rulesBidText:
     'Chacun son tour, vous annoncez le nombre de plis visé — de 0 au nombre de cartes en main. Vous voyez votre jeu et l’atout pour décider.',
   rulesHookTitle: 'La règle du crochet',
   rulesHookText:
-    "Le dernier à annoncer (le donneur) ne peut pas choisir le chiffre qui ferait correspondre exactement le total des annonces au nombre de plis de la manche. Résultat : quelqu'un sera forcément déçu. Le chiffre interdit est barré automatiquement.",
+    'Le dernier à annoncer (le donneur) ne peut pas choisir le chiffre qui ferait correspondre exactement le total des annonces au nombre de plis de la manche. Résultat : quelqu’un sera forcément déçu. Le chiffre interdit est barré automatiquement.',
   rulesPlayTitle: 'Le jeu des plis',
   rulesPlayText:
     'Le joueur à gauche du donneur entame. Chacun pose une carte, et la plus forte remporte le pli. Le gagnant entame le pli suivant.',
   rulesFollowSuit: 'Vous devez fournir la couleur demandée si vous en avez une.',
-  rulesNoSuit: "Sinon, vous jouez ce que vous voulez : couper à l'atout ou vous défausser.",
-  rulesWinTrick: "Le plus haut atout l'emporte ; sans atout, la plus haute carte de la couleur demandée.",
+  rulesNoSuit: 'Sinon, vous jouez ce que vous voulez : couper à l’atout ou vous défausser.',
+  rulesWinTrick: 'Le plus haut atout l’emporte ; sans atout, la plus haute carte de la couleur demandée.',
   rulesScoreTitle: 'Les points',
   rulesScoreOk: 'Contrat réussi',
   rulesScoreOkExample: 'Annoncé 3, réalisé 3 → 16 points',
@@ -326,10 +326,10 @@ export const fr = {
   rulesScoreVariants: 'L’hôte peut choisir un autre barème dans le salon :',
   rulesEndTitle: 'Fin de partie',
   rulesEndText:
-    "Une fois toutes les manches jouées, le joueur qui totalise le plus de points l'emporte. Le tableau des scores est consultable à tout moment pendant la partie.",
+    'Une fois toutes les manches jouées, le joueur qui totalise le plus de points l’emporte. Le tableau des scores est consultable à tout moment pendant la partie.',
   rulesTip:
     'Astuce : sur les petites manches, un as ou un atout élevé suffit souvent à assurer un pli. Sur les grandes, méfiez-vous des couleurs longues.',
-  rulesGotIt: "J'ai compris",
+  rulesGotIt: 'J’ai compris',
 
   // Notifications « c'est ton tour »
   notificationsTitle: 'Me prévenir quand c’est mon tour',

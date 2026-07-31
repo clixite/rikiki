@@ -13,7 +13,7 @@ export const en: Messages = {
   // Profile
   yourPseudo: 'Your nickname',
   pickAvatar: 'Pick your avatar',
-  letsGo: "Let's go!",
+  letsGo: 'Let’s go!',
   save: 'Save',
   editProfile: 'My profile',
   changeAvatar: 'Change avatar',
@@ -107,7 +107,7 @@ export const en: Messages = {
   bidsTotal: (sum: number, cards: number) => `Bid: ${sum} / ${cards} tricks`,
   hookForbidden: (n: number) => `Not allowed: the total would be exactly ${n}`,
   hookExplain: (forbidden: number, cards: number) =>
-    `${forbidden} is off-limits: the bids can't add up to ${cards} (hook rule).`,
+    `${forbidden} is off-limits: the bids can’t add up to ${cards} (hook rule).`,
   bid: 'Bid',
   tricks: 'Tricks',
   lastTrick: 'Last trick',
@@ -126,7 +126,7 @@ export const en: Messages = {
   noBidYet: 'No bid yet',
   tricksOfContract: (tricks: number, bid: number) => `${tricks}/${bid} tricks`,
   yourTurn: 'Your turn',
-  turnOf: (p: string) => `${p}'s turn`,
+  turnOf: (p: string) => `${p}’s turn`,
   trickWonBy: (p: string) => `${p} wins the trick`,
   scoreboard: 'Scores',
   total: 'Total',
@@ -236,7 +236,7 @@ export const en: Messages = {
   groups: 'My groups',
   groupsTitle: 'My groups',
   groupsSubtitle: 'A running leaderboard for the people who always play together',
-  noGroups: "You're not in any group yet.",
+  noGroups: 'You’re not in any group yet.',
   createGroup: 'Create a group',
   createGroupCta: 'Create group',
   groupNamePlaceholder: 'Tuesday night crew',
@@ -292,17 +292,17 @@ export const en: Messages = {
   rulesSubtitle: 'Rikiki in 2 minutes',
   rulesGoalTitle: 'The idea',
   rulesGoalText:
-    "Before each round, you announce how many tricks you think you'll win. The whole point is to be exactly right: no more, no less. Winning plenty of tricks is worth nothing if you bid low.",
+    'Before each round, you announce how many tricks you think you’ll win. The whole point is to be exactly right: no more, no less. Winning plenty of tricks is worth nothing if you bid low.',
   rulesDealTitle: 'The deal',
   rulesDealText:
     'A game runs over several rounds. The first one deals a single card to each player, then two, then three… before coming back down. In every round, everyone gets the same number of cards.',
   rulesTrumpText: 'One card is turned over: its suit is the trump for the round.',
   rulesBidTitle: 'The bid',
   rulesBidText:
-    "One after another, you announce how many tricks you're going for — from 0 up to the number of cards in your hand. You see your hand and the trump before deciding.",
+    'One after another, you announce how many tricks you’re going for — from 0 up to the number of cards in your hand. You see your hand and the trump before deciding.',
   rulesHookTitle: 'The hook rule',
   rulesHookText:
-    "The last player to bid (the dealer) can't pick the number that would make the bids add up to exactly the number of tricks in the round. So someone is bound to be disappointed. The forbidden number is crossed out automatically.",
+    'The last player to bid (the dealer) can’t pick the number that would make the bids add up to exactly the number of tricks in the round. So someone is bound to be disappointed. The forbidden number is crossed out automatically.',
   rulesPlayTitle: 'Playing the tricks',
   rulesPlayText:
     'The player to the dealer’s left leads. Everyone plays one card, and the strongest one wins the trick. The winner leads the next trick.',
