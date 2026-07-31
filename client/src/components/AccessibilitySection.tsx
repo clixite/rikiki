@@ -45,16 +45,23 @@ export default function AccessibilitySection({ className = '' }: { className?: s
               vibrate('select');
               setColorblindMode(!colorblind);
             }}
-            className={`relative h-7 w-12 shrink-0 rounded-full transition ${
-              colorblind ? 'bg-success' : 'bg-white/15'
-            }`}
+            className="flex h-11 w-12 shrink-0 items-center"
           >
+            {/* Le rail garde ses vingt-huit pixels — c'est le bon dessin. C'est
+                le BOUTON qui monte à quarante-quatre : un interrupteur haut
+                comme son rail se rate au pouce une fois sur trois. */}
             <span
               aria-hidden="true"
-              className={`absolute top-1 h-5 w-5 rounded-full bg-paper-50 shadow transition-all ${
-                colorblind ? 'left-6' : 'left-1'
+              className={`relative block h-7 w-12 rounded-full transition ${
+                colorblind ? 'bg-success' : 'bg-white/15'
               }`}
-            />
+            >
+              <span
+                className={`absolute top-1 h-5 w-5 rounded-full bg-paper-50 shadow transition-all ${
+                  colorblind ? 'left-6' : 'left-1'
+                }`}
+              />
+            </span>
           </button>
         </div>
       </div>
@@ -75,16 +82,23 @@ export default function AccessibilitySection({ className = '' }: { className?: s
               vibrate('select');
               setLeftHanded(!leftHanded);
             }}
-            className={`relative h-7 w-12 shrink-0 rounded-full transition ${
-              leftHanded ? 'bg-success' : 'bg-white/15'
-            }`}
+            className="flex h-11 w-12 shrink-0 items-center"
           >
+            {/* Le rail garde ses vingt-huit pixels — c'est le bon dessin. C'est
+                le BOUTON qui monte à quarante-quatre : un interrupteur haut
+                comme son rail se rate au pouce une fois sur trois. */}
             <span
               aria-hidden="true"
-              className={`absolute top-1 h-5 w-5 rounded-full bg-paper-50 shadow transition-all ${
-                leftHanded ? 'left-6' : 'left-1'
+              className={`relative block h-7 w-12 rounded-full transition ${
+                leftHanded ? 'bg-success' : 'bg-white/15'
               }`}
-            />
+            >
+              <span
+                className={`absolute top-1 h-5 w-5 rounded-full bg-paper-50 shadow transition-all ${
+                  leftHanded ? 'left-6' : 'left-1'
+                }`}
+              />
+            </span>
           </button>
         </div>
       </div>

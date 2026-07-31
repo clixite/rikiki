@@ -105,14 +105,14 @@ export default function Rules() {
             <div className="flex-1 rounded-xl bg-success/10 p-2.5 ring-1 ring-success/20">
               <p className="text-xs font-semibold text-success">{t.rulesScoreOk}</p>
               <p className="mt-1 whitespace-nowrap text-[15px] font-bold tabular-nums text-success">
-                10 + 2 × plis
+                {t.rulesScoreOkFormula}
               </p>
               <p className="mt-0.5 text-[11px] leading-snug text-paper-50/55">{t.rulesScoreOkExample}</p>
             </div>
             <div className="flex-1 rounded-xl bg-danger/10 p-2.5 ring-1 ring-danger/20">
               <p className="text-xs font-semibold text-danger">{t.rulesScoreKo}</p>
               <p className="mt-1 whitespace-nowrap text-[15px] font-bold tabular-nums text-danger">
-                −2 × écart
+                {t.rulesScoreKoFormula}
               </p>
               <p className="mt-0.5 text-[11px] leading-snug text-paper-50/55">{t.rulesScoreKoExample}</p>
             </div>

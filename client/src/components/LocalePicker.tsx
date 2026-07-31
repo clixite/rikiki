@@ -71,7 +71,7 @@ export default function LocalePicker({ variant = 'row', className = '' }: Props)
         data-testid="locale-toggle"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center gap-3 text-left"
+        className="flex min-h-11 w-full items-center gap-3 text-left"
       >
         <span aria-hidden="true" className="text-lg">
           🌍

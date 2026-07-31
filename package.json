@@ -21,6 +21,7 @@
     "typecheck": "tsc --noEmit -p shared && tsc --noEmit -p server && tsc --noEmit -p client",
     "test:ux": "node scripts/ux-tests.mjs",
     "test:e2e": "node scripts/e2e.mjs",
+    "test:i18n": "node scripts/i18n-sweep.mjs",
     "test:perf": "node scripts/perf-client.mjs",
     "test:table": "node scripts/table-audit.mjs",
     "store:assets": "node scripts/store-assets.mjs",

@@ -111,7 +111,7 @@ export default function Profile() {
           enterKeyHint="done"
           onKeyDown={(e) => e.key === 'Enter' && submit()}
           className="w-full rounded-xl bg-felt-900/50 px-4 py-3.5 text-lg outline-none ring-1 ring-white/10 transition placeholder:text-paper-50/55 focus:ring-2 focus:ring-brass-400"
-          placeholder="Marie, Karim, Léa…"
+          placeholder={t.pseudoPlaceholder}
         />
 
         <p className="mb-2 mt-5 text-xs font-medium uppercase tracking-wide text-paper-50/55">{t.pickAvatar}</p>
@@ -228,15 +228,22 @@ function NotificationsSection() {
           data-testid="push-toggle"
           onClick={toggle}
           disabled={busy || availability === null || blocked !== null}
-          className={`relative mt-0.5 h-7 w-12 shrink-0 rounded-full transition disabled:opacity-40 ${
-            enabled ? 'bg-brass-400' : 'bg-white/15'
-          }`}
+          className="flex h-11 w-12 shrink-0 items-center disabled:opacity-40"
         >
+          {/* Cf. les interrupteurs d'accessibilité : le rail reste à vingt-huit
+              pixels, la zone de frappe monte à quarante-quatre. */}
           <span
-            className={`absolute top-1 h-5 w-5 rounded-full bg-paper-50 transition-all ${
-              enabled ? 'left-6' : 'left-1'
+            aria-hidden="true"
+            className={`relative block h-7 w-12 rounded-full transition ${
+              enabled ? 'bg-brass-400' : 'bg-white/15'
             }`}
-          />
+          >
+            <span
+              className={`absolute top-1 h-5 w-5 rounded-full bg-paper-50 transition-all ${
+                enabled ? 'left-6' : 'left-1'
+              }`}
+            />
+          </span>
         </button>
       </div>
       <p className={`mt-2 text-xs ${message ? 'text-danger' : 'text-paper-50/55'}`}>
@@ -312,7 +319,7 @@ function AccountSection({ isGuest, email }: { isGuest: boolean; email: string | 
             type="button"
             onClick={send}
             disabled={busy}
-            className="shrink-0 rounded-lg bg-white/10 px-3.5 py-2.5 text-sm font-semibold transition active:scale-95 disabled:opacity-40"
+            className="min-h-11 shrink-0 rounded-lg bg-white/10 px-3.5 text-sm font-semibold transition hover:bg-white/15 active:scale-95 disabled:opacity-40"
           >
             {t.sendMagicLink}
           </button>

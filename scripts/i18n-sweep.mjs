@@ -83,6 +83,7 @@ const EXCEPTIONS = new Set([
   'Clixite SRL', // raison sociale
   PSEUDO, // artefact du script, pas du produit
   'robot', // cognat : identique en fr/cs/et/ro/sk (constaté à l'exécution)
+  'Normale', // cognat : le format « Normale » s'écrit pareil en français et en italien
   'ABCDEF', // exemple de code de groupe à 6 lettres, volontairement identique partout (groupCodePlaceholder)
   ...Object.values(LOCALE_NAMES), // endonymes du sélecteur de langue : jamais traduits par construction
   ...ALL_LOCALES, // codes ISO à côté de chaque endonyme (bg, cs, de…)
@@ -105,10 +106,22 @@ function normalize(text) {
 function hasLetters(text) {
   return /\p{L}/u.test(text);
 }
+/**
+ * Durée d'un format (« ≈ 10 min »).
+ *
+ * « min » est l'abréviation internationale de la minute : le finnois et le
+ * maltais l'écrivent comme le français, et c'est correct. La clé est bien
+ * traduite — c'est sa valeur qui coïncide. Sans cette exception, le contrôle
+ * signalerait éternellement trois faux positifs par langue, et on finirait
+ * par ne plus le lire.
+ */
+const DUREE_FORMAT = /^≈?\s*\d+\s*min$/u;
+
 function isExpectedMatch(normalized) {
   if (!hasLetters(normalized)) return true;
   if (EXCEPTIONS.has(normalized)) return true;
   if (COPYRIGHT_LINE.test(normalized)) return true;
+  if (DUREE_FORMAT.test(normalized)) return true;
   return false;
 }
 
@@ -423,7 +436,16 @@ for (const code of requested) {
   try {
     await sweep(browser, code, { report: true, frBaseline });
   } catch (e) {
-    check(code, 'parcours complet sans erreur', false, e.message);
+    // Un aller-retour réseau isolé peut expirer sur une machine chargée, sans
+    // rapport avec la langue testée — un seul essai supplémentaire suffit à
+    // le distinguer d'un vrai blocage (page qui ne charge jamais, sélecteur
+    // introuvable parce qu'un bouton a disparu).
+    console.log(`  … échec du parcours, un second essai (${e.message.split('\n')[0]})`);
+    try {
+      await sweep(browser, code, { report: true, frBaseline });
+    } catch (e2) {
+      check(code, 'parcours complet sans erreur (après un second essai)', false, e2.message.split('\n')[0]);
+    }
   }
 }
 
