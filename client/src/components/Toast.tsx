@@ -23,8 +23,14 @@ export default function Toast() {
           cela, un joueur au lecteur d'écran tente un coup illégal et n'entend
           RIEN — pour lui, le jeu a simplement cessé de répondre. */}
       <div role="alert" aria-live="assertive" className="contents">
+        {/* En bas, pas en haut : posé à 48 px du sommet, le message venait
+            recouvrir précisément ce qu'on était en train de lire — le code de
+            la partie dans le salon, le nom du groupe qu'on vient de créer. Le
+            bas de l'écran est la seule bande qui ne porte d'information
+            critique sur aucun écran. Le bandeau de reconnexion, lui, reste en
+            haut : c'est une alerte, elle a le droit de s'imposer. */}
         {toast && (
-          <div className="fixed inset-x-0 top-12 z-50 mx-auto w-fit max-w-[90%] rounded-full bg-black/80 px-4 py-1.5 text-sm shadow-lg">
+          <div className="fixed inset-x-0 bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+5rem))] z-50 mx-auto w-fit max-w-[90%] rounded-full bg-black/80 px-4 py-1.5 text-center text-sm shadow-lg">
             {toast}
           </div>
         )}

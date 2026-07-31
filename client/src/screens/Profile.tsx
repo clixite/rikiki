@@ -151,8 +151,8 @@ export default function Profile() {
         data-testid="profile-submit"
         onClick={submit}
         disabled={busy}
-        className="mt-4 w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-4 text-lg font-bold text-felt-950 transition active:scale-[0.98] disabled:opacity-40"
-        style={{ boxShadow: '0 4px 20px -6px rgb(0 0 0 / 0.6)' }}
+        className="mt-4 w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-4 text-lg font-bold text-felt-950 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-40"
+        style={{ boxShadow: 'var(--shadow-cta)' }}
       >
         {user ? t.save : t.letsGo}
       </button>

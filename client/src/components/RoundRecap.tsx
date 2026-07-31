@@ -113,8 +113,8 @@ export default function RoundRecap({ view }: Props) {
               type="button"
               data-testid="next-round"
               onClick={() => nextRound()}
-              className="w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-3.5 text-base font-bold text-felt-950 transition active:scale-[0.98]"
-              style={{ boxShadow: '0 4px 16px -4px rgb(0 0 0 / 0.5)' }}
+              className="w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-3.5 text-base font-bold text-felt-950 transition hover:brightness-110 active:scale-[0.98]"
+              style={{ boxShadow: 'var(--shadow-cta)' }}
             >
               {isLastRound ? t.seeResults : t.nextRound}
             </button>

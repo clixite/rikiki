@@ -308,8 +308,8 @@ export default function GroupDetail() {
             data-testid="group-play"
             onClick={onPlay}
             disabled={busy}
-            className="mt-2.5 w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-4 text-base font-bold text-felt-950 transition active:scale-[0.98] disabled:opacity-40"
-            style={{ boxShadow: '0 4px 20px -6px rgb(0 0 0 / 0.6)' }}
+            className="mt-2.5 w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-4 text-base font-bold text-felt-950 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-40"
+            style={{ boxShadow: 'var(--shadow-cta)' }}
           >
             {t.groupPlay}
           </button>

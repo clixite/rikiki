@@ -30,31 +30,34 @@ export default function TrumpBadge({ trumpCard }: Props) {
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-      className="flex h-11 shrink-0 items-center gap-1.5 rounded-2xl bg-felt-950/60 py-1 pl-2 pr-1.5 ring-1 ring-brass-400/35"
+      className="flex h-11 shrink-0 items-center rounded-2xl bg-felt-950/60 p-1 ring-1 ring-brass-400/35"
       style={{ boxShadow: '0 2px 12px -6px rgb(0 0 0 / 0.6)' }}
       data-testid="trump-badge"
       data-trump={trumpCard ? trumpCard.suit : 'none'}
     >
-      {/* Libellé et rang à gauche, hors de la pastille : posé sur l'enseigne,
-          le rang devenait illisible et brouillait le symbole. */}
-      <span className="flex flex-col items-start leading-[1.15]">
-        <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-brass-300">
-          {t.trump.split(' ')[0]}
-        </span>
-        {trumpCard && (
-          <span className="text-[13px] font-bold tabular-nums text-paper-50/80">
-            {rankLabel(trumpCard.rank)}
-          </span>
-        )}
-      </span>
-
       {trumpCard ? (
         <>
           {/* Pastille claire : une enseigne noire serait illisible sur le
-              feutre sombre, et le contraste doit tenir en plein soleil. */}
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-paper-50" data-testid="trump-suit">
+              feutre sombre, et le contraste doit tenir en plein soleil.
+
+              Le mot « atout » a disparu, et le rang s'est réfugié dans un coin
+              de la pastille : à sept ou huit joueurs, cette colonne de texte
+              volait la largeur du numéro de manche, qui se retrouvait tronqué
+              en « MANCHE … ». On ne savait plus où on en était. L'enseigne
+              colorée dit déjà « atout » sans un mot ; le libellé complet reste
+              lu par les lecteurs d'écran. */}
+          <span
+            className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-paper-50"
+            data-testid="trump-suit"
+          >
             <span className={`text-[26px] leading-none ${suitInkClass(trumpCard.suit)}`} aria-hidden="true">
               {suitSymbol(trumpCard.suit)}
+            </span>
+            <span
+              className="absolute -right-0.5 -top-1 rounded bg-felt-950 px-0.5 text-[10px] font-bold leading-tight tabular-nums text-brass-300"
+              aria-hidden="true"
+            >
+              {rankLabel(trumpCard.rank)}
             </span>
           </span>
           <span className="sr-only">

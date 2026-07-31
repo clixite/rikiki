@@ -137,8 +137,8 @@ export default function GameOver({ view }: Props) {
             type="button"
             data-testid="rematch"
             onClick={onRematch}
-            className="w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-4 text-lg font-bold text-felt-950 transition active:scale-[0.98]"
-            style={{ boxShadow: '0 4px 16px -4px rgb(0 0 0 / 0.5)' }}
+            className="w-full rounded-2xl bg-linear-to-b from-brass-300 to-brass-500 py-4 text-lg font-bold text-felt-950 transition hover:brightness-110 active:scale-[0.98]"
+            style={{ boxShadow: 'var(--shadow-cta)' }}
           >
             {t.playAgain}
           </button>
@@ -148,7 +148,7 @@ export default function GameOver({ view }: Props) {
             type="button"
             data-testid="share-result"
             onClick={onShare}
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-white/10 py-3 text-base font-semibold transition active:scale-[0.98]"
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-white/10 py-3 text-base font-semibold transition hover:bg-white/15 active:scale-[0.98]"
           >
             <span aria-hidden="true">📤</span>
             {t.shareResult}
@@ -156,7 +156,7 @@ export default function GameOver({ view }: Props) {
           <button
             type="button"
             onClick={onHome}
-            className="rounded-2xl bg-white/8 px-5 py-3 text-base font-medium transition active:scale-[0.98]"
+            className="rounded-2xl bg-white/8 px-5 py-3 text-base font-medium transition hover:bg-white/12 active:scale-[0.98]"
           >
             {t.backHome}
           </button>

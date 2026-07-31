@@ -57,6 +57,11 @@
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.28), 0 6px 14px -4px rgb(0 0 0 / 0.35);
   --shadow-card-lifted: 0 2px 4px rgb(0 0 0 / 0.3), 0 14px 28px -8px rgb(0 0 0 / 0.45);
   --shadow-panel: 0 -1px 0 rgb(255 255 255 / 0.06), 0 -12px 32px -12px rgb(0 0 0 / 0.5);
+  /* Bouton principal doré. Il existait en deux valeurs magiques recopiées
+     séparément dans huit fichiers — proches mais différentes, donc un halo
+     qui changeait discrètement d'un écran à l'autre. On retient la plus
+     diffuse, cohérente avec `--shadow-card-lifted`. */
+  --shadow-cta: 0 4px 20px -6px rgb(0 0 0 / 0.6);
 
   /* Courbes d'animation */
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);

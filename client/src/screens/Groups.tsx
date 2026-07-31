@@ -5,6 +5,7 @@ import { useNav } from '../nav';
 import type { Group } from '@rikiki/shared';
 import { createGroup, fetchGroups, joinGroupByCode, readCachedGroups } from '../api';
 import SoundToggle from '../components/SoundToggle';
+import EmptyState from '../components/EmptyState';
 import { useT } from '../i18n';
 
 import { useGame } from '../store/game';
@@ -102,9 +103,7 @@ export default function Groups() {
         {loading && !groups ? (
           <p className="py-8 text-center text-sm text-paper-50/55">{t.loading}</p>
         ) : !groups || groups.length === 0 ? (
-          <p data-testid="groups-empty" className="py-8 text-center text-sm text-paper-50/55">
-            {t.noGroups}
-          </p>
+          <EmptyState glyph="👥" message={t.noGroups} testId="groups-empty" />
         ) : (
           <ul className="space-y-2" data-testid="groups-list">
             {groups.map((g, i) => (
@@ -163,7 +162,7 @@ export default function Groups() {
               data-testid="group-create-submit"
               onClick={onCreate}
               disabled={busy}
-              className="mt-2.5 h-11 w-full rounded-xl bg-linear-to-b from-brass-300 to-brass-500 text-sm font-bold text-felt-950 transition active:scale-[0.98] disabled:opacity-40"
+              className="mt-2.5 h-11 w-full rounded-xl bg-linear-to-b from-brass-300 to-brass-500 text-sm font-bold text-felt-950 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-40"
             >
               {t.createGroupCta}
             </button>
@@ -197,7 +196,7 @@ export default function Groups() {
               data-testid="group-join-submit"
               onClick={onJoin}
               disabled={busy || code.length !== 6}
-              className="mt-2 h-11 w-full rounded-xl bg-linear-to-b from-brass-300 to-brass-500 text-sm font-bold text-felt-950 transition active:scale-[0.98] disabled:opacity-40"
+              className="mt-2 h-11 w-full rounded-xl bg-linear-to-b from-brass-300 to-brass-500 text-sm font-bold text-felt-950 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-40"
             >
               {t.joinGroupCta}
             </button>

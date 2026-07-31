@@ -113,7 +113,9 @@ export default function Table({ view: serverView }: Props) {
         <LeaveGameButton />
 
         <div className="min-w-0 flex-1 leading-tight">
-          <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-paper-50/50">
+          {/* Sans `tracking-wide` : l'espacement des lettres coûtait à lui seul
+              de quoi tronquer « MANCHE 1/13 » sur une table à huit joueurs. */}
+          <p className="truncate text-[11px] font-semibold uppercase text-paper-50/55">
             {t.round} {round.roundIndex + 1}/{view.roundsSequence.length}
           </p>
           <p className="truncate text-sm font-medium text-paper-50">{t.cards(round.cardsCount)}</p>

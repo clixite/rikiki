@@ -5,6 +5,7 @@ import { useNav } from '../nav';
 import type { GameHistoryEntry } from '@rikiki/shared';
 import { fetchHistory, fetchMe, readCachedHistory } from '../api';
 import SoundToggle from '../components/SoundToggle';
+import EmptyState from '../components/EmptyState';
 import { useT } from '../i18n';
 
 import { useSession } from '../store/session';
@@ -79,7 +80,7 @@ export default function History() {
         {loading && !games ? (
           <p className="py-8 text-center text-sm text-paper-50/55">{t.loading}</p>
         ) : !games || games.length === 0 ? (
-          <p className="py-8 text-center text-sm text-paper-50/55">{t.noHistory}</p>
+          <EmptyState glyph="🃏" message={t.noHistory} testId="history-empty" />
         ) : (
           <ul className="space-y-2">
             {games.map((g, i) => (
